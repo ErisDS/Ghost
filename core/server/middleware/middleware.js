@@ -159,6 +159,33 @@ var middleware = {
         }
     },
 
+    addCSPReportHeader: function (req, res, next) {
+        var safeList = [
+            '*.googleusercontent.com',
+            '*.googleapis.com',
+            '*.github.com',
+            '*.twitter.com',
+            '*.facebook.com',
+            '*.youtube.com',
+            '*.bootstrapcdn.com',
+            '*.disqus.com',
+            '*.google-analytics.com',
+            '*.cloudflare.com'   // for cdnjs
+        ];
+
+        if (res.isAdmin) {
+
+            res.set({
+                'Content-Security-Policy-Report-Only': 'report-uri http://107.170.184.17:3000; ' +
+                    'style-src \'self\' \'unsafe-inline\' ' + safeList.join(' ') + '; ' +
+                    'default-src \'self\' \'unsafe-eval\' ' + safeList.join(' ') + '; ' +
+                    'img-src *; '
+            });
+        }
+
+        next();
+    },
+    
     // work around to handle missing client_secret
     // oauth2orize needs it, but untrusted clients don't have it
     addClientSecret: function (req, res, next) {
