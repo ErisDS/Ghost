@@ -22,6 +22,7 @@ adminControllers = {
         function renderIndex() {
             res.render('default', {
                 user: userData,
+                nonce: res.nonce,
                 config: JSON.stringify(frontConfig)
             });
         }

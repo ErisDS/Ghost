@@ -6,6 +6,7 @@ var _           = require('lodash'),
     express     = require('express'),
     busboy      = require('./ghost-busboy'),
     config      = require('../config'),
+    crypto      = require('crypto'),
     path        = require('path'),
     api         = require('../api'),
     passport    = require('passport'),
@@ -160,6 +161,8 @@ var middleware = {
     },
 
     addCSPReportHeader: function (req, res, next) {
+        res.nonce = crypto.randomBytes(12).toString('hex');
+
         var safeList = [
             '*.googleusercontent.com',
             '*.googleapis.com',
@@ -173,17 +176,22 @@ var middleware = {
             '*.cloudflare.com'   // for cdnjs
         ];
 
+        if (config().cspSafeList) {
+            safeList = _.union(safeList, config().cspSafeList);
+        }
+
         if (res.isAdmin) {
 
             res.set({
-                'Content-Security-Policy-Report-Only': 'report-uri http://107.170.184.17:3000; ' +
+                'Content-Security-Policy':
                     'style-src \'self\' \'unsafe-inline\' ' + safeList.join(' ') + '; ' +
-                    'default-src \'self\' \'unsafe-eval\' ' + safeList.join(' ') + '; ' +
+                    'default-src \'self\' \'unsafe-eval\' \'nonce-' + res.nonce + '\' ' + safeList.join(' ') + '; ' +
                     'img-src *; '
             });
         }
 
         next();
+
     },
     
     // work around to handle missing client_secret
