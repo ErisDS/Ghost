@@ -1,5 +1,5 @@
 import AuthenticatedRoute from 'ghost/routes/authenticated';
-import base from 'ghost/mixins/editor-route-base';
+import base from 'ghost/mixins/editor-base-route';
 
 var EditorNewRoute = AuthenticatedRoute.extend(base, {
     classNames: ['editor'],
@@ -28,7 +28,7 @@ var EditorNewRoute = AuthenticatedRoute.extend(base, {
         // used to check if anything has changed in the editor
         controller.set('previousTagNames', Ember.A());
 
-        // attach model-related listeners created in editor-route-base
+        // attach model-related listeners created in editor-base-route
         this.attachModelHooks(controller, model);
     },
 
@@ -65,7 +65,7 @@ var EditorNewRoute = AuthenticatedRoute.extend(base, {
             // since the transition is now certain to complete..
             window.onbeforeunload = null;
 
-            // remove model-related listeners created in editor-route-base
+            // remove model-related listeners created in editor-base-route
             this.detachModelHooks(controller, model);
         }
     }
