@@ -1,7 +1,20 @@
+// ------------------------------------------------------------
+// Editor
+//
+// Styles for the editor and publish bar (tags & post settings)
+//
+// * Editor
+// * Firefox Editor Hacks
+// * Post Preview
+// * Zen Mode
+// * Publish Bar
+// * Post Settings Menu meta Data
+// * Markdown Help Modal
+// ------------------------------------------------------------
+
+
 //
 // Editor
-// --------------------------------------------------
-// Slug: /ghost/editor/
 // --------------------------------------------------
 
  // The main post title
@@ -25,7 +38,7 @@
             outline: 0;
         }
     }
-} // .entry-title
+}//.entry-title
 
 .editor {
 
@@ -41,8 +54,13 @@
     }
 
     // The two content panel wrappers, positioned left/right
-    .entry-markdown { left: 0; }
-    .entry-preview { right: 0; border-left: $lightbrown 1px solid; }
+    .entry-markdown {
+        left: 0;
+    }
+    .entry-preview {
+        right: 0;
+        border-left: $lightbrown 1px solid;
+    }
 
     // The visual styles for both panels
     .entry-markdown,
@@ -64,7 +82,8 @@
             border: none;
             z-index: 100;
             min-height: 380px;
-            .markdown, .entry-preview-content {
+            .markdown,
+            .entry-preview-content {
                 height: 50px;
                 overflow: hidden;
             }
@@ -147,55 +166,108 @@
             }
         }
 
-    } // .entry-markdown, .entry-preview
+    }//.entry-markdown, .entry-preview
+
+
+    //
+    // Textarea-only Editor
+    // --------------------------------------------------
 
     .entry-markdown-content {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
 
-        .markdown-editor {
-            border: 0;
-            width: 100%;
-            min-height: auto;
-            height: calc(100% - 40px);
-            max-width: 100%;
-            margin: 0;
-            padding: 22px 20px 35px 20px;
-            position: absolute;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            -webkit-overflow-scrolling: touch;
+    .markdown-editor {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
 
-            font-size: 2rem;
-            line-height: 1.7em;
-            font-family: $font-family-mono;
-            color: lighten($darkgrey, 10%);
+        height: 100%;
+        max-width: 100%;
 
-            @media (max-width: 600px) {
-                padding: 10px;
-            }
-            @media (min-width: 601px) and (max-width: 1000px) {
-                padding: 15px;
-            }
-            @media (min-width: 1001px) {
-                top: 40px;
-            }
-            @media (max-height: 560px) {
-                height: calc(100% - 45px);
-            }
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
 
-            ::selection {
-                color: $darkgrey;
-                background: lighten($blue, 20%);
-                text-shadow: none;
-            }
+        resize: none;
+        border: 0;
 
-            &:focus {
-                outline: 0;
-            }
+        font-size: 1.6rem;
+        line-height: 2.5rem;
+        font-family: $font-family-mono;
+        color: lighten($darkgrey, 10%);
+
+        @media (max-width: 450px) {
+            padding: 15px;
         }
 
-    } // .entry-markdown-content
+        @media (min-width: 451px) and (max-width: 1000px) {
+            padding: 20px;
+        }
+
+        @media (min-width: 1001px) {
+            padding: 62px 20px 36px 20px;
+        }
+    }
+
+    //
+    // Div > Textarea Editor
+    // --------------------------------------------------
+
+    // .entry-markdown-content {
+
+    //     // Scrolling div
+    //     .markdown-scroller {
+    //         position: absolute;
+    //         top: 0;
+    //         right: 0;
+    //         bottom: 0;
+    //         left: 0;
+    //         overflow: auto;
+    //         -webkit-overflow-scrolling: touch;
+
+    //         @media (max-width: 450px) {
+    //             padding: 15px;
+    //         }
+
+    //         @media (max-width: 1000px) {
+    //             padding: 20px;
+    //         }
+
+    //         @media (min-width: 1001px) {
+    //             padding: 62px 20px 36px 20px;
+    //         }
+    //     }
+
+    //     // The textarea
+    //     .markdown-editor {
+    //         border: 0;
+    //         width: 100%;
+    //         padding: 0;
+    //         max-width: 100%;
+    //         resize: none;
+    //         overflow: hidden;
+
+    //         font-size: 1.6rem;
+    //         line-height: 2.5rem;
+    //         font-family: $font-family-mono;
+    //         color: lighten($darkgrey, 10%);
+
+    //         &:focus {
+    //             outline: 0;
+    //         }
+    //     }
+
+    // }//.entry-markdown-content
+
+
+
+
 
     .entry-preview {
         // Align the tab of entry-preview on the right
@@ -214,7 +286,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        padding: 60px 40px 40px 40px;
+        padding: 60px 40px 37px 40px;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
         word-break: break-word;
@@ -223,11 +295,12 @@
         cursor: default;
 
         // Tweak padding for smaller screens
-        @media (max-width: 1000px) {
-            padding-top: 20px;
-        }
         @media (max-width: 400px) {
             padding: 15px;
+        }
+
+        @media (max-width: 1000px) {
+            padding-top: 20px;
         }
     }
 
@@ -251,9 +324,24 @@
                 box-shadow: 0 5px 5px rgba(0,0,0,0.05) inset;
             }
         }
-    } // .scrolling
+    }//.scrolling
 
-} // .editor
+}//.editor
+
+
+//
+// Firefox Editor Hacks
+// --------------------------------------------------
+@-moz-document url-prefix() {
+    .editor .markdown-editor {
+        padding-top: 0;
+        padding-bottom: 0;
+        top: 40px;
+        height: calc(100% - 40px);
+    }
+}
+
+
 
 .markdown-help {
     position: relative;
@@ -290,10 +378,12 @@
         text-decoration: none;
         color: $grey;
     }
+
     .img-placeholder {
         border: 5px dashed $grey;
         height: 100px;
         position: relative;
+
         span {
             display: block;
             height: 30px;
@@ -304,18 +394,19 @@
             text-align: center;
         }
     }
+
     a {
         &.image-edit {
             width: 16px;
             height: 16px;
         }
     }
+
     img {
         max-width: 100%;
         height: auto;
         margin: 0 auto;
     }
-
 }
 
 // Placeholder objects for <script> & <iframe>
@@ -328,7 +419,7 @@
     font-weight: bold;
     font-size: 1.6rem;
     text-align: center;
-}
+}//.entry-preview-content, .content-preview-content
 
 
 //
@@ -336,10 +427,11 @@
 // --------------------------------------------------
 
 body.zen {
-    background: lighten($lightbrown, 3%);
+
     .usermenu {
         display: none;
     }
+
     .global-nav,
     .page-header,
     #publish-bar {
@@ -359,8 +451,7 @@ body.zen {
         bottom: 0;
         transition: all 0.5s ease-out;
     }
-
-}
+}//body.zen
 
 
 //
@@ -402,10 +493,10 @@ body.zen {
             border-top: rgba(255,255,255,0.3) 1px solid;
         }
     }
+}//#publish-bar
 
-}
-
-.extended-tags { // When the tag bar is exapanded
+// When the tag bar is exapanded
+.extended-tags {
     position: static;
     min-height: 100%;
 
@@ -434,7 +525,7 @@ body.zen {
     .right {
         display: none;
     }
-}
+}//.extended-tags
 
 #entry-tags {
 
@@ -476,10 +567,9 @@ body.zen {
             cursor: pointer;
         }
     }
-}
+}//#entry-tags
 
 .suggestions {
-
     top: auto;
     bottom: calc(100% + 15px);
 
@@ -489,6 +579,7 @@ body.zen {
             color: #fff;
             background: $blue;
         }
+
         mark {
             color: #fff;
         }
@@ -499,7 +590,6 @@ body.zen {
         color: #000;
         font-weight: bold;
     }
-
 }
 
 #entry-actions {
@@ -509,10 +599,12 @@ body.zen {
     align-items: center;
     margin-right: 6px;
     position: relative;
+
     .dropdown {
         position: absolute;
         bottom: 49px;
         right: 0;
+
         .dropdown-menu {
             top: auto;
             left: auto;
@@ -528,7 +620,7 @@ body.zen {
             display: none;
         }
     }
-}
+}//#entry-actions
 
 #entry-actions-menu {
     position: absolute;
@@ -549,6 +641,7 @@ body.zen {
     width: 40px;
     height: 40px;
     position: relative;
+
     &:before {
         position: absolute;
         top: 50%;
@@ -558,10 +651,12 @@ body.zen {
         color: #7D878A;
         transition: color 0.15s linear;
     }
+
     &:hover:before {
         color: #fff;
     }
 }//.tag-label
+
 #entry-tags.focused {
     .tag-label:before {
         color: #fff;
@@ -603,7 +698,6 @@ body.zen {
         padding-bottom: 9px;
         height: 70px;
     }
-
 }//.publish-bar-2
 
 .publish-bar-tags-input {
@@ -631,22 +725,20 @@ body.zen {
     &.active {
         color: $darkgrey;
     }
-} // .post-settings
+}//.post-settings
 
 .post-settings-menu {
-
     .dropdown-menu {
         top: auto;
         bottom: 100%;
         left: auto;
         right: 100%;
     }
-
-} // .post-settings-menu
+}//.post-settings-menu
 
 
 //
-// Post Settings Menu eta Data
+// Post Settings Menu meta Data
 // --------------------------------------------------
 
 // These styles are copied from Google.com
