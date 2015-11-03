@@ -222,7 +222,7 @@ data.posts = [
         featured: false,
         page: 1,
         author_id: 1,
-        tags: []
+        tags: [1]
     }
 ];
 

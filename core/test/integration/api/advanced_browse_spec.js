@@ -232,10 +232,39 @@ describe('Filter Param Spec', function () {
         });
     });
 
-    describe.skip('Count capabilities', function () {
-        it('can fetch `posts.count` for tags (published only)', function (done) {
-            // This could be posts.count & posts.all.count?
-            done();
+    describe('Count capabilities', function () {
+        it('can fetch `posts_count` for tags (published only)', function (done) {
+            TagAPI.browse({limit: 'all', include: 'post_count'}).then(function (result) {
+                var tagCounts = [4, 4, 5, 6, 0];
+
+                // 1. Result should have the correct base structure
+                should.exist(result);
+                result.should.have.property('tags');
+                result.should.have.property('meta');
+
+                // console.log(result.tags);
+
+                // 2. The data part of the response should be correct
+                // We should have 5 matching items
+                result.tags.should.be.an.Array.with.lengthOf(5);
+
+                _.each(result.tags, function (tag, index) {
+                    tag.should.have.ownProperty('post_count');
+                    tag.post_count.should.eql(tagCounts[index]);
+                });
+
+                // 3. The meta object should contain the right details
+                result.meta.should.have.property('pagination');
+                result.meta.pagination.should.be.an.Object.with.properties(['page', 'limit', 'pages', 'total', 'next', 'prev']);
+                result.meta.pagination.page.should.eql(1);
+                result.meta.pagination.limit.should.eql('all');
+                result.meta.pagination.pages.should.eql(1);
+                result.meta.pagination.total.should.eql(5);
+                should.equal(result.meta.pagination.next, null);
+                should.equal(result.meta.pagination.prev, null);
+
+                done();
+            }).catch(done);
         });
 
         it('can fetch `posts.all.count` for tags (all posts)', function (done) {
@@ -471,8 +500,8 @@ describe('Filter Param Spec', function () {
             });
 
             // TODO: determine if this should be supported via filter, or whether it should only be available via a 'PageAPI'
-            it.skip('Will return only pages when requested', function (done) {
-                PostAPI.browse({filter: 'page:true'}).then(function (result) {
+            it.only('Will return only pages when requested', function (done) {
+                PostAPI.browse({filter: 'page:false,page:true'}).then(function (result) {
                     var ids, page;
                     // 1. Result should have the correct base structure
                     should.exist(result);

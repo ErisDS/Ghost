@@ -3,16 +3,38 @@ var _ = require('lodash');
 module.exports = function (Bookshelf) {
     var modelProto = Bookshelf.Model.prototype,
         Model,
-        countQueryBuilder;
+        countQueryBuilder,
+        postDefaultWhere,
+        postPublicWhere;
+
+    // @TODO encode this in configuration for the models and relations rather than hard coding in multiple places
+    postDefaultWhere = function postDefaultWhere() {
+        this.where('page', false);
+    };
+
+    postPublicWhere = function postPublicWhere() {
+        this.where('page', false)
+            .andWhere('status', 'published');
+    };
 
     countQueryBuilder = {
         tags: {
-            posts: function addPostCountToTags(model) {
+            posts: function addPostCountToTags(model, isPublic) {
+                isPublic = isPublic || true;
                 model.query('columns', 'tags.*', function (qb) {
-                    qb.count('posts_tags.post_id')
-                        .from('posts_tags')
-                        .whereRaw('tag_id = tags.id')
-                        .as('post_count');
+                    qb.count('posts.id')
+                        .as('post_count')
+                        .from('posts')
+                        .innerJoin('posts_tags', function () {
+                            this.on('posts_tags.post_id', 'posts.id')
+                                .andOn('posts_tags.tag_id', 'tags.id');
+                        });
+
+                    if (isPublic) {
+                        qb.where(postPublicWhere);
+                    } else {
+                        qb.where(postDefaultWhere);
+                    }
                 });
             }
         }
