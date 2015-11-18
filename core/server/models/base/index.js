@@ -19,7 +19,8 @@ var _          = require('lodash'),
     validation = require('../../data/validation'),
     plugins    = require('../plugins'),
 
-    ghostBookshelf;
+    ghostBookshelf,
+    proto;
 
 // ### ghostBookshelf
 // Initializes a new Bookshelf instance called ghostBookshelf, for reference elsewhere in Ghost.
@@ -39,6 +40,8 @@ ghostBookshelf.plugin(plugins.includeCount);
 
 // Load the Ghost pagination plugin, which gives us the `fetchPage` method on Models
 ghostBookshelf.plugin(plugins.pagination);
+
+proto = ghostBookshelf.Model.prototype;
 
 // ## ghostBookshelf.Model
 // The Base Model which other Ghost objects will inherit from,
@@ -173,7 +176,8 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
             }
         });
 
-        return attrs;
+        // @TODO upgrade bookshelf & knex and use serialize & toJSON to do this in a neater way
+        return proto.finalize.call(this, attrs);
     },
 
     sanitize: function sanitize(attr) {
@@ -276,7 +280,7 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
             tableName      = _.result(this.prototype, 'tableName');
 
         // Set this to true or pass ?debug=true as an API option to get output
-        itemCollection.debug = options.debug && process.env.NODE_ENV !== 'production';
+        itemCollection.debug = true || options.debug && process.env.NODE_ENV !== 'production';
 
         // Filter options so that only permitted ones remain
         options = this.filterOptions(options, 'findPage');
@@ -298,11 +302,20 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
             options.columns = _.intersection(options.columns, this.prototype.permittedAttributes());
         }
 
+        console.log('order before', options.order);
+
+        var orderAttributes = this.prototype.permittedAttributes();
+        if (options.include && options.include.indexOf('count.posts') > -1) {
+            orderAttributes.push('count.posts');
+        }
+
         if (options.order) {
-            options.order = self.parseOrderOption(options.order);
+            options.order = self.parseOrderOption(options.order, orderAttributes);
         } else {
             options.order = self.orderDefaultOptions();
         }
+
+        console.log('order after', options.order);
 
         return itemCollection.fetchPage(options).then(function formatResponse(response) {
             var data = {};
@@ -458,10 +471,9 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
         });
     },
 
-    parseOrderOption: function (order) {
-        var permittedAttributes, result, rules;
+    parseOrderOption: function (order, attributes) {
+        var result, rules;
 
-        permittedAttributes = this.prototype.permittedAttributes();
         result = {};
         rules = order.split(',');
 
@@ -478,7 +490,8 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
             field = match[1].toLowerCase();
             direction = match[2].toUpperCase();
 
-            if (permittedAttributes.indexOf(field) === -1) {
+            console.log('field', field);
+            if (attributes.indexOf(field) === -1) {
                 return;
             }
 

@@ -118,6 +118,10 @@ get = function get(context, options) {
     return apiMethod(apiOptions).then(function success(result) {
         var blockParams;
 
+        if (result.tags) {
+            console.log(result.tags[0]);
+        }
+
         // If no result is found, call the inverse or `{{else}}` function
         if (_.isEmpty(result[context])) {
             return options.inverse(self, {data: data});
@@ -137,6 +141,7 @@ get = function get(context, options) {
         });
     }).catch(function error(err) {
         data.error = err.message;
+        console.log(err.message);
         return options.inverse(self, {data: data});
     });
 };

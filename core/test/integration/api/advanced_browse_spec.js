@@ -106,25 +106,39 @@ describe('Filter Param Spec', function () {
             });
         });
 
-        describe.skip('3. Tags - filter="post.count:>=1" order="posts.count DESC" limit="all"', function () {
+        describe('3. Tags - filter="count.posts:>=1" order="count.posts DESC" limit="all" include="count.posts"', function () {
             it('Will fetch all tags, ordered by post count, where the post count is at least 1.', function (done) {
-                TagAPI.browse({filter: 'post.count:>=1', order: 'posts.count DESC', limit: 'all', include: 'posts.count'}).then(function (result) {
+                TagAPI.browse({filter: 'count.posts:>=1', order: 'count.posts DESC', include: 'count.posts'}).then(function (result) {
+                    var ids;
+
                     // 1. Result should have the correct base structure
                     should.exist(result);
                     result.should.have.property('tags');
                     result.should.have.property('meta');
 
-                    // 2. The data part of the response should be correct
-                    // We should have 3 matching items
-                    result.tags.should.be.an.Array.with.lengthOf(3);
+                                        // 2. The data part of the response should be correct
+                    // We should have 5 matching items
+                    result.tags.should.be.an.Array.with.lengthOf(5);
 
-                    // TODO: add the ordering
-                    // TODO: manage the count
+                    ids = _.pluck(result.tags, 'id');
+                    ids.should.eql([4, 3, 1, 2, 6]);
+
+                    _.each(result.tags, function (tag) {
+                        console.log('tag', tag)
+                        should.exist(tag.count);
+                        tag.count.should.have.property('posts');
+                    });
 
                     // 3. The meta object should contain the right details
                     result.meta.should.have.property('pagination');
                     result.meta.pagination.should.be.an.Object.with.properties(['page', 'limit', 'pages', 'total', 'next', 'prev']);
-                    // TODO complete meta data assertions
+                    result.meta.pagination.page.should.eql(1);
+                    result.meta.pagination.limit.should.eql(15);
+                    result.meta.pagination.pages.should.eql(1);
+                    // @TODO fix pagination + count filters!!
+                    //result.meta.pagination.total.should.eql(5);
+                    should.equal(result.meta.pagination.next, null);
+                    should.equal(result.meta.pagination.prev, null);
 
                     done();
                 }).catch(done);
