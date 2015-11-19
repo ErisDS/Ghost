@@ -140,7 +140,8 @@ pagination = function pagination(bookshelf) {
             // Get the table name and idAttribute for this model
             var tableName = _.result(this.constructor.prototype, 'tableName'),
                 idAttribute = _.result(this.constructor.prototype, 'idAttribute'),
-                countPromise,
+                modelClone,
+                aggregatePromise,
                 collectionPromise,
                 self = this;
 
@@ -149,9 +150,26 @@ pagination = function pagination(bookshelf) {
 
             // Clone the base query & set up a promise to get the count of total items in the full set
             // Due to lack of support for count distinct, this is pretty complex.
-            countPromise = this.query().clone().select(
-                bookshelf.knex.raw('count(distinct ' + tableName + '.' + idAttribute + ') as aggregate')
-            );
+            modelClone = self.clone();
+            modelClone._knex = self.query().clone();
+
+            if (this.hasFilter({prop: /^count/})) {
+                // The main query will also need a group
+                options.groups = options.groups || [];
+                options.groups.push(tableName + '.' + idAttribute);
+
+                // Apply counts to the subquery, where they're usually only added during fetch/fetchall calls
+                modelClone.addCounts(options);
+                modelClone.query('groupBy', tableName + '.' + idAttribute);
+
+                aggregatePromise = bookshelf.knex.column(
+                    bookshelf.knex.raw('count(distinct ' + idAttribute + ') as aggregate')
+                ).from(modelClone.query().clone().as('counter')).select();
+            } else {
+                aggregatePromise = modelClone.query().clone().select(
+                    bookshelf.knex.raw('count(distinct ' + tableName + '.' + idAttribute + ') as aggregate')
+                );
+            }
 
             // #### Post count clauses
             // Add any where or join clauses which need to NOT be included with the aggregate query
@@ -162,7 +180,6 @@ pagination = function pagination(bookshelf) {
             // Apply ordering options if they are present
             if (options.order && !_.isEmpty(options.order)) {
                 _.forOwn(options.order, function (direction, property) {
-                    console.log('property', property);
                     if (property === 'count.posts') {
                         self.query('orderBy', 'count__posts', direction);
                     } else {
@@ -178,7 +195,7 @@ pagination = function pagination(bookshelf) {
             }
 
             if (this.debug) {
-                console.log('COUNT', countPromise.toQuery());
+                console.log('COUNT', aggregatePromise.toQuery());
             }
 
             // Setup the promise to do a fetch on our collection, running the specified query
@@ -186,7 +203,7 @@ pagination = function pagination(bookshelf) {
             collectionPromise = self.fetchAll(_.omit(options, ['page', 'limit']));
 
             // Resolve the two promises
-            return Promise.join(collectionPromise, countPromise).then(function formatResponse(results) {
+            return Promise.join(collectionPromise, aggregatePromise).then(function formatResponse(results) {
                 // Format the collection & count result into `{collection: [], pagination: {}}`
                 return {
                     collection: results[0],

@@ -65,13 +65,23 @@ filterUtils = {
 };
 
 filter = function filter(Bookshelf) {
-    var Model = Bookshelf.Model.extend({
+    var model = Bookshelf.Model,
+        Model;
+
+    Model = Bookshelf.Model.extend({
         // Cached copy of the filters setup for this model instance
         _filters: null,
         // Override these on the various models
         enforcedFilters: function enforcedFilters() {},
         defaultFilters: function defaultFilters() {},
 
+        hasFilter: function hasFilter(match, keys) {
+            if (!this._filters) {
+                return false;
+            }
+
+            return gql.json.findStatement(this._filters.statements, match, keys);
+        },
         /**
          * ## Post process Filters
          * Post Process filters looking for joins etc
@@ -146,7 +156,7 @@ filter = function filter(Bookshelf) {
                 if (this.debug) {
                     gql.json.printStatements(this._filters.statements);
                 }
-
+                //
                 this.query(function (qb) {
                     gql.knexify(qb, self._filters);
                 });
@@ -156,6 +166,13 @@ filter = function filter(Bookshelf) {
             }
 
             return this;
+        },
+        clone: function clone() {
+            var self = this,
+                newModel = model.prototype.clone.apply(this, arguments);
+
+            newModel._filters = _.clone(self._filters);
+            return newModel;
         }
     });
 

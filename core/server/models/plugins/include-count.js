@@ -5,37 +5,47 @@ module.exports = function (Bookshelf) {
         Model,
         countQueryBuilder;
 
+    function publicPostQuery(qb, isPublic) {
+        if (isPublic) {
+            qb.andWhere('posts.page', '=', false);
+            qb.andWhere('posts.status', '=', 'published');
+        }
+    }
+
+    function userPostCountSubQuery(qb, isPublic) {
+        qb.count('posts.id')
+            .from('posts')
+            .whereRaw('posts.author_id = users.id')
+            .as('count__posts');
+
+        // @TODO use the filter behavior for posts
+        publicPostQuery(qb, isPublic);
+    }
+
+    function tagPostCountSubQuery(qb, isPublic) {
+        qb.count('posts.id')
+            .from('posts')
+            .leftOuterJoin('posts_tags', 'posts.id', 'posts_tags.post_id')
+            .whereRaw('posts_tags.tag_id = tags.id')
+            .as('count__posts');
+
+        // @TODO use the filter behavior for posts
+        publicPostQuery(qb, isPublic);
+    }
+
     countQueryBuilder = {
         tags: {
             posts: function addPostCountToTags(model) {
                 model.query('columns', 'tags.*', function (qb) {
-                    qb.count('posts.id')
-                        .from('posts')
-                        .leftOuterJoin('posts_tags', 'posts.id', 'posts_tags.post_id')
-                        .whereRaw('posts_tags.tag_id = tags.id')
-                        .as('count__posts');
-
-                    if (model.isPublicContext()) {
-                        // @TODO use the filter behavior for posts
-                        qb.andWhere('posts.page', '=', false);
-                        qb.andWhere('posts.status', '=', 'published');
-                    }
+                    // @TODO refactor this to use knex.modify after 9.0 upgrade?
+                    tagPostCountSubQuery(qb, model.isPublicContext());
                 });
             }
         },
         users: {
-            posts: function addPostCountToTags(model) {
+            posts: function addPostCountToUsers(model) {
                 model.query('columns', 'users.*', function (qb) {
-                    qb.count('posts.id')
-                        .from('posts')
-                        .whereRaw('posts.author_id = users.id')
-                        .as('count__posts');
-
-                    if (model.isPublicContext()) {
-                        // @TODO use the filter behavior for posts
-                        qb.andWhere('posts.page', '=', false);
-                        qb.andWhere('posts.status', '=', 'published');
-                    }
+                    userPostCountSubQuery(qb, model.isPublicContext());
                 });
             }
         }
@@ -52,7 +62,6 @@ module.exports = function (Bookshelf) {
             if (options.include && options.include.indexOf('count.posts') > -1) {
                 // remove post_count from withRelated and include
                 options.withRelated = _.pull([].concat(options.withRelated), 'count.posts');
-                options.include = _.pull([].concat(options.include), 'count.posts');
 
                 // Call the query builder
                 countQueryBuilder[tableName].posts(this);
@@ -70,10 +79,6 @@ module.exports = function (Bookshelf) {
         },
         fetchAll: function () {
             this.addCounts.apply(this, arguments);
-
-            if (this.debug) {
-                console.log('QUERY', this.query().toQuery());
-            }
 
             if (this.debug) {
                 console.log('QUERY', this.query().toQuery());

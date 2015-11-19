@@ -277,10 +277,11 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
 
         var self = this,
             itemCollection = this.forge(null, {context: options.context}),
-            tableName      = _.result(this.prototype, 'tableName');
+            tableName      = _.result(this.prototype, 'tableName'),
+            orderAttributes;
 
         // Set this to true or pass ?debug=true as an API option to get output
-        itemCollection.debug = true || options.debug && process.env.NODE_ENV !== 'production';
+        itemCollection.debug = options.debug && process.env.NODE_ENV !== 'production';
 
         // Filter options so that only permitted ones remain
         options = this.filterOptions(options, 'findPage');
@@ -302,9 +303,7 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
             options.columns = _.intersection(options.columns, this.prototype.permittedAttributes());
         }
 
-        console.log('order before', options.order);
-
-        var orderAttributes = this.prototype.permittedAttributes();
+        orderAttributes = this.prototype.permittedAttributes();
         if (options.include && options.include.indexOf('count.posts') > -1) {
             orderAttributes.push('count.posts');
         }
@@ -314,8 +313,6 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
         } else {
             options.order = self.orderDefaultOptions();
         }
-
-        console.log('order after', options.order);
 
         return itemCollection.fetchPage(options).then(function formatResponse(response) {
             var data = {};
@@ -490,7 +487,6 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
             field = match[1].toLowerCase();
             direction = match[2].toUpperCase();
 
-            console.log('field', field);
             if (attributes.indexOf(field) === -1) {
                 return;
             }

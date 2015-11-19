@@ -1,3 +1,4 @@
+var _ = require('lodash');
 // # Access Rules
 //
 // Extends Bookshelf.Model.force to take a 'context' option which provides information on how this query should
@@ -18,6 +19,14 @@ module.exports = function (Bookshelf) {
          */
         isPublicContext: function isPublicContext() {
             return !!(this._context && this._context.public);
+        },
+
+        clone: function clone() {
+            var self = this,
+                newModel = model.prototype.clone.apply(this, arguments);
+
+            newModel._context = _.clone(self._context);
+            return newModel;
         }
     },
     {
