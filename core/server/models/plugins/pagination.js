@@ -140,21 +140,21 @@ pagination = function pagination(bookshelf) {
             // Get the table name and idAttribute for this model
             var tableName = _.result(this.constructor.prototype, 'tableName'),
                 idAttribute = _.result(this.constructor.prototype, 'idAttribute'),
-                countPromise,
+                totalCountPromise,
                 collectionPromise,
                 self = this;
 
             // #### Pre count clauses
-            // Add any where or join clauses which need to be included with the aggregate query
+            // Add any where or join clauses which need to be included with the total count query
 
             // Clone the base query & set up a promise to get the count of total items in the full set
             // Due to lack of support for count distinct, this is pretty complex.
-            countPromise = this.query().clone().select(
-                bookshelf.knex.raw('count(distinct ' + tableName + '.' + idAttribute + ') as aggregate')
+            totalCountPromise = this.query().clone().select(
+                bookshelf.knex.raw('count(distinct ' + tableName + '.' + idAttribute + ') as total_count')
             );
 
             // #### Post count clauses
-            // Add any where or join clauses which need to NOT be included with the aggregate query
+            // Add any where or join clauses which need to NOT be included with the total count query
 
             // Setup the pagination parameters so that we return the correct items from the set
             paginationUtils.addLimitAndOffset(self, options);
@@ -177,7 +177,7 @@ pagination = function pagination(bookshelf) {
             }
 
             if (this.debug) {
-                console.log('COUNT', countPromise.toQuery());
+                console.log('COUNT', totalCountPromise.toQuery());
             }
 
             // Setup the promise to do a fetch on our collection, running the specified query
@@ -185,11 +185,11 @@ pagination = function pagination(bookshelf) {
             collectionPromise = self.fetchAll(_.omit(options, ['page', 'limit']));
 
             // Resolve the two promises
-            return Promise.join(collectionPromise, countPromise).then(function formatResponse(results) {
+            return Promise.join(collectionPromise, totalCountPromise).then(function formatResponse(results) {
                 // Format the collection & count result into `{collection: [], pagination: {}}`
                 return {
                     collection: results[0],
-                    pagination: paginationUtils.formatResponse(results[1][0] ? results[1][0].aggregate : 0, options)
+                    pagination: paginationUtils.formatResponse(results[1][0] ? results[1][0].total_count : 0, options)
                 };
             });
         }
