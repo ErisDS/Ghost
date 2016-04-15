@@ -7,12 +7,9 @@ var path = require('path'),
     AppSandbox = require('./sandbox'),
     AppDependencies = require('./dependencies'),
     AppPermissions = require('./permissions'),
+    isInternalApp = require('./is-internal'),
     i18n = require('../i18n'),
     loader;
-
-function isInternalApp(name) {
-    return _.contains(config.internalApps, name);
-}
 
 // Get the full path to an app by name
 function getAppAbsolutePath(name) {
