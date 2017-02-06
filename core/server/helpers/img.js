@@ -7,7 +7,6 @@ var hbs = require('express-hbs'),
     utils  = require('../utils'),
     localUtils = require('./utils'),
     imageUtils = require('../images'),
-    types,
     img;
 
 
@@ -24,11 +23,10 @@ img = function imgHelper(image, options) {
     var imageToOutput = this[image];
 
     if (options.hash.type) {
-        imageSrc = 'srcset="' + imageUtils.getSrc(imageToOutput, options.hash.type) + '"';
+        imageSrc = 'srcset="' + imageUtils.getSrcAttribute(imageToOutput, options.hash.type) + '"';
     } else {
         imageSrc = 'src="' + utils.url.urlFor('image', {image: imageToOutput}) + '"';
     }
-
 
     var settings = {
         src: imageSrc,

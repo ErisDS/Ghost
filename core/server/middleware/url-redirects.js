@@ -44,6 +44,8 @@ urlRedirects = function urlRedirects(req, res, next) {
     if (!targetHostWithoutProtocol.match(new RegExp(requestedHost))) {
         debug('redirect because host does not match');
 
+        console.log('REDIRECT 1');
+
         return res.redirect(301, redirectUrl({
             redirectTo: targetHostWithProtocol,
             path: requestedUrl,
@@ -53,6 +55,7 @@ urlRedirects = function urlRedirects(req, res, next) {
 
     // CASE: correct admin url, but not the correct protocol
     if (utils.url.isSSL(targetHostWithProtocol) && !req.secure) {
+        console.log('REDIRECT 2');
         debug('redirect because protocol does not match');
 
         return res.redirect(301, redirectUrl({
