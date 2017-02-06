@@ -12,6 +12,7 @@ var serveStatic = require('express').static,
     i18n = require('../i18n'),
     utils = require('../utils'),
     BaseStore = require('./base'),
+    imageUtils = require('../images'),
     remove = Promise.promisify(fs.remove);
 
 function LocalFileStore() {
@@ -57,6 +58,53 @@ LocalFileStore.prototype.exists = function exists(filename) {
     });
 };
 
+
+function serveTheme(options) {
+    return function downloadTheme(req, res, next) {
+        var themeName = options.name,
+            themePath = path.join(config.getContentPath('themes'), themeName),
+            zipName = themeName + '.zip',
+            // store this in a unique temporary folder
+            zipBasePath = path.join(os.tmpdir(), utils.uid(10)),
+            zipPath = path.join(zipBasePath, zipName),
+            stream;
+
+        Promise.promisify(fs.ensureDir)(zipBasePath)
+            .then(function () {
+                return Promise.promisify(utils.zipFolder)(themePath, zipPath);
+            })
+            .then(function (length) {
+                res.set({
+                    'Content-disposition': 'attachment; filename={themeName}.zip'.replace('{themeName}', themeName),
+                    'Content-Type': 'application/zip',
+                    'Content-Length': length
+                });
+
+                stream = fs.createReadStream(zipPath);
+                stream.pipe(res);
+            })
+            .catch(function (err) {
+                next(err);
+            })
+            .finally(function () {
+                remove(zipBasePath);
+            });
+    };
+}
+
+
+function generateHook(url) {
+    // Try to generate the image
+    var src = imageUtils.decodeSrc(url);
+
+    if (src) {
+        return imageUtils.generate(src);
+    }
+
+    return Promise.reject();
+}
+
+
 // middleware for serving the files
 LocalFileStore.prototype.serve = function serve(options) {
     options = options || {};
@@ -65,36 +113,7 @@ LocalFileStore.prototype.serve = function serve(options) {
     // serveStatic can't be used to serve themes, because
     // download files depending on the route (see `send` npm module)
     if (options.isTheme) {
-        return function downloadTheme(req, res, next) {
-            var themeName = options.name,
-                themePath = path.join(config.getContentPath('themes'), themeName),
-                zipName = themeName + '.zip',
-                // store this in a unique temporary folder
-                zipBasePath = path.join(os.tmpdir(), utils.uid(10)),
-                zipPath = path.join(zipBasePath, zipName),
-                stream;
-
-            Promise.promisify(fs.ensureDir)(zipBasePath)
-                .then(function () {
-                    return Promise.promisify(utils.zipFolder)(themePath, zipPath);
-                })
-                .then(function (length) {
-                    res.set({
-                        'Content-disposition': 'attachment; filename={themeName}.zip'.replace('{themeName}', themeName),
-                        'Content-Type': 'application/zip',
-                        'Content-Length': length
-                    });
-
-                    stream = fs.createReadStream(zipPath);
-                    stream.pipe(res);
-                })
-                .catch(function (err) {
-                    next(err);
-                })
-                .finally(function () {
-                    remove(zipBasePath);
-                });
-        };
+       return serveTheme(options);
     } else {
         // CASE: serve images
         // For some reason send divides the max age number by 1000
@@ -102,11 +121,16 @@ LocalFileStore.prototype.serve = function serve(options) {
         // Wrap server static errors
         return function serveStaticContent(req, res, next) {
             return serveStatic(config.getContentPath('images'), {maxAge: utils.ONE_YEAR_MS, fallthrough: false})(req, res, function (err) {
-                if (err) {
-                    if (err.statusCode === 404) {
-                        return next(new errors.NotFoundError({message: i18n.t('errors.errors.pageNotFound')}));
-                    }
-
+                if (err && err.statusCode === 404) {
+                    return generateHook(req.originalUrl)
+                        .then(function () {
+                            // if generation is successful, try again
+                            serveStatic(config.getContentPath('images'), {maxAge: utils.ONE_YEAR_MS, fallthrough: false})(req, res, next);
+                        })
+                        .catch(function (err) {
+                            return next(new errors.NotFoundError({err: err}));
+                        });
+                } else if (err) {
                     return next(new errors.GhostError({err: err}));
                 }
 

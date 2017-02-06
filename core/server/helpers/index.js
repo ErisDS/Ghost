@@ -23,6 +23,7 @@ coreHelpers.foreach = require('./foreach');
 coreHelpers.get = require('./get');
 coreHelpers.ghost_foot = require('./ghost_foot');
 coreHelpers.ghost_head = require('./ghost_head');
+coreHelpers.img = require('./img');
 coreHelpers.image = require('./image');
 coreHelpers.is = require('./is');
 coreHelpers.has = require('./has');
@@ -97,6 +98,7 @@ registerHelpers = function () {
     registerThemeHelper('has', coreHelpers.has);
     registerThemeHelper('is', coreHelpers.is);
     registerThemeHelper('image', coreHelpers.image);
+    registerThemeHelper('img', coreHelpers.img);
     registerThemeHelper('meta_description', coreHelpers.meta_description);
     registerThemeHelper('meta_title', coreHelpers.meta_title);
     registerThemeHelper('navigation', coreHelpers.navigation);
