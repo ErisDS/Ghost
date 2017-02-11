@@ -1,6 +1,7 @@
 // # Ghost Startup
 // Orchestrates the startup of Ghost when run from command line.
 console.time('Ghost boot');
+require('time-require');
 
 var debug = require('debug')('ghost:boot:index'),
     ghost, express, logging, errors, utils, parentApp;
