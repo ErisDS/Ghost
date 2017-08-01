@@ -13,7 +13,19 @@ var serveStatic = require('express').static,
     errors = require('../../errors'),
     i18n = require('../../i18n'),
     utils = require('../../utils'),
+    imageUtils = require('../../images'),
     StorageBase = require('ghost-storage-base');
+
+function generateHook(url) {
+    // Try to generate the image
+    var src = imageUtils.decodeSrc(url);
+
+    if (src) {
+        return imageUtils.generate(src);
+    }
+
+    return Promise.reject();
+}
 
 class LocalFileStore extends StorageBase {
 
@@ -82,7 +94,16 @@ class LocalFileStore extends StorageBase {
 
         return function serveStaticContent(req, res, next) {
             return serveStatic(self.storagePath, {maxAge: utils.ONE_YEAR_MS, fallthrough: false})(req, res, function (err) {
-                if (err) {
+                if (err && err.statusCode === 404) {
+                    return generateHook(req.originalUrl)
+                        .then(function () {
+                            // if generation is successful, try to serve the image again
+                            serveStatic(config.getContentPath('images'), {maxAge: utils.ONE_YEAR_MS, fallthrough: false})(req, res, next);
+                        })
+                        .catch(function (err) {
+                            return next(new errors.NotFoundError({err: err}));
+                        });
+                } else if (err) {
                     if (err.statusCode === 404) {
                         return next(new errors.NotFoundError({message: i18n.t('errors.errors.pageNotFound')}));
                     }

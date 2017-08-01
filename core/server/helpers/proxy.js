@@ -40,11 +40,13 @@ module.exports = {
         isPrivacyDisabled: config.isPrivacyDisabled.bind(config)
     },
 
-    // Labs utils for enabling/disabling helpers
-    labs: require('../utils/labs'),
+    images: require('../images'),
 
     // System for apps to hook into one day maybe
     filters: require('../filters'),
+
+    // Labs utils for enabling/disabling helpers
+    labs: require('../utils/labs'),
 
     // Things required from data/meta
     metaData: {

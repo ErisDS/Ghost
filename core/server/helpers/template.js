@@ -30,5 +30,6 @@ templates.asset = _.template('<%= source %>?v=<%= version %>');
 templates.link = _.template('<a href="<%= url %>"><%= text %></a>');
 templates.script = _.template('<script src="<%= source %>?v=<%= version %>"></script>');
 templates.input = _.template('<input class="<%= className %>" type="<%= type %>" name="<%= name %>" <%= extras %> />');
+templates.image = _.template('<img class="<%= className %>" <%= src %> />');
 
 module.exports = templates;
