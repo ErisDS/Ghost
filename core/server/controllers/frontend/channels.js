@@ -35,6 +35,7 @@ function handlePageParam(req, res, next, page) {
 
 rssRouter = function rssRouter(channelConfig) {
     function rssConfigMiddleware(req, res, next) {
+        // @TODO move this off of the channel config
         res.locals.channel.isRSS = true;
         next();
     }

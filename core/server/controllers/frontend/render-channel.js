@@ -12,7 +12,7 @@ var debug = require('debug')('ghost:channels:render'),
     templates          = require('./templates');
 
 function renderChannel(req, res, next) {
-    debug('renderChannel called', req.channelConfig);
+    debug('renderChannel called', res.locals.channel);
     // Parse the parameters we need from the URL
     var channelOpts = res.locals.channel,
         pageParam = req.params.page !== undefined ? req.params.page : 1,
