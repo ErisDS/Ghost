@@ -82,6 +82,7 @@ posts = {
         var attrs = ['id', 'slug', 'status', 'uuid', 'formats'],
             tasks;
 
+        console.log('api.post.read options', options);
         /**
          * ### Model Query
          * Make the call to the Model layer

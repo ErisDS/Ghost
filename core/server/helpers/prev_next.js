@@ -31,9 +31,18 @@ fetch = function fetch(apiOptions, options) {
 module.exports = function prevNext(options) {
     options = options || {};
 
+    console.log('OPTIONS', options);
+
+
     var apiOptions = {
         include: options.name === 'prev_post' ? 'previous,previous.author,previous.tags' : 'next,next.author,next.tags'
     };
+
+    if (options.hash && options.hash.channel) {
+        console.log('USE CHANNEL FILTER!');
+        apiOptions.channel = options.hash.channel;
+    }
+
 
     if (isPost(this) && this.status === 'published') {
         apiOptions.slug = this.slug;

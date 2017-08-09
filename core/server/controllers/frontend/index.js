@@ -10,6 +10,7 @@ var debug = require('debug')('ghost:channels:single'),
     filters     = require('../../filters'),
     templates   = require('./templates'),
     handleError = require('./error'),
+    channelConfig = require('./channel-config'),
     formatResponse = require('./format-response'),
     postLookup     = require('./post-lookup'),
     setResponseContext = require('./context'),
@@ -69,6 +70,13 @@ frontendControllers = {
         }).catch(handleError(next));
     },
     single: function single(req, res, next) {
+        debug('single', req.url, req.query);
+
+        if (req.query && req.query.c) {
+            req.channelConfig = channelConfig.get(req.query.c);
+            debug('Single post, in channel context', req.channelConfig);
+        }
+
         // Query database to find post
         return postLookup(req.path).then(function then(lookup) {
             var post = lookup ? lookup.post : false;

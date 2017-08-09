@@ -41,6 +41,13 @@ channelConfig = function channelConfig() {
             },
             slugTemplate: true,
             editRedirect: utils.url.urlJoin(utils.url.urlFor('admin'), '#/team/:slug/')
+        },
+        featured: {
+            name: 'featured',
+            route: '/featured/',
+            postOptions: {
+                filter: 'featured:true'
+            }
         }
     };
 

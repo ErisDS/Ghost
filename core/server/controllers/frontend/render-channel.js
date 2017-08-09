@@ -12,7 +12,7 @@ var debug = require('debug')('ghost:channels:render'),
     templates          = require('./templates');
 
 function renderChannel(req, res, next) {
-    debug('renderChannel called');
+    debug('renderChannel called', req.channelConfig);
     // Parse the parameters we need from the URL
     var channelOpts = res.locals.channel,
         pageParam = req.params.page !== undefined ? req.params.page : 1,
@@ -31,15 +31,23 @@ function renderChannel(req, res, next) {
             return next(new errors.NotFoundError({message: i18n.t('errors.errors.pageNotFound')}));
         }
 
-        // @TODO: figure out if this can be removed, it's supposed to ensure that absolutely URLs get generated
+        _.each(result.posts, function (post) {
+            debug('url', post.url);
+            post.url += '?c=' + channelOpts.name;
+        });
+
+        // @TODO: figure out if this can be removed, it's supposed to ensure that absolute URLs get generated
         // correctly for the various objects, but I believe it doesn't work and a different approach is needed.
         setRequestIsSecure(req, result.posts);
         _.each(result.data, function (data) {
             setRequestIsSecure(req, data);
+
         });
 
         // @TODO: properly design these filters
+        debug('pre-filter');
         filters.doFilter('prePostsRender', result.posts, res.locals).then(function then(posts) {
+            debug('post-filter');
             var view = templates.channel(channelOpts);
 
             // Do final data formatting and then render

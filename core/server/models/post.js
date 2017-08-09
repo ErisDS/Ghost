@@ -657,6 +657,8 @@ Post = ghostBookshelf.Model.extend({
     findOne: function findOne(data, options) {
         options = options || {};
 
+        console.log('FINDING ONE', options);
+
         var withNext = _.includes(options.include, 'next'),
             withPrev = _.includes(options.include, 'previous'),
             nextRelations = _.transform(options.include, function (relations, include) {
