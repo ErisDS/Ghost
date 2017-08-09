@@ -243,7 +243,7 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
         var attrs = _.extend({}, this.attributes),
             self = this;
         options = options || {};
-        options = _.pick(options, ['shallow', 'baseKey', 'include', 'context']);
+        options = _.pick(options, ['shallow', 'baseKey', 'include', 'context', 'channel']);
 
         if (options && options.shallow) {
             return attrs;

@@ -15,6 +15,9 @@ fetch = function fetch(apiOptions, options) {
     return api.posts.read(apiOptions).then(function (result) {
         var related = result.posts[0];
 
+        console.log('RELATED', related);
+
+
         if (related.previous) {
             return options.fn(related.previous);
         } else if (related.next) {
@@ -31,15 +34,12 @@ fetch = function fetch(apiOptions, options) {
 module.exports = function prevNext(options) {
     options = options || {};
 
-    console.log('OPTIONS', options.data.root);
-
     var apiOptions = {
         include: options.name === 'prev_post' ? 'previous,previous.author,previous.tags' : 'next,next.author,next.tags'
     };
 
-    if (options.hash && options.hash.channel) {
-        console.log('USE CHANNEL FILTER!');
-        apiOptions.channel = options.hash.channel;
+    if (options.hash && options.hash.channel && options.data.root.channel) {
+        apiOptions.channel = options.data.root.channel;
     }
 
     if (isPost(this) && this.status === 'published') {

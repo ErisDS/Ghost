@@ -80,9 +80,9 @@ posts = {
      */
     read: function read(options) {
         var attrs = ['id', 'slug', 'status', 'uuid', 'formats'],
+            permittedOptions = ['channel'].concat(options.opts || []),
             tasks;
 
-        console.log('api.post.read options', options);
         /**
          * ### Model Query
          * Make the call to the Model layer
@@ -90,12 +90,13 @@ posts = {
          * @returns {Object} options
          */
         function modelQuery(options) {
+            console.log('modelQuery', options);
             return dataProvider.Post.findOne(options.data, _.omit(options, ['data']));
         }
 
         // Push all of our tasks into a `tasks` array in the correct order
         tasks = [
-            utils.validate(docName, {attrs: attrs, opts: options.opts || []}),
+            utils.validate(docName, {attrs: attrs, opts: permittedOptions}),
             utils.handlePublicPermissions(docName, 'read'),
             utils.convertOptions(allowedIncludes, dataProvider.Post.allowedFormats),
             modelQuery
@@ -104,6 +105,8 @@ posts = {
         // Pipeline calls each task passing the result of one to be the arguments for the next
         return pipeline(tasks, options).then(function formatResponse(result) {
             // @TODO make this a formatResponse task?
+            console.log('FORMATTING', options);
+
             if (result) {
                 return {posts: [result.toJSON(options)]};
             }

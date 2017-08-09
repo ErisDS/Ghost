@@ -498,9 +498,13 @@ Post = ghostBookshelf.Model.extend({
     toJSON: function toJSON(options) {
         options = options || {};
 
+        console.log('TOJSON 1', options);
+
         var attrs = ghostBookshelf.Model.prototype.toJSON.call(this, options),
             oldPostId = attrs.amp,
             commentId;
+
+        console.log('TOJSON 2', options);
 
         attrs = this.formatsToJSON(attrs, options);
 
@@ -516,6 +520,16 @@ Post = ghostBookshelf.Model.extend({
 
         if (!options.columns || (options.columns && options.columns.indexOf('url') > -1)) {
             attrs.url = utils.url.urlPathForPost(attrs);
+
+            console.log('TOJSON 3', options);
+
+            if (options.channel) {
+                console.log('HAS CHANNEL', options.channel);
+
+                attrs.url += '?c=' + options.channel.name;
+
+                console.log('URL', attrs.url);
+            }
         }
 
         if (oldPostId) {
@@ -657,8 +671,6 @@ Post = ghostBookshelf.Model.extend({
     findOne: function findOne(data, options) {
         options = options || {};
 
-        console.log('FINDING ONE', options);
-
         var withNext = _.includes(options.include, 'next'),
             withPrev = _.includes(options.include, 'previous'),
             nextRelations = _.transform(options.include, function (relations, include) {
@@ -693,31 +705,46 @@ Post = ghostBookshelf.Model.extend({
         return ghostBookshelf.Model.findOne.call(this, data, options).then(function then(post) {
             if ((withNext || withPrev) && post && !post.page) {
                 var publishedAt = moment(post.get('published_at')).format('YYYY-MM-DD HH:mm:ss'),
-                    prev,
-                    next;
+                    prevCollection,
+                    nextCollection;
 
                 if (withNext) {
-                    next = Post.forge().query(function queryBuilder(qb) {
-                        qb.where('status', '=', 'published')
-                            .andWhere('page', '=', 0)
-                            .andWhere('published_at', '>', publishedAt)
-                            .orderBy('published_at', 'asc')
-                            .limit(1);
-                    }).fetch({withRelated: nextRelations});
+                    nextCollection = Post
+                        .forge(null, {context: options.context})
+                        .query(function queryBuilder(qb) {
+                            qb
+                                .where('published_at', '>', publishedAt)
+                                .limit(1);
+
+                        });
+
+                    if (options.channel) {
+                        nextCollection.applyDefaultAndCustomFilters(options.channel.postOptions);
+                    }
+
+                    nextCollection = nextCollection.fetch({withRelated: nextRelations});
                 }
 
                 if (withPrev) {
-                    prev = Post.forge().query(function queryBuilder(qb) {
+                    prevCollection = Post.forge().query(function queryBuilder(qb) {
                         qb.where('status', '=', 'published')
                             .andWhere('page', '=', 0)
                             .andWhere('published_at', '<', publishedAt)
                             .orderBy('published_at', 'desc')
                             .limit(1);
-                    }).fetch({withRelated: prevRelations});
+                    });
+
+                    if (options.channel) {
+                        prevCollection.applyDefaultAndCustomFilters(options.channel.postOptions);
+                    }
+
+                    prevCollection = prevCollection.fetch({withRelated: prevRelations});
                 }
 
-                return Promise.join(next, prev)
+                return Promise.join(nextCollection, prevCollection)
                     .then(function then(nextAndPrev) {
+                        console.log('IN ADVANCE', nextAndPrev);
+
                         if (nextAndPrev[0]) {
                             post.relations.next = nextAndPrev[0];
                         }

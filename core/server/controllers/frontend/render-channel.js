@@ -41,7 +41,6 @@ function renderChannel(req, res, next) {
         setRequestIsSecure(req, result.posts);
         _.each(result.data, function (data) {
             setRequestIsSecure(req, data);
-
         });
 
         // @TODO: properly design these filters

@@ -119,6 +119,7 @@ utils = {
                 to: {isDate: true},
                 fields: {matches: /^[\w, ]+$/},
                 order: {matches: /^[a-z0-9_,\. ]+$/i},
+                channel: {},
                 name: {}
             },
             // these values are sanitised/validated separately

@@ -70,11 +70,8 @@ frontendControllers = {
         }).catch(handleError(next));
     },
     single: function single(req, res, next) {
-        debug('single', req.url, req.query);
-
         if (req.query && req.query.c) {
             res.locals.channel = channelConfig.get(req.query.c);
-            debug('Single post, in channel context', res.locals.channel);
         }
 
         // Query database to find post
