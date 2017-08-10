@@ -58,6 +58,7 @@ rssRouter = function rssRouter(channelConfig) {
 channelRouter = function router() {
     function channelConfigMiddleware(channel) {
         return function doChannelConfig(req, res, next) {
+            // @TODO: do the %s replace HERE
             res.locals.channel = _.cloneDeep(channel);
             next();
         };
