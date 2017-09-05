@@ -25,6 +25,7 @@ var debug = require('ghost-ignition').debug('boot:init'),
     dbHealth = require('./data/db/health'),
     xmlrpc = require('./data/xml/xmlrpc'),
     slack = require('./data/slack'),
+    urlService = require('./services/url'),
     GhostServer = require('./ghost-server'),
     scheduling = require('./adapters/scheduling'),
     settings = require('./settings'),
@@ -61,7 +62,11 @@ function init() {
             // Initialize xmrpc ping
             xmlrpc.listen(),
             // Initialize slack ping
-            slack.listen()
+            slack.listen(),
+
+            // Url Service
+            urlService.init()
+
         );
     }).then(function () {
         debug('Apps, XMLRPC, Slack done');
