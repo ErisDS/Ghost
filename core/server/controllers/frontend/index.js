@@ -10,30 +10,14 @@ var debug = require('ghost-ignition').debug('channels:single'),
     filters = require('../../filters'),
     templates = require('./templates'),
     handleError = require('./error'),
-    formatResponse = require('./format-response'),
+
     postLookup = require('./post-lookup'),
-    setResponseContext = require('./context'),
+
     setRequestIsSecure = require('./secure'),
 
     frontendControllers;
 
-/*
-* Sets the response context around a post and renders it
-* with the current theme's post view. Used by post preview
-* and single post methods.
-* Returns a function that takes the post to be rendered.
-*/
-function renderPost(req, res) {
-    debug('renderPost called');
-    return function renderPost(post) {
-        var view = templates.single(post),
-            response = formatResponse.single(post);
 
-        setResponseContext(req, res, response);
-        debug('Rendering view: ' + view);
-        res.render(view, response);
-    };
-}
 
 frontendControllers = {
     preview: function preview(req, res, next) {
