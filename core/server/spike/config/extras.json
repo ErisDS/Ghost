@@ -1,0 +1,12 @@
+{
+    "routes": {
+        "/": {
+            "type:": "entry",
+            "id": "59848f9d6aaf5c34e475a640"
+        },
+        "/blog": {
+            "type": "channel",
+            "name": "index"
+        }
+    }
+}

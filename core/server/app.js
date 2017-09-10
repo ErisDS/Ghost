@@ -50,8 +50,8 @@ module.exports = function setupParentApp() {
     // ADMIN
     parentApp.use('/ghost', require('./admin')());
 
-    // BLOG
-    parentApp.use(require('./blog')());
+    // Publication
+    parentApp.use(require('./spike')());
 
     debug('ParentApp setup end');
 
