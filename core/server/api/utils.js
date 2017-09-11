@@ -195,9 +195,10 @@ utils = {
      * ## Handle Permissions
      * @param {String} docName
      * @param {String} method (browse || read || edit || add || destroy)
+     * @param {Array} unsafeAttrs - attribute names (e.g. post.status) that could change the outcome
      * @returns {Function}
      */
-    handlePermissions: function handlePermissions(docName, method) {
+    handlePermissions: function handlePermissions(docName, method, unsafeAttrs) {
         var singular = docName.replace(/s$/, '');
 
         /**
@@ -207,7 +208,8 @@ utils = {
          * @returns {Object} options
          */
         return function doHandlePermissions(options) {
-            var permsPromise = permissions.canThis(options.context)[method][singular](options.id);
+            var extraAttrs = unsafeAttrs ? _.pick(options.data[docName][0], unsafeAttrs) : null,
+                permsPromise = permissions.canThis(options.context)[method][singular](options.id, extraAttrs);
 
             return permsPromise.then(function permissionGranted() {
                 return options;

@@ -13,6 +13,7 @@ var Promise         = require('bluebird'),
         'created_by', 'updated_by', 'published_by', 'author', 'tags', 'fields',
         'next', 'previous', 'next.author', 'next.tags', 'previous.author', 'previous.tags'
     ],
+    unsafeAttrs = ['status'],
     posts;
 
 /**
@@ -136,7 +137,7 @@ posts = {
         // Push all of our tasks into a `tasks` array in the correct order
         tasks = [
             utils.validate(docName, {opts: utils.idDefaultOptions.concat(options.opts || [])}),
-            utils.handlePermissions(docName, 'edit'),
+            utils.handlePermissions(docName, 'edit', unsafeAttrs),
             utils.convertOptions(allowedIncludes),
             modelQuery
         ];
@@ -183,7 +184,7 @@ posts = {
         // Push all of our tasks into a `tasks` array in the correct order
         tasks = [
             utils.validate(docName),
-            utils.handlePermissions(docName, 'add'),
+            utils.handlePermissions(docName, 'add', unsafeAttrs),
             utils.convertOptions(allowedIncludes),
             modelQuery
         ];

@@ -49,6 +49,7 @@ Post = ghostBookshelf.Model.extend({
         model.emitChange('added');
 
         if (['published', 'scheduled'].indexOf(status) !== -1) {
+            console.log('CREATED POST WHICH IS BEING:', status);
             model.emitChange(status, {importing: options.importing});
         }
 
@@ -100,6 +101,7 @@ Post = ghostBookshelf.Model.extend({
             model.emitChange('added');
 
             if (model.isPublished) {
+                console.log('UPDATED POST WHICH IS BEING published');
                 model.emitChange('published');
             }
 
@@ -115,6 +117,7 @@ Post = ghostBookshelf.Model.extend({
 
                 // CASE: was draft or scheduled before and is now e.q. published
                 if (model.isPublished) {
+                    console.log('UPDATED POST WHICH IS BEING published');
                     model.emitChange('published');
                 }
 
@@ -802,10 +805,19 @@ Post = ghostBookshelf.Model.extend({
             });
     }),
 
-    permissible: function permissible(postModelOrId, action, context, loadedPermissions, hasUserPermission, hasAppPermission) {
+    permissible: function permissible(postModelOrId, action, context, unsafeAttrs, loadedPermissions, hasUserPermission, hasAppPermission) {
         var self = this,
             postModel = postModelOrId,
             origArgs;
+
+        function isPublishing(oldStatus, newStatus) {
+            var statusChanged = oldStatus !== newStatus,
+            // For the purposes of permissions ONLY, scheduled === published
+                newStatusIsPublished = ['published', 'scheduled'].indexOf(newStatus) > -1;
+            // If the value is changing, and the new value is published, then we are in the process of Publishing
+            return statusChanged && newStatusIsPublished;
+        }
+
 
         // If we passed in an id instead of a model, get the model
         // then check the permissions
@@ -823,8 +835,13 @@ Post = ghostBookshelf.Model.extend({
         }
 
         if (postModel) {
-            // If this is the author of the post, allow it.
-            hasUserPermission = hasUserPermission || context.user === postModel.get('author_id');
+            if (isPublishing(postModel.get('status'), unsafeAttrs['status']) && _.some(loadedPermissions.user.roles, {name: 'Author'})) {
+                // This post is being published and the current user is an Author
+                hasUserPermission = config.get('permissions:authorRoleCanPublish');
+            } else {
+                // If this is the author of the post, allow it.
+                hasUserPermission = hasUserPermission || context.user === postModel.get('author_id');
+            }
         }
 
         if (hasUserPermission && hasAppPermission) {

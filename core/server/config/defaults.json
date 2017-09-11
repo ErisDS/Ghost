@@ -74,5 +74,8 @@
         "robotstxt": {
             "maxAge": 3600000
         }
+    },
+    "permissions": {
+        "authorRoleCanPublish": true
     }
 }
