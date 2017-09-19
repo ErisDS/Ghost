@@ -6,9 +6,9 @@ var express = require('express');
 
 // Outside world
 var settingsCache = require('../../settings/cache');
+var entryService = require('./entry');
 
 
-var handler = require('./handler');
 var routeTypes = ['entry', 'channel'];
 var routeCache = {
     entry: {},
@@ -34,17 +34,17 @@ module.exports.entryRouter = function entryRouter() {
 
     var router = express.Router({mergeParams: true});
 
-    _.each(routeCache.entry, function entryHandler(entryConfig, route) {
-        // @TODO: register URL in url-registry
-        router.get(route, function setEntryConfig(req, res, next) {
-            // TODO: some sort of validation here?
-            res.locals.entry = entryConfig;
-            next();
-        }, handler.entry())
-    });
+    // _.each(routeCache.entry, function entryHandler(entryConfig, route) {
+    //     // @TODO: register URL in url-registry
+    //     router.get(route, function setEntryConfig(req, res, next) {
+    //         // TODO: some sort of validation here?
+    //         res.locals.entry = entryConfig;
+    //         next();
+    //     }, handler.entry())
+    // });
 
     // Fallback route for automatic entry rendering
-    router.get('*', handler.entry());
+    router.get('*', entryService.middleware());
 
     return router;
 };
