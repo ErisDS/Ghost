@@ -22,3 +22,25 @@ module.exports.init = function init() {
         urlService.loadResourceUrls();
     });
 };
+
+// Page events
+// this.dataEvents.on('page.published', self.addOrUpdateUrl.bind(self));
+// this.dataEvents.on('page.published.edited', self.addOrUpdateUrl.bind(self));
+// // Note: This is called if a published post is deleted
+// this.dataEvents.on('page.unpublished', self.removeUrl.bind(self));
+
+// Post events
+// this.dataEvents.on('page.published', self.addOrUpdateUrl.bind(self));
+// this.dataEvents.on('page.published.edited', self.addOrUpdateUrl.bind(self));
+// // Note: This is called if a published post is deleted
+// this.dataEvents.on('page.unpublished', self.removeUrl.bind(self));
+
+// Tag events
+// this.dataEvents.on('tag.added', self.addOrUpdateUrl.bind(self));
+// this.dataEvents.on('tag.edited', self.addOrUpdateUrl.bind(self));
+// this.dataEvents.on('tag.deleted', self.removeUrl.bind(self));
+
+// Author events
+// this.dataEvents.on('user.activated', self.addOrUpdateUrl.bind(self));
+// this.dataEvents.on('user.activated.edited', self.addOrUpdateUrl.bind(self));
+// this.dataEvents.on('user.deactivated', self.removeUrl.bind(self));
