@@ -1,0 +1,60 @@
+[
+    {
+        "name": "preview",
+        "path": "/{{preview}}/:uuid/",
+        "controller": {
+            "type": "custom"
+        },
+        "resource": {
+            "type": "post"
+        }
+    },
+    {
+        "name": "home",
+        "path": "/",
+        "controller": {
+            "type": "channel",
+            "config": {
+                "name": "index",
+                "frontPageTemplate": "home"
+            }
+        },
+        "sitemap": "page"
+    },
+    {
+        "name": "tag",
+        "path": "/{{tag}}/:slug/",
+        "controller": {
+            "type": "channel",
+            "config": {
+                "name": "tag"
+            }
+        },
+        "resource": {
+            "type": "tag"
+        },
+        "sitemap": "tag"
+    },
+    {
+        "name": "posts",
+        "path": "{{permalink}}",
+        "controller": {
+            "type": "entry"
+        },
+        "resource": {
+            "type": "post"
+        },
+        "sitemap": "post"
+    },
+    {
+        "name": "pages",
+        "path": "/:slug/",
+        "controller": {
+            "type": "entry"
+        },
+        "resource": {
+            "type": "post"
+        },
+        "sitemap": "page"
+    }
+]
