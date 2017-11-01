@@ -18,7 +18,7 @@ class Resource {
     }
 
     prefetch() {
-        var options = _.defaults(this.prefetchOptions, prefetchDefaults);
+        const options = _.defaults(this.prefetchOptions, prefetchDefaults);
 
         return api[this.api]
             .browse(options)
@@ -29,7 +29,7 @@ class Resource {
     }
 
     toUrl(resource) {
-        var data = {
+        const data = {
             [this.urlLookup]: resource
         };
         return urlUtils.urlFor(this.urlLookup, data);

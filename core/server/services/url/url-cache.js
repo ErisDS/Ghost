@@ -9,7 +9,6 @@
 // priority
 //
 
-
 // Based heavily on the settings cache
 var _ = require('lodash'),
     events = require('../../events'),
@@ -26,6 +25,6 @@ module.exports = {
     },
     set: function set(key, value) {
         urlCache[key] = _.cloneDeep(value);
-        events.emit('url.added', key, value)
+        events.emit('url.added', key, value);
     }
 };

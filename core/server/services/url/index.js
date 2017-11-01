@@ -1,6 +1,4 @@
-var _ = require('lodash'),
-
-    debug = require('ghost-ignition').debug('url-service'),
+var debug = require('ghost-ignition').debug('url-service'),
     events = require('../../events'),
     URLService = require('./URLService'),
     urlService;
@@ -24,23 +22,26 @@ module.exports.init = function init() {
 };
 
 // Page events
-// this.dataEvents.on('page.published', self.addOrUpdateUrl.bind(self));
-// this.dataEvents.on('page.published.edited', self.addOrUpdateUrl.bind(self));
+// events.on('page.published', self.addOrUpdateUrl.bind(self));
+// events.on('page.published.edited', self.addOrUpdateUrl.bind(self));
 // // Note: This is called if a published post is deleted
-// this.dataEvents.on('page.unpublished', self.removeUrl.bind(self));
+// events.on('page.unpublished', self.removeUrl.bind(self));
 
 // Post events
-// this.dataEvents.on('page.published', self.addOrUpdateUrl.bind(self));
-// this.dataEvents.on('page.published.edited', self.addOrUpdateUrl.bind(self));
+// events.on('page.published', self.addOrUpdateUrl.bind(self));
+// events.on('page.published.edited', self.addOrUpdateUrl.bind(self));
 // // Note: This is called if a published post is deleted
-// this.dataEvents.on('page.unpublished', self.removeUrl.bind(self));
+// events.on('page.unpublished', self.removeUrl.bind(self));
 
 // Tag events
-// this.dataEvents.on('tag.added', self.addOrUpdateUrl.bind(self));
-// this.dataEvents.on('tag.edited', self.addOrUpdateUrl.bind(self));
-// this.dataEvents.on('tag.deleted', self.removeUrl.bind(self));
+// events.on('tag.added', self.addOrUpdateUrl.bind(self));
+// events.on('tag.edited', self.addOrUpdateUrl.bind(self));
+// events.on('tag.deleted', self.removeUrl.bind(self));
 
 // Author events
-// this.dataEvents.on('user.activated', self.addOrUpdateUrl.bind(self));
-// this.dataEvents.on('user.activated.edited', self.addOrUpdateUrl.bind(self));
-// this.dataEvents.on('user.deactivated', self.removeUrl.bind(self));
+// events.on('user.activated', self.addOrUpdateUrl.bind(self));
+// events.on('user.activated.edited', self.addOrUpdateUrl.bind(self));
+// events.on('user.deactivated', self.removeUrl.bind(self));
+
+// PERMALINK CHANGE!
+// events.on('settings.permalinks.edited', ARGH!);

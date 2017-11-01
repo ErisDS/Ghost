@@ -1,6 +1,16 @@
+'use strict';
+
+/**
+ * # URL Service
+ *
+ * This file defines a class of URLService, which serves as a centralised place to handle
+ * generating, storing & fetching URLs of all kinds.
+ */
+
 var _ = require('lodash'),
     Promise = require('bluebird'),
-    debug = require('ghost-ignition').debug('url-service'),
+    _debug = require('ghost-ignition').debug._base,
+    debug = _debug('ghost:url-service'),
     // TODO: load this from a routing service, so it is dynamic
     resourceConfig = require('./config.json'),
     Resource = require('./Resource'),
@@ -45,7 +55,11 @@ class UrlService {
                 });
 
                 debug('processing done, url cache built', _.size(urlCache.getAll()));
-                console.log(require('util').inspect(urlCache.getAll(), false, null));
+                // Wrap this in a check, because else this is a HUGE amount of output
+                // To output this, use DEBUG=ghost:*,ghost-url
+                if (_debug.enabled('ghost-url')) {
+                    debug('url-cache', require('util').inspect(urlCache.getAll(), false, null));
+                }
             })
             .catch((err) => {
                 debug('load error', err);
@@ -54,7 +68,7 @@ class UrlService {
 
     // @TODO: reconsider naming
     addStatic(relativeUrl, data) {
-        var url = urlUtils.urlFor({relativeUrl: relativeUrl});
+        const url = urlUtils.urlFor({relativeUrl: relativeUrl});
         data['static'] = true;
         urlCache.set(url, data);
     }
