@@ -18,8 +18,7 @@ module.exports = function renderPost(req, res) {
         res.data = formatResponse.single(post);
 
         // Context
-        // @TODO fix this!!
-        setResponseContext(req, res, res.data);
+        setResponseContext(req, res);
 
         // Template
         // @TODO make a function that can do the different template calls

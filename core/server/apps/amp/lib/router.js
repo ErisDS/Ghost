@@ -25,8 +25,7 @@ function _renderer(req, res, next) {
     }
 
     // Context
-    // @TODO fix this!!
-    setResponseContext(req, res, res.data);
+    setResponseContext(req, res);
 
     // Template
     // @TODO make a function that can do the different template calls

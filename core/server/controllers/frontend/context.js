@@ -21,7 +21,7 @@ var config = require('../../config'),
     rssPattern = new RegExp('^\\/rss\\/'),
     homePattern = new RegExp('^\\/$');
 
-function setResponseContext(req, res, data) {
+function setResponseContext(req, res) {
     var pageParam = req.params && req.params.page !== undefined ? parseInt(req.params.page, 10) : 1;
 
     res.locals = res.locals || {};
@@ -48,7 +48,7 @@ function setResponseContext(req, res, data) {
     }
 
     // Add context 'amp' to either post or page, if we have an `*/amp` route
-    if (ampPattern.test(res.locals.relativeUrl) && data.post) {
+    if (ampPattern.test(res.locals.relativeUrl) && res.data.post) {
         res.locals.context.push('amp');
     }
 
@@ -59,9 +59,9 @@ function setResponseContext(req, res, data) {
         res.locals.context.push('private');
     } else if (subscribePattern.test(res.locals.relativeUrl) && labs.isSet('subscribers') === true) {
         res.locals.context.push('subscribe');
-    } else if (data && data.post && data.post.page) {
+    } else if (res.data && res.data.post && res.data.post.page) {
         res.locals.context.push('page');
-    } else if (data && data.post) {
+    } else if (res.data && res.data.post) {
         res.locals.context.push('post');
     }
 }
