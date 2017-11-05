@@ -7,13 +7,23 @@ var path                = require('path'),
     // Dirty requires
     errors              = require('../../../errors'),
     settingsCache       = require('../../../settings/cache'),
-    templates           = require('../../../controllers/frontend/templates'),
     postLookup          = require('../../../controllers/frontend/post-lookup'),
     setResponseContext  = require('../../../controllers/frontend/context'),
     renderer            = require('../../../controllers/frontend/renderer'),
 
     templateName = 'amp',
-    defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs');
+    routeConfig = {
+        type: 'custom',
+        templateName: templateName,
+        defaultTemplate: path.resolve(__dirname, 'views', templateName + '.hbs')
+    };
+
+function configMiddleware(req, res, next) {
+    // Note: this is super similar to the config middleware used in channels
+    // @TODO refactor into to something explicit
+    res.locals.route = routeConfig;
+    next();
+}
 
 function _renderer(req, res, next) {
     // Renderer begin
@@ -26,10 +36,6 @@ function _renderer(req, res, next) {
 
     // Context
     setResponseContext(req, res);
-
-    // Template
-    // @TODO make a function that can do the different template calls
-    res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
 
     // Final checks, filters, etc...
     // DOES happen here, after everything is set, as the last thing before we actually render
@@ -86,7 +92,9 @@ function checkIfAMPIsEnabled(req, res, next) {
 }
 
 // AMP frontend route
-ampRouter.route('/')
+ampRouter
+    .use(configMiddleware)
+    .route('/')
     .get(
         getPostData,
         checkIfAMPIsEnabled,

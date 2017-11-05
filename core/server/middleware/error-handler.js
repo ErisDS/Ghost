@@ -95,7 +95,7 @@ _private.HTMLErrorRenderer = function HTMLErrorRender(err, req, res, next) {
     // We don't do context for errors?!
 
     // Template
-    res.locals.template = templates.error(err.statusCode);
+    templates.setTemplate(req, res);
 
     // Final checks, filters, etc...
     // DOES happen here, after everything is set, as the last thing before we actually render

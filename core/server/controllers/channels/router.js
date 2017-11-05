@@ -42,6 +42,8 @@ function rssConfigMiddleware(req, res, next) {
 function channelConfigMiddleware(channel) {
     return function doChannelConfig(req, res, next) {
         res.locals.channel = _.cloneDeep(channel);
+        // @TODO refactor into to something explicit
+        res.locals.route = {type: 'channel'};
         next();
     };
 }

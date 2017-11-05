@@ -1,5 +1,4 @@
 var debug = require('ghost-ignition').debug('channels:render-post'),
-    templates = require('./templates'),
     formatResponse = require('./format-response'),
     renderer = require('./renderer'),
     setResponseContext = require('./context');
@@ -19,10 +18,6 @@ module.exports = function renderPost(req, res) {
 
         // Context
         setResponseContext(req, res);
-
-        // Template
-        // @TODO make a function that can do the different template calls
-        res.locals.template = templates.single(post);
 
         // Final checks, filters, etc...
         // Should happen here, after everything is set, as the last thing before we actually render

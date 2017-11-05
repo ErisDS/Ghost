@@ -12,6 +12,12 @@ module.exports = function previewController(req, res, next) {
         include: 'author,tags'
     };
 
+    // Note: this is super similar to the config middleware used in channels
+    // @TODO refactor into to something explicit
+    res.locals.route = {
+        type: 'single'
+    };
+
     api.posts.read(params).then(function then(result) {
         // Format data 1
         var post = result.posts[0];

@@ -6,6 +6,12 @@ var utils = require('../utils'),
     setRequestIsSecure = require('./frontend/secure');
 
 module.exports = function singleController(req, res, next) {
+    // Note: this is super similar to the config middleware used in channels
+    // @TODO refactor into to something explicit
+    res.locals.route = {
+        type: 'single'
+    };
+
     // Query database to find post
     return postLookup(req.path).then(function then(lookup) {
         // Format data 1

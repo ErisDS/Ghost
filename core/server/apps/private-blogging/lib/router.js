@@ -2,15 +2,26 @@ var path                = require('path'),
     express             = require('express'),
     middleware          = require('./middleware'),
     bodyParser          = require('body-parser'),
-    templates           = require('../../../controllers/frontend/templates'),
     setResponseContext  = require('../../../controllers/frontend/context'),
     renderer            = require('../../../controllers/frontend/renderer'),
     brute               = require('../../../middleware/brute'),
 
     templateName = 'private',
-    defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs'),
+    // @TODO: DRY this up
+    routeConfig = {
+        type: 'custom',
+        templateName: templateName,
+        defaultTemplate: path.resolve(__dirname, 'views', templateName + '.hbs')
+    },
 
     privateRouter = express.Router();
+
+function configMiddleware(req, res, next) {
+    // Note: this is super similar to the config middleware used in channels
+    // @TODO refactor into to something explicit
+    res.locals.route = routeConfig;
+    next();
+}
 
 function _renderer(req, res) {
     // Renderer begin
@@ -24,10 +35,6 @@ function _renderer(req, res) {
     // Context
     setResponseContext(req, res);
 
-    // Template
-    // @TODO make a function that can do the different template calls
-    res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
-
     // Final checks, filters, etc...
     // Should happen here, after everything is set, as the last thing before we actually render
 
@@ -36,7 +43,9 @@ function _renderer(req, res) {
 }
 
 // password-protected frontend route
-privateRouter.route('/')
+privateRouter
+    .use(configMiddleware)
+    .route('/')
     .get(
         middleware.isPrivateSessionAuth,
         _renderer
