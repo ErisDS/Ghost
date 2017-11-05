@@ -1,6 +1,7 @@
 var debug = require('ghost-ignition').debug('channels:render-post'),
     templates = require('./templates'),
     formatResponse = require('./format-response'),
+    renderer = require('./renderer'),
     setResponseContext = require('./context');
 /*
  * Sets the response context around a post and renders it
@@ -14,20 +15,22 @@ module.exports = function renderPost(req, res) {
     return function renderPost(post) {
         // Renderer begin
         // Format data 2 - 1 is in preview/single
-        var response = formatResponse.single(post);
+        res.data = formatResponse.single(post);
 
         // Context
-        setResponseContext(req, res, response);
+        // @TODO fix this!!
+        setResponseContext(req, res, res.data);
 
         // Template
+        // @TODO make a function that can do the different template calls
         res.locals.template = templates.single(post);
 
         // Final checks, filters, etc...
         // Should happen here, after everything is set, as the last thing before we actually render
         // @TODO move any sort of filter here - currently happens elsewhere
+        // Should happen here, after everything is set, as the last thing before we actually render
 
         // Render Call
-        debug('Rendering view: ' + res.locals.template);
-        res.render(res.locals.template, response);
+        return renderer(req, res);
     };
 };

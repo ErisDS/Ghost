@@ -11,26 +11,27 @@ var path                = require('path'),
     templates           = require('../../../controllers/frontend/templates'),
     postLookup          = require('../../../controllers/frontend/post-lookup'),
     setResponseContext  = require('../../../controllers/frontend/context'),
-
+    renderer            = require('../../../controllers/frontend/renderer'),
     templateName = 'subscribe',
     defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs');
 
 function _renderer(req, res) {
     // Renderer begin
     // Format data
-    var data = req.body;
+    res.data = req.body;
 
     // Context
     setResponseContext(req, res);
 
     // Template
+    // @TODO make a function that can do the different template calls
     res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
 
     // Final checks, filters, etc...
     // Should happen here, after everything is set, as the last thing before we actually render
 
     // Render Call
-    return res.render(res.locals.template, data);
+    return renderer(req, res);
 }
 
 /**

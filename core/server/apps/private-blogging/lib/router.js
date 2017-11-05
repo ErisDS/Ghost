@@ -4,6 +4,7 @@ var path                = require('path'),
     bodyParser          = require('body-parser'),
     templates           = require('../../../controllers/frontend/templates'),
     setResponseContext  = require('../../../controllers/frontend/context'),
+    renderer            = require('../../../controllers/frontend/renderer'),
     brute               = require('../../../middleware/brute'),
 
     templateName = 'private',
@@ -14,23 +15,24 @@ var path                = require('path'),
 function _renderer(req, res) {
     // Renderer begin
     // Format data
-    var data = {};
+    res.data = {};
 
     if (res.error) {
-        data.error = res.error;
+        res.data.error = res.error;
     }
 
     // Context
     setResponseContext(req, res);
 
     // Template
+    // @TODO make a function that can do the different template calls
     res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
 
     // Final checks, filters, etc...
     // Should happen here, after everything is set, as the last thing before we actually render
 
     // Render Call
-    return res.render(res.locals.template, data);
+    return renderer(req, res);
 }
 
 // password-protected frontend route

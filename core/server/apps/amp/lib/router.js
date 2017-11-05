@@ -10,6 +10,7 @@ var path                = require('path'),
     templates           = require('../../../controllers/frontend/templates'),
     postLookup          = require('../../../controllers/frontend/post-lookup'),
     setResponseContext  = require('../../../controllers/frontend/context'),
+    renderer            = require('../../../controllers/frontend/renderer'),
 
     templateName = 'amp',
     defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs');
@@ -17,16 +18,18 @@ var path                = require('path'),
 function _renderer(req, res, next) {
     // Renderer begin
     // Format data
-    var data = req.body || {};
+    res.data = req.body || {};
 
     if (res.error) {
-        data.error = res.error;
+        res.data.error = res.error;
     }
 
     // Context
-    setResponseContext(req, res, data);
+    // @TODO fix this!!
+    setResponseContext(req, res, res.data);
 
     // Template
+    // @TODO make a function that can do the different template calls
     res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
 
     // Final checks, filters, etc...
@@ -40,7 +43,7 @@ function _renderer(req, res, next) {
     }
 
     // Render Call
-    return res.render(res.locals.template, data);
+    return renderer(req, res);
 }
 
 function getPostData(req, res, next) {
