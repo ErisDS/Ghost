@@ -12,11 +12,22 @@ var debug = require('ghost-ignition').debug('channels:render-post'),
 module.exports = function renderPost(req, res) {
     debug('renderPost called');
     return function renderPost(post) {
-        var view = templates.single(post),
-            response = formatResponse.single(post);
+        // Renderer begin
+        // Format data 2 - 1 is in preview/single
+        var response = formatResponse.single(post);
 
+        // Context
         setResponseContext(req, res, response);
-        debug('Rendering view: ' + view);
-        res.render(view, response);
+
+        // Template
+        res.locals.template = templates.single(post);
+
+        // Final checks, filters, etc...
+        // Should happen here, after everything is set, as the last thing before we actually render
+        // @TODO move any sort of filter here - currently happens elsewhere
+
+        // Render Call
+        debug('Rendering view: ' + res.locals.template);
+        res.render(res.locals.template, response);
     };
 };

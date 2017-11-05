@@ -4,8 +4,10 @@ var router           = require('./lib/router'),
 
 module.exports = {
     activate: function activate(ghost) {
+        var ampRoute = '*/' + config.get('routeKeywords').amp + '/';
+
         registerHelpers(ghost);
 
-        ghost.routeService.registerRouter('*/' + config.get('routeKeywords').amp + '/', router);
+        ghost.routeService.registerRouter(ampRoute, router);
     }
 };

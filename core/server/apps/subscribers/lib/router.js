@@ -10,17 +10,27 @@ var path                = require('path'),
     validator           = require('../../../data/validation').validator,
     templates           = require('../../../controllers/frontend/templates'),
     postLookup          = require('../../../controllers/frontend/post-lookup'),
-    setResponseContext  = require('../../../controllers/frontend/context');
+    setResponseContext  = require('../../../controllers/frontend/context'),
 
-function controller(req, res) {
-    var templateName = 'subscribe',
-        defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs'),
-        view = templates.pickTemplate(templateName, defaultTemplate),
-        data = req.body;
+    templateName = 'subscribe',
+    defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs');
 
+function _renderer(req, res) {
+    // Renderer begin
+    // Format data
+    var data = req.body;
+
+    // Context
     setResponseContext(req, res);
 
-    return res.render(view, data);
+    // Template
+    res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
+
+    // Final checks, filters, etc...
+    // Should happen here, after everything is set, as the last thing before we actually render
+
+    // Render Call
+    return res.render(res.locals.template, data);
 }
 
 /**
@@ -33,7 +43,7 @@ function errorHandler(error, req, res, next) {
 
     if (error.statusCode !== 404) {
         res.locals.error = error;
-        return controller(req, res);
+        return _renderer(req, res);
     }
 
     next(error);
@@ -100,19 +110,18 @@ function storeSubscriber(req, res, next) {
 // subscribe frontend route
 subscribeRouter.route('/')
     .get(
-        controller
+        _renderer
     )
     .post(
         bodyParser.urlencoded({extended: true}),
         honeyPot,
         handleSource,
         storeSubscriber,
-        controller
+        _renderer
     );
 
 // configure an error handler just for subscribe problems
 subscribeRouter.use(errorHandler);
 
 module.exports = subscribeRouter;
-module.exports.controller = controller;
 module.exports.storeSubscriber = storeSubscriber;

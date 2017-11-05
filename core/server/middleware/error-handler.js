@@ -71,6 +71,7 @@ _private.JSONErrorRenderer = function JSONErrorRenderer(err, req, res, next) { /
     });
 };
 
+// @TODO: differenciate properly between rendering errors for theme templates, and other situations
 _private.HTMLErrorRenderer = function HTMLErrorRender(err, req, res, next) {
     // If the error code is explicitly set to STATIC_FILE_NOT_FOUND,
     // Skip trying to render an HTML error, and move on to the basic error renderer
@@ -80,25 +81,35 @@ _private.HTMLErrorRenderer = function HTMLErrorRender(err, req, res, next) {
         return next(err);
     }
 
+    // Renderer begin
+    // Format Data
     var templateData = {
-            message: err.message,
-            // @deprecated
-            code: err.statusCode,
-            statusCode: err.statusCode,
-            errorDetails: err.errorDetails || []
-        },
-        template = templates.error(err.statusCode);
+        message: err.message,
+        // @deprecated
+        code: err.statusCode,
+        statusCode: err.statusCode,
+        errorDetails: err.errorDetails || []
+    };
 
+    // Context
+    // We don't do context for errors?!
+
+    // Template
+    res.locals.template = templates.error(err.statusCode);
+
+    // Final checks, filters, etc...
+    // DOES happen here, after everything is set, as the last thing before we actually render
     // It can be that something went wrong with the theme or otherwise loading handlebars
     // This ensures that no matter what res.render will work here
     if (_.isEmpty(req.app.engines)) {
-        template = 'error';
+        res.locals.template = 'error';
         req.app.engine('hbs', _private.createHbsEngine());
         req.app.set('view engine', 'hbs');
         req.app.set('views', config.get('paths').defaultViews);
     }
 
-    res.render(template, templateData, function renderResponse(err, html) {
+    // Render Call - featuring an error handler for what happens if rendering fails
+    res.render(res.locals.template, templateData, function renderResponse(err, html) {
         if (!err) {
             return res.send(html);
         }

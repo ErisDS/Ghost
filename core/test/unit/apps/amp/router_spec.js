@@ -73,7 +73,7 @@ describe('AMP Controller', function () {
             done();
         };
 
-        ampController.controller(req, res, failTest(done));
+        ampController.renderer(req, res, failTest(done));
     });
 
     it('should render theme amp page when theme has amp template', function (done) {
@@ -87,7 +87,7 @@ describe('AMP Controller', function () {
             done();
         };
 
-        ampController.controller(req, res, failTest(done));
+        ampController.renderer(req, res, failTest(done));
     });
 
     it('should render with error when error is passed in', function (done) {
@@ -102,7 +102,7 @@ describe('AMP Controller', function () {
             done();
         };
 
-        ampController.controller(req, res, failTest(done));
+        ampController.renderer(req, res, failTest(done));
     });
 
     it('does not render amp page when amp context is missing', function (done) {
@@ -118,7 +118,7 @@ describe('AMP Controller', function () {
 
         renderSpy = res.render;
 
-        ampController.controller(req, res, failTest(done));
+        ampController.renderer(req, res, failTest(done));
         renderSpy.called.should.be.false();
     });
 
@@ -135,7 +135,7 @@ describe('AMP Controller', function () {
 
         renderSpy = res.render;
 
-        ampController.controller(req, res, failTest(done));
+        ampController.renderer(req, res, failTest(done));
         renderSpy.called.should.be.false();
     });
 });

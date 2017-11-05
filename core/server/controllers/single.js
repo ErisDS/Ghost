@@ -8,6 +8,7 @@ var utils = require('../utils'),
 module.exports = function singleController(req, res, next) {
     // Query database to find post
     return postLookup(req.path).then(function then(lookup) {
+        // Format data 1
         var post = lookup ? lookup.post : false;
 
         if (!post) {

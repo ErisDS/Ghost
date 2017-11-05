@@ -9,28 +9,38 @@ var path                = require('path'),
     settingsCache       = require('../../../settings/cache'),
     templates           = require('../../../controllers/frontend/templates'),
     postLookup          = require('../../../controllers/frontend/post-lookup'),
-    setResponseContext  = require('../../../controllers/frontend/context');
+    setResponseContext  = require('../../../controllers/frontend/context'),
 
-function controller(req, res, next) {
-    var templateName = 'amp',
-        defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs'),
-        view = templates.pickTemplate(templateName, defaultTemplate),
-        data = req.body || {};
+    templateName = 'amp',
+    defaultTemplate = path.resolve(__dirname, 'views', templateName + '.hbs');
+
+function _renderer(req, res, next) {
+    // Renderer begin
+    // Format data
+    var data = req.body || {};
 
     if (res.error) {
         data.error = res.error;
     }
 
+    // Context
     setResponseContext(req, res, data);
 
+    // Template
+    res.locals.template = templates.pickTemplate(templateName, defaultTemplate);
+
+    // Final checks, filters, etc...
+    // DOES happen here, after everything is set, as the last thing before we actually render
     // Context check:
     // Our context must be ['post', 'amp'], otherwise we won't render the template
     // This prevents AMP from being rendered for pages
+    // @TODO figure out a nicer way to determine this
     if (_.intersection(res.locals.context, ['post', 'amp']).length < 2) {
         return next();
     }
 
-    return res.render(view, data);
+    // Render Call
+    return res.render(res.locals.template, data);
 }
 
 function getPostData(req, res, next) {
@@ -78,10 +88,10 @@ ampRouter.route('/')
     .get(
         getPostData,
         checkIfAMPIsEnabled,
-        controller
+        _renderer
     );
 
 module.exports = ampRouter;
-module.exports.controller = controller;
+module.exports.renderer = _renderer;
 module.exports.getPostData = getPostData;
 module.exports.checkIfAMPIsEnabled = checkIfAMPIsEnabled;

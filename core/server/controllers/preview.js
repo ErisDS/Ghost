@@ -13,6 +13,7 @@ module.exports = function previewController(req, res, next) {
     };
 
     api.posts.read(params).then(function then(result) {
+        // Format data 1
         var post = result.posts[0];
 
         if (!post) {
