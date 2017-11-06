@@ -19,11 +19,6 @@ module.exports = function renderPost(req, res) {
         // Context
         setResponseContext(req, res);
 
-        // Final checks, filters, etc...
-        // Should happen here, after everything is set, as the last thing before we actually render
-        // @TODO move any sort of filter here - currently happens elsewhere
-        // Should happen here, after everything is set, as the last thing before we actually render
-
         // Render Call
         return renderer(req, res);
     };

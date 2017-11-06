@@ -1,6 +1,5 @@
 var path                = require('path'),
     express             = require('express'),
-    _                   = require('lodash'),
     ampRouter           = express.Router(),
     i18n                = require('../../../i18n'),
 
@@ -34,18 +33,14 @@ function _renderer(req, res, next) {
         res.data.error = res.error;
     }
 
-    // Context
-    setResponseContext(req, res);
-
-    // Final checks, filters, etc...
-    // DOES happen here, after everything is set, as the last thing before we actually render
-    // Context check:
-    // Our context must be ['post', 'amp'], otherwise we won't render the template
-    // This prevents AMP from being rendered for pages
-    // @TODO figure out a nicer way to determine this
-    if (_.intersection(res.locals.context, ['post', 'amp']).length < 2) {
+    // @TODO work out a proper way to do renderer hooks?
+    // If we don't have a post, or the post is a page
+    if (!res.data.post || res.data.post.page) {
         return next();
     }
+
+    // Context
+    setResponseContext(req, res);
 
     // Render Call
     return renderer(req, res);

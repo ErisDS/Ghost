@@ -8,7 +8,7 @@ module.exports = function renderer(req, res) {
 
     // Final checks, filters, etc...
     // Should happen here, after everything is set, as the last thing before we actually render
-    // @TODO figure out how to do this!
+    // @TODO figure out how to add proper hooks / filters here
 
     // Render Call
     debug('Rendering template: ' + res.locals.template + ' for: ' + req.originalUrl);
