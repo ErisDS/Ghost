@@ -1,7 +1,9 @@
 var _ = require('lodash'),
     api = require('../../api'),
     helpers = require('../../helpers/register'),
+    temp = require('../temp'),
     filters = require('../../filters'),
+    controllers = require('../../controllers/base'),
     i18n = require('../../i18n'),
     router = require('../route').appRouter,
     generateProxyFunctions;
@@ -70,11 +72,22 @@ generateProxyFunctions = function (name, permissions, isInternal) {
             register: checkRegisterPermissions('helpers', helpers.registerThemeHelper.bind(helpers)),
             registerAsync: checkRegisterPermissions('helpers', helpers.registerAsyncThemeHelper.bind(helpers))
         },
+        // Expose our temporary url service
+        urls: {
+            lookupEntry: checkRegisterPermissions('urls', temp.lookupEntry.bind(temp))
+        },
         // Expose the route service...
         routeService: {
             // This allows for mounting an entirely new Router at a path...
             registerRouter: checkRegisterPermissions('routes', router.registerRouter.bind(router))
         },
+        // Controllers, do we want to add permissions for classes?!
+        controllers: {
+            CustomController: controllers.CustomController,
+            ChannelController: controllers.ChannelController,
+            EntryController: controllers.EntryController
+        },
+
         // Mini proxy to the API - needs review
         api: {
             posts: passThruAppContextToApi('posts',

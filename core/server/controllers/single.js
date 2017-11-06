@@ -1,28 +1,30 @@
 var utils = require('../utils'),
     filters = require('../filters'),
+    tempUrlService = require('../services/temp'),
+    EntryController = require('./base/EntryController'),
     handleError = require('./frontend/error'),
-    postLookup = require('./frontend/post-lookup'),
-    renderPost = require('./frontend/render-post'),
-    setRequestIsSecure = require('./frontend/secure');
+    formatResponse = require('./frontend/format-response'),
+    setRequestIsSecure = require('./frontend/secure'),
+    singleController = new EntryController({
+        name: 'preview'
+    });
 
-module.exports = function singleController(req, res, next) {
-    // Note: this is super similar to the config middleware used in channels
-    // @TODO refactor into to something explicit
-    res.locals.route = {
-        type: 'single'
-    };
-
+singleController.main = function singleController(req, res, next) {
+    console.log('controller');
     // Query database to find post
-    return postLookup(req.path).then(function then(lookup) {
+    return tempUrlService.lookupEntry(req.path).then(function then(lookup) {
+        console.log('controller part 2');
         // Format data 1
         var post = lookup ? lookup.post : false;
 
         if (!post) {
+            console.log('next 1');
             return next();
         }
 
         // CASE: postlookup can detect options for example /edit, unknown options get ignored and end in 404
         if (lookup.isUnknownOption) {
+            console.log('next 2');
             return next();
         }
 
@@ -38,7 +40,17 @@ module.exports = function singleController(req, res, next) {
 
         setRequestIsSecure(req, post);
 
+        console.log('pre filter');
+        // @TODO clean this duplicate code up
         filters.doFilter('prePostsRender', post, res.locals)
-            .then(renderPost(req, res));
+            .then(function formatResult(post) {
+                console.log('post after filter', post);
+                // Format data 2
+                res.data = formatResponse.single(post);
+
+                //return next();
+            });
     }).catch(handleError(next));
 };
+
+module.exports = singleController;

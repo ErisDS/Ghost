@@ -16,7 +16,7 @@ module.exports = function siteRouter() {
     router.get(/^\/((ghost-admin|admin|wp-admin|dashboard|signin|login)\/?)$/, function (req, res) { return utils.url.redirectToAdmin(301, res, '/'); });
 
     // Post Live Preview
-    router.get(utils.url.urlJoin('/', routeKeywords.preview, ':uuid', ':options?'), controllers.preview);
+    router.get(utils.url.urlJoin('/', routeKeywords.preview, ':uuid', ':options?'), controllers.preview.mount());
 
     // Channels
     router.use(channels.router());
@@ -25,7 +25,7 @@ module.exports = function siteRouter() {
     router.use(apps.router);
 
     // Default
-    router.get('*', controllers.single);
+    router.get('*', controllers.single.mount());
 
     return router;
 };
