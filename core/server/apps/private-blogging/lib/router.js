@@ -2,7 +2,6 @@ var path                = require('path'),
     express             = require('express'),
     middleware          = require('./middleware'),
     bodyParser          = require('body-parser'),
-    setResponseContext  = require('../../../controllers/frontend/context'),
     renderer            = require('../../../controllers/frontend/renderer'),
     brute               = require('../../../middleware/brute'),
 
@@ -31,9 +30,6 @@ function _renderer(req, res) {
     if (res.error) {
         res.data.error = res.error;
     }
-
-    // Context
-    setResponseContext(req, res);
 
     // Render Call
     return renderer(req, res);

@@ -9,7 +9,6 @@ var path                = require('path'),
     errors              = require('../../../errors'),
     validator           = require('../../../data/validation').validator,
     postLookup          = require('../../../controllers/frontend/post-lookup'),
-    setResponseContext  = require('../../../controllers/frontend/context'),
     renderer            = require('../../../controllers/frontend/renderer'),
 
     templateName = 'subscribe',
@@ -31,9 +30,6 @@ function _renderer(req, res) {
     // Renderer begin
     // Format data
     res.data = req.body;
-
-    // Context
-    setResponseContext(req, res);
 
     // Render Call
     return renderer(req, res);

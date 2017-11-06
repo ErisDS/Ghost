@@ -7,7 +7,6 @@ var path                = require('path'),
     errors              = require('../../../errors'),
     settingsCache       = require('../../../settings/cache'),
     postLookup          = require('../../../controllers/frontend/post-lookup'),
-    setResponseContext  = require('../../../controllers/frontend/context'),
     renderer            = require('../../../controllers/frontend/renderer'),
 
     templateName = 'amp',
@@ -38,9 +37,6 @@ function _renderer(req, res, next) {
     if (!res.data.post || res.data.post.page) {
         return next();
     }
-
-    // Context
-    setResponseContext(req, res);
 
     // Render Call
     return renderer(req, res);

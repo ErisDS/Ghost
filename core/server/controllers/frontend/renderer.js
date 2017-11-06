@@ -1,9 +1,14 @@
 var debug = require('ghost-ignition').debug('renderer'),
+    setContext = require('./context'),
     templates = require('./templates');
 
 module.exports = function renderer(req, res) {
-    // Template
     // @TODO: this is looking more and more like a middleware stack, finish refactoring!
+
+    // Context
+    setContext(req, res);
+
+    // Template
     templates.setTemplate(req, res);
 
     // Final checks, filters, etc...
