@@ -9,11 +9,19 @@
 var proxy = require('./proxy'),
     _ = require('lodash'),
     downsize = require('downsize'),
+    cheerio = require('cheerio'),
     SafeString = proxy.SafeString;
 
-module.exports = function content(options) {
-    var truncateOptions = (options || {}).hash || {};
-    truncateOptions = _.pick(truncateOptions, ['words', 'characters']);
+module.exports = function content(path, options) {
+    if (!options) {
+        options = path || {};
+        path = undefined;
+    }
+
+    var contentOptions = (options || {}).hash || {};
+    var truncateOptions = _.pick(contentOptions, ['words', 'characters']);
+    var output;
+
     _.keys(truncateOptions).map(function (key) {
         truncateOptions[key] = parseInt(truncateOptions[key], 10);
     });
@@ -24,5 +32,16 @@ module.exports = function content(options) {
         );
     }
 
-    return new SafeString(this.html);
+    if (!path) {
+        output = this.html;
+    } else {
+        var $ = cheerio.load(this.html);
+        console.log('p', $(path).first());
+        console.log('p2', $(path).first().text());
+        console.log('p3', $(path).first().attr('href'));
+
+        output = $(path).first().attr('href');
+    }
+
+    return new SafeString(output);
 };

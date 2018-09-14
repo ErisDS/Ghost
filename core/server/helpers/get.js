@@ -61,8 +61,12 @@ function resolvePaths(data, value) {
         // Handle Handlebars .[] style arrays
         path = path.replace(/\.\[/g, '[');
 
+        console.log(path);
+
         // Do the query, which always returns an array of matches
         result = jsonpath.query(data, path);
+
+        console.log(result);
 
         // Handle the case where the single data property we return is a Date
         // Data.toString() is not DB compatible, so use `toISOString()` instead
@@ -103,6 +107,8 @@ get = function get(resource, options) {
     options = options || {};
     options.hash = options.hash || {};
     options.data = options.data || {};
+
+    console.log(options);
 
     var self = this,
         data = createFrame(options.data),

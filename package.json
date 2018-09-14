@@ -19,6 +19,7 @@
   "main": "./core/index",
   "scripts": {
     "start": "node index",
+    "db:seed": "node core/server/data/db/seed.js",
     "dev": "DEBUG=ghost:* grunt dev",
     "test": "grunt validate --verbose",
     "setup": "yarn install && knex-migrator init && grunt symlink && grunt init || true",
