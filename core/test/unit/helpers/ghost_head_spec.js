@@ -13,10 +13,6 @@ const should = require('should'),
     settingsCache = proxy.settingsCache,
     sandbox = sinon.sandbox.create();
 
-/**
- * @TODO: this is not a full unit test. it's a half integration test, because we don't mock "getMetaData"!!
- *        either move to integration tests or rewrite!!!
- */
 describe('{{ghost_head}} helper', function () {
     let posts = [], tags = [], authors = [], users = [];
 
