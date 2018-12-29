@@ -3,6 +3,9 @@ var config = require('../../config'),
     social = require('../../lib/social'),
     _ = require('lodash');
 
+const SchemaGenerator = require('./schema-org');
+const schemaGenerator = new SchemaGenerator();
+
 function schemaImageObject(metaDataVal) {
     var imageObject;
     if (!metaDataVal) {
@@ -170,20 +173,64 @@ function getAuthorSchema(metaData, data) {
     return trimSchema(schema);
 }
 
-function getSchema(metaData, data) {
-    if (!config.isPrivacyDisabled('useStructuredData')) {
-        var context = data.context ? data.context : null;
-        if (_.includes(context, 'post') || _.includes(context, 'page') || _.includes(context, 'amp')) {
-            return getPostSchema(metaData, data);
-        } else if (_.includes(context, 'home')) {
-            return getHomeSchema(metaData);
-        } else if (_.includes(context, 'tag')) {
-            return getTagSchema(metaData, data);
-        } else if (_.includes(context, 'author')) {
-            return getAuthorSchema(metaData, data);
-        }
+// function getSchema(metaData, data) {
+//     if (!config.isPrivacyDisabled('useStructuredData')) {
+//         var context = data.context ? data.context : null;
+//         if (_.includes(context, 'post') || _.includes(context, 'page') || _.includes(context, 'amp')) {
+//             return getPostSchema(metaData, data);
+//         } else if (_.includes(context, 'home')) {
+//             return getHomeSchema(metaData);
+//         } else if (_.includes(context, 'tag')) {
+//             return getTagSchema(metaData, data);
+//         } else if (_.includes(context, 'author')) {
+//             return getAuthorSchema(metaData, data);
+//         }
+//     }
+//     return null;
+// }
+
+function getSchemaTypeFromContext(context) {
+    let type = null;
+
+    if (_.includes(context, 'post') || _.includes(context, 'page') || _.includes(context, 'amp')) {
+        type = 'post';
+    } else if (_.includes(context, 'home')) {
+        type = 'home';
+    } else if (_.includes(context, 'tag')) {
+        type = 'tag';
+    } else if (_.includes(context, 'author')) {
+        type = 'author';
     }
-    return null;
+
+    return type;
+}
+
+function buildSchema(metaData, rawData) {
+    const options = {};
+
+    const context = rawData.context ? rawData.context : null;
+    const type = getSchemaTypeFromContext(context);
+
+    console.log('BUILDING SCHEMA', context, type);
+
+    if (!type) {
+        return null;
+    }
+
+    const data = metaData;
+
+    return schemaGenerator.createSchema(type, data, options);
+}
+
+/**
+ * Check config before building schema
+ */
+function getSchema(metaData, rawData) {
+    if (config.isPrivacyDisabled('useStructuredData')) {
+        return null;
+    }
+
+    return buildSchema(metaData, rawData);
 }
 
 module.exports = getSchema;
