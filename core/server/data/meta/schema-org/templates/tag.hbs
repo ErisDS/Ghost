@@ -1,0 +1,16 @@
+{
+    @context: "https://schema.org",
+    @type: "Series",
+    publisher: {
+        @type: "Organization",
+        name: "{{site.title}}",
+        logo: {{site.logo}}
+    },
+    url: {{meta.url}},
+    image: {{meta.image}},
+    description: {{meta.description}},
+    mainEntityOfPage: {
+        @type: "WebPage",
+        @id: {{site.url}},
+    }
+}

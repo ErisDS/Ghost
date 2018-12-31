@@ -1,7 +1,6 @@
 /**
  * Post Schema = Article
  */
-const tpl = require('./tpl');
 
 // All my template variables
 // let siteTitle = escapeExpression(metaData.blog.title);
@@ -19,31 +18,31 @@ const tpl = require('./tpl');
 // let metaKeywords = metaData.keywords && metaData.keywords.length > 0 ? metaData.keywords.join(", ") : null;
 // let metaDescription = metaData.excerpt ? escapeExpression(metaData.excerpt) : null;
 
-module.exports = tpl`{
+module.exports = `{
     @context: "https://schema.org",
     @type: "Article",
     publisher: {
         @type: "Organization",
-        name: "${'site.title'}",
-        logo: ${'site.logo'}
+        name: "{{site.title}}",
+        logo: {{site.logo}}
     },
     author: {
         "@type": "Person",
-        name: "${'author.name'}",
-        image: ${'author.image'},
-        url: ${'author.url'},
-        sameAs: ${'author.sameAs'},
-        description: ${'author.description'}
+        name: "{{author.name}}",
+        image: {{author.image}},
+        url: "{{author.url}}",
+        sameAs: "{{author.sameAs}}",
+        description: "{{author.description}}"
     },
-    headline: ${'meta.title'},
-    url: ${'meta.url'},
-    datePublished: ${'meta.datePublished'},
-    dateModified: ${'meta.dateModified'},
-    image: ${'meta.image'}
-    keywords: ${'meta.keywords'},
-    description: ${'meta.description'},
+    headline: "{{meta.title}}",
+    url: "{{meta.url}}",
+    datePublished: "{{meta.datePublished}}",
+    dateModified: "{{meta.dateModified}}",
+    image: {{meta.image}},
+    keywords: "{{meta.keywords}}",
+    description: "{{meta.description}}",
     mainEntityOfPage: {
         @type: "WebPage",
-        @id: ${'site.url'},
+        @id: {{site.url}},
     }
-};`;
+}`;

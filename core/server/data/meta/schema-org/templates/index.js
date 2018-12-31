@@ -1,6 +1,9 @@
+const fs = require('fs-extra');
+const path = require('path');
+
 module.exports = {
-    home: require('./home'),
-    post: require('./post'),
-    author: require('./author'),
-    tag: require('./tag')
+    home: fs.readFileSync(path.join(__dirname, '/home.hbs')).toString(),
+    post: fs.readFileSync(path.join(__dirname, '/post.hbs')).toString(),
+    author: fs.readFileSync(path.join(__dirname, '/author.hbs')).toString(),
+    tag: fs.readFileSync(path.join(__dirname, '/tag.hbs')).toString()
 };
