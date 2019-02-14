@@ -311,6 +311,7 @@ _private.validateCollections = function validateCollections(collections) {
 
 _private.validateTaxonomies = function validateTaxonomies(taxonomies) {
     const validRoutingTypeObjectKeys = Object.keys(RESOURCE_CONFIG.TAXONOMIES);
+    let permalink;
     _.each(taxonomies, (routingTypeObject, routingTypeObjectKey) => {
         if (!routingTypeObject) {
             throw new common.errors.ValidationError({
@@ -331,31 +332,47 @@ _private.validateTaxonomies = function validateTaxonomies(taxonomies) {
             });
         }
 
+        // CASE: taxonomy can have a permalink, or an object with 2 properties:
+        if (_.isString(routingTypeObject)) {
+            permalink = routingTypeObject;
+        } else {
+            if (!routingTypeObject.hasOwnProperty('permalink')) {
+                throw new common.errors.ValidationError({
+                    message: common.i18n.t('errors.services.settings.yaml.validate', {
+                        at: routingTypeObjectKey,
+                        reason: 'Please define a permalink route.'
+                    }),
+                    help: 'e.g. permalink: /{slug}/'
+                });
+            }
+            permalink = routingTypeObject.permalink;
+        }
+
         // CASE: we hard-require trailing slashes for the taxonomie permalink route
-        if (!routingTypeObject.match(/\/$/)) {
+        if (!permalink.match(/\/$/)) {
             throw new common.errors.ValidationError({
                 message: common.i18n.t('errors.services.settings.yaml.validate', {
-                    at: routingTypeObject,
+                    at: routingTypeObjectKey,
                     reason: 'A trailing slash is required.'
                 })
             });
         }
 
         // CASE: we hard-require leading slashes for the value/permalink route
-        if (!routingTypeObject.match(/^\//)) {
+        if (!permalink.match(/^\//)) {
             throw new common.errors.ValidationError({
                 message: common.i18n.t('errors.services.settings.yaml.validate', {
-                    at: routingTypeObject,
+                    at: routingTypeObjectKey,
                     reason: 'A leading slash is required.'
                 })
             });
         }
 
         // CASE: notation /:slug/ or /:primary_author/ is not allowed. We only accept /{{...}}/.
-        if (routingTypeObject && routingTypeObject.match(/\/:\w+/)) {
+        if (permalink.match(/\/:\w+/)) {
             throw new common.errors.ValidationError({
                 message: common.i18n.t('errors.services.settings.yaml.validate', {
-                    at: routingTypeObject,
+                    at: routingTypeObjectKey,
                     reason: 'Please use the following notation e.g. /{slug}/.'
                 })
             });
@@ -363,9 +380,9 @@ _private.validateTaxonomies = function validateTaxonomies(taxonomies) {
 
         // CASE: transform {.*} into :\w+ notation. This notation is our internal notation e.g. see permalink
         //       replacement in our UrlService utility.
-        if (routingTypeObject && routingTypeObject.match(/{.*}/)) {
-            routingTypeObject = routingTypeObject.replace(/{(\w+)}/g, ':$1');
-            taxonomies[routingTypeObjectKey] = routingTypeObject;
+        if (permalink.match(/{.*}/)) {
+            permalink = permalink.replace(/{(\w+)}/g, ':$1');
+            // taxonomies[routingTypeObjectKey] = routingTypeObject;
         }
     });
 

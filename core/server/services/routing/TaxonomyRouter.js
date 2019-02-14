@@ -1,4 +1,5 @@
 const debug = require('ghost-ignition').debug('services:routing:taxonomy-router');
+const _ = require('lodash');
 const common = require('../../lib/common');
 const ParentRouter = require('./ParentRouter');
 const RSSRouter = require('./RSSRouter');
@@ -7,11 +8,22 @@ const controllers = require('./controllers');
 const middlewares = require('./middlewares');
 
 class TaxonomyRouter extends ParentRouter {
-    constructor(key, permalinks, RESOURCE_CONFIG) {
+    constructor(key, object, RESOURCE_CONFIG) {
         super('Taxonomy');
+
+        console.log('object', object);
 
         this.taxonomyKey = key;
         this.RESOURCE_CONFIG = RESOURCE_CONFIG;
+
+        let permalinks;
+
+        if (_.isString(object)) {
+            permalinks = object;
+        } else {
+            permalinks = object.permalink;
+            this.order = object.order;
+        }
 
         this.permalinks = {
             value: permalinks
@@ -55,6 +67,7 @@ class TaxonomyRouter extends ParentRouter {
             permalinks: this.permalinks.getValue(),
             data: {[this.taxonomyKey]: this.RESOURCE_CONFIG.QUERY[this.taxonomyKey]},
             filter: this.RESOURCE_CONFIG.TAXONOMIES[this.taxonomyKey].filter,
+            order: this.order,
             resourceType: this.getResourceType(),
             context: [this.taxonomyKey],
             slugTemplate: true,

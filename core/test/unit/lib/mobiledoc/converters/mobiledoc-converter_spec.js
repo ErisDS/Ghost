@@ -143,7 +143,7 @@ describe('Mobiledoc converter', function () {
             let output = converter.render(mobiledoc, 2);
 
             // normal headings
-            output.should.match(/<h1 id="heading-one">Heading One<\/h1>/);
+            output.should.match(/<h1 id="heading-one"   >Heading One<\/h1>/);
             output.should.match(/<h2 id="heading-two">Heading Two<\/h2>/);
             output.should.match(/<h3 id="heading-three">Heading Three<\/h3>/);
             output.should.match(/<h4 id="heading-four">Heading Four<\/h4>/);

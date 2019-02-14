@@ -6,5 +6,7 @@ collections:
     template: index
 
 taxonomies:
-  tag: /tag/{slug}/
+  tag:
+    permalink: /tag/{slug}/
+    order: featured desc, published_at desc
   author: /author/{slug}/
