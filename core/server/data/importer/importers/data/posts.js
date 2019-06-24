@@ -58,6 +58,8 @@ class PostsImporter extends BaseImporter {
                         id: relation[fk]
                     });
                 }
+
+                debug(target, fk, postToImport[target]);
             });
         };
 
@@ -85,6 +87,10 @@ class PostsImporter extends BaseImporter {
                 // this is the original relational object (old id)
                 let objectInFile = _.find(this.requiredFromFile[tableName], {id: object.id});
 
+                if (targetProperty === 'tags') {
+                    console.log('EACH', targetProperty, this.requiredFromFile[tableName], object.id, objectInFile);
+                }
+
                 if (!objectInFile) {
                     let existingObject = _.find(this.requiredExistingData[tableName], {id: object.id});
 
@@ -102,6 +108,10 @@ class PostsImporter extends BaseImporter {
                 // EDGE CASE: uppercase tag slug was imported and auto modified
                 let importedObject = _.find(this.requiredImportedData[tableName], {originalSlug: objectInFile.slug});
 
+                if (targetProperty === 'tags') {
+                    console.log('IMPORTED', importedObject, objectInFile.slug);
+                }
+
                 if (importedObject) {
                     this.dataToImport[postIndex][targetProperty][index].id = importedObject.id;
                     return;
@@ -109,6 +119,10 @@ class PostsImporter extends BaseImporter {
 
                 // CASE: search through existing data by unique attribute
                 let existingObject = _.find(this.requiredExistingData[tableName], {slug: objectInFile.slug});
+
+                if (targetProperty === 'tags') {
+                    console.log('existingObject', existingObject);
+                }
 
                 if (existingObject) {
                     this.dataToImport[postIndex][targetProperty][index].id = existingObject.id;
