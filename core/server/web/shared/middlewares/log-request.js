@@ -15,9 +15,9 @@ module.exports = function logRequest(req, res, next) {
         req.userId = req.user ? (req.user.id ? req.user.id : req.user) : null;
 
         if (req.err && req.err.statusCode !== 404) {
-            common.logging.error({req: req, res: res, err: req.err});
+            common.logging.error({req, res, err: req.err});
         } else {
-            common.logging.info({req: req, res: res});
+            common.logging.info({req, res});
         }
 
         res.removeListener('finish', logResponse);
