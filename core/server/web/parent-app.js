@@ -1,6 +1,7 @@
 const debug = require('ghost-ignition').debug('web:parent');
 const express = require('express');
 const config = require('../config');
+const common = require('../lib/common');
 const compress = require('compression');
 const netjet = require('netjet');
 const shared = require('./shared');
@@ -17,7 +18,8 @@ module.exports = function setupParentApp(options = {}) {
     // (X-Forwarded-Proto header will be checked, if present)
     parentApp.enable('trust proxy');
 
-    parentApp.use(shared.middlewares.logRequest);
+    // parentApp.use(shared.middlewares.logRequest);
+    parentApp.use(common.logging.request);
 
     // Register event emmiter on req/res to trigger cache invalidation webhook event
     parentApp.use(shared.middlewares.emitEvents);
