@@ -15,6 +15,8 @@
 // });
 
 const {createLogger, format, transports, addColors} = require('winston');
+const GelfTransport = require('winston-graylog2');
+
 const customLevels = {
     levels: {
         trace: 5,
@@ -59,7 +61,8 @@ const logger = createLogger({
     ),
     transports: [
         new transports.File({filename: 'test.error.log', level: 'error', maxsize: 10 * 1024 * 1024, maxfiles: 10}),
-        new transports.File({filename: 'test.combined.log', level: 'info', maxsize: 10 * 1024 * 1024, maxfiles: 10})
+        new transports.File({filename: 'test.combined.log', level: 'info', maxsize: 10 * 1024 * 1024, maxfiles: 10}),
+        new GelfTransport({name: 'ghost', level: 'info', graylog: {servers: [{host: '134.209.202.203', port: 12201}], facility: 'ghost'}})
     ]
 });
 
@@ -74,7 +77,15 @@ if (process.env.NODE_ENV !== 'production') {
             format.errors({stack: true}),
             format.colorize(),
             format.printf(info => `${info.timestamp} ${info.level} ${info.stack ? info.stack : info.message}`))
-    }));                    
+    }));
 }
 
-module.exports = logger;
+// logger.on('finish', function (info) {
+//     // All `info` log messages has now been logged
+//     process.exit();
+// });
+
+logger.info('test', {foo: 'bar'});
+
+// logger.end();
+//module.exports = logger;
