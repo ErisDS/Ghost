@@ -2993,6 +2993,11 @@ graceful-fs@^4.2.0:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.0.tgz#8d8fdc73977cb04104721cb53666c1ca64cd328b"
   integrity sha512-jpSvDPV4Cq/bgtpndIWbI5hmYxhQGHPC4d4cqBPb4DLniCfhJokdXhwhaDuLBGLQdvvRum/UiX6ECVIPvDXqdg==
 
+graylog2@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/graylog2/-/graylog2-0.2.1.tgz#fcb0775766fb6d7d6f5fef3ff873326b8b1d35a9"
+  integrity sha512-vjysakwOhrAqMeIvSK0WZcmzKvkpxY6pCfT9QqtdSVAidPFIynuin7adqbdFp9MCCTbTE402WIxvg8cph5OWTA==
+
 growl@1.10.3:
   version "1.10.3"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.3.tgz#1926ba90cf3edfe2adb4927f5880bc22c66c790f"
@@ -7614,6 +7619,15 @@ window-size@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/window-size/-/window-size-0.1.4.tgz#f8e1aa1ee5a53ec5bf151ffa09742a6ad7697876"
 
+winston-graylog2@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/winston-graylog2/-/winston-graylog2-2.1.2.tgz#a97b9e40d2540a7cf08b3497111c9c503fc6b890"
+  integrity sha512-QYVUYrb9CH91/u71hldO1+kwtOT/OALpD+h7V3xQcnjHF+riEPUKUWd4JDcyHlnKPTdRTPN/3atk+dEYD6kNnQ==
+  dependencies:
+    graylog2 "^0.2.1"
+    winston "^3.2.0"
+    winston-transport "^4.3.0"
+
 winston-transport@^4.3.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/winston-transport/-/winston-transport-4.3.0.tgz#df68c0c202482c448d9b47313c07304c2d7c2c66"
@@ -7622,7 +7636,7 @@ winston-transport@^4.3.0:
     readable-stream "^2.3.6"
     triple-beam "^1.2.0"
 
-winston@^3.2.1:
+winston@^3.2.0, winston@^3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/winston/-/winston-3.2.1.tgz#63061377976c73584028be2490a1846055f77f07"
   integrity sha512-zU6vgnS9dAWCEKg/QYigd6cgMVVNwyTzKs81XZtTFuRwJOcDdBg7AU0mXVyNbs7O5RH2zdv+BdNZUlx7mXPuOw==

@@ -74,7 +74,7 @@ if (process.env.NODE_ENV !== 'production') {
             format.errors({stack: true}),
             format.colorize(),
             format.printf(info => `${info.timestamp} ${info.level} ${info.stack ? info.stack : info.message}`))
-    }));
+    }));                    
 }
 
 module.exports = logger;
