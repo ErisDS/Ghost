@@ -39,6 +39,8 @@
     "cli": "^1.9.0"
   },
   "dependencies": {
+    "@log4js-node/gelf": "^1.0.2",
+    "@log4js-node/logstashudp": "^1.2.0",
     "@nexes/nql": "0.2.2",
     "@tryghost/helpers": "1.1.6",
     "@tryghost/members-api": "0.1.2",

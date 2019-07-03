@@ -35,9 +35,10 @@ log4js.configure(
             out: {type: 'stdout', layout: {type: 'pattern', pattern: '[%d{yyyy-MM-dd hh:mm:ss O}] %[%p%] %m'}},
             access: {type: 'file', filename: 'test', maxsize: 10 * 1024 * 1024, backups: 20},
             errors: {type: 'file', filename: 'test.error', maxsize: 10 * 1024 * 1024, backups: 20},
-            errorsOnly: {type: 'logLevelFilter', appender: 'errors', level: 'error'}
+            errorsOnly: {type: 'logLevelFilter', appender: 'errors', level: 'error'},
+            gelf: {type: '@log4js-node/gelf', host: '134.209.202.203', port: 12201}
         },
-        categories: {default: {appenders: ['out', 'access', 'errorsOnly'], level: 'debug'}},
+        categories: {default: {appenders: ['out', 'access', 'errorsOnly', 'gelf'], level: 'debug'}},
         levels
     });
 

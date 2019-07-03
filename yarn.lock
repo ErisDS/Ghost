@@ -23,6 +23,21 @@
     core-js "^2.5.7"
     regenerator-runtime "^0.12.0"
 
+"@log4js-node/gelf@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@log4js-node/gelf/-/gelf-1.0.2.tgz#f5b05704eab53eef0c2ad45de5d0ffb6ad6db5cb"
+  integrity sha512-/U3C8RUTmv2VoRLfvetG0fA+D8PBPRzr3vmwmljE7HXizxuk98zKIgaZy9U60vn888Ez6Ic2LG6+MDfa6UOLSw==
+  dependencies:
+    debug "^3.1.0"
+
+"@log4js-node/logstashudp@^1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@log4js-node/logstashudp/-/logstashudp-1.2.0.tgz#eeb47eb2dc584cd78f5b033f530777477826cd73"
+  integrity sha512-O7XmR8d0TJubzMBUZddbWuyWNhJcQUyLmKL+p8Iq3yE9yqx9aFSsCxwJpyJck6zf+wRgBdYCsQRwF6luus99SA==
+  dependencies:
+    debug "^3.1.0"
+    lodash "^4.17.11"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
