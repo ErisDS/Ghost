@@ -15,7 +15,7 @@
 // });
 
 const {createLogger, format, transports, addColors} = require('winston');
-const GelfTransport = require('winston-graylog2');
+const GelfTransport = require('winston-gelf-pro');
 
 const customLevels = {
     levels: {
