@@ -18,8 +18,8 @@ module.exports = function setupParentApp(options = {}) {
     // (X-Forwarded-Proto header will be checked, if present)
     parentApp.enable('trust proxy');
 
-    // parentApp.use(shared.middlewares.logRequest);
-    parentApp.use(common.logging.request);
+    parentApp.use(shared.middlewares.logRequest);
+    // parentApp.use(common.logging.request);
 
     // Register event emmiter on req/res to trigger cache invalidation webhook event
     parentApp.use(shared.middlewares.emitEvents);

@@ -205,6 +205,10 @@ GhostServer.prototype.logStartMessages = function () {
         common.logging.info(common.i18n.t('notices.httpServer.ctrlCToShutDown'));
     }
 
+    setTimeout(() => {
+        throw new Error('FUUUUUU');
+    }, 5000);
+
     function shutdown() {
         common.logging.warn(common.i18n.t('notices.httpServer.ghostHasShutdown'));
 
@@ -217,7 +221,9 @@ GhostServer.prototype.logStartMessages = function () {
             );
         }
 
-        process.exit(0);
+        common.logging.shutdown(() => {
+            process.exit(0);
+        });
     }
 
     // ensure that Ghost exits correctly on Ctrl+C and SIGTERM
