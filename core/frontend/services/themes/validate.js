@@ -40,40 +40,28 @@ const check = function check(theme, isZip) {
 const checkSafe = function checkSafe(theme, isZip) {
     return check(theme, isZip)
         .then((checkedTheme) => {
-            let files = _.map(checkedTheme.files, 'file');
-
-            if (!_.includes(files, 'routes.yaml')) {
-                if (canActivate(checkedTheme)) {
-                    return checkedTheme;
-                }
+            if (canActivate(checkedTheme)) {
+                return checkedTheme;
             }
-            let dirtyPath = `${checkedTheme.path}/routes.yaml`;
-            const settings = require('../routing/settings');
 
-            return settings.setFromFilePath(dirtyPath).then(() => {
-                if (canActivate(checkedTheme)) {
-                    return checkedTheme;
-                }
+            // NOTE: When theme cannot be activated and gscan explicitly keeps extracted files (after
+            //       being called with `keepExtractedDir: true`), this is the closes place for a cleanup.
+            // TODO: The `keepExtractedDir` flag is the cause of confusion for when and where the cleanup
+            //       should be done. It's probably best if gscan is called directly with path to the extracted
+            //       directory, this would allow keeping gscan to do just one thing - validate the theme, and
+            //       file manipulations could be left to another module/library
+            if (isZip) {
+                fs.remove(checkedTheme.path);
+            }
 
-                // NOTE: When theme cannot be activated and gscan explicitly keeps extracted files (after
-                //       being called with `keepExtractedDir: true`), this is the closes place for a cleanup.
-                // TODO: The `keepExtractedDir` flag is the cause of confusion for when and where the cleanup
-                //       should be done. It's probably best if gscan is called directly with path to the extracted
-                //       directory, this would allow keeping gscan to do just one thing - validate the theme, and
-                //       file manipulations could be left to another module/library
-                if (isZip) {
-                    fs.remove(checkedTheme.path);
-                }
-
-                return Promise.reject(new common.errors.ThemeValidationError({
-                    message: common.i18n.t('errors.api.themes.invalidTheme'),
-                    errorDetails: Object.assign(
-                        _.pick(checkedTheme, ['checkedVersion', 'name', 'path', 'version']), {
-                            errors: checkedTheme.results.error
-                        }
-                    )
-                }));
-            });
+            return Promise.reject(new common.errors.ThemeValidationError({
+                message: common.i18n.t('errors.api.themes.invalidTheme'),
+                errorDetails: Object.assign(
+                    _.pick(checkedTheme, ['checkedVersion', 'name', 'path', 'version']), {
+                        errors: checkedTheme.results.error
+                    }
+                )
+            }));
         });
 };
 

@@ -5,6 +5,7 @@ const themeLoader = require('./loader');
 const active = require('./active');
 const activate = require('./activate');
 const validate = require('./validate');
+const dirty = require('./dirty');
 const list = require('./list');
 const settingsCache = require('../../../server/services/settings/cache');
 const engineDefaults = require('./engines/defaults');
@@ -93,7 +94,7 @@ module.exports = {
             }));
         }
 
-        return validate.checkSafe(loadedTheme)
+        return dirty.prepareTheme(loadedTheme)
             .then((checkedTheme) => {
                 debug('Activating theme (method B on API "activate")', themeName);
                 activate(loadedTheme, checkedTheme);

@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 
 const activate = require('./activate');
-const validate = require('./validate');
+const dirty = require('./dirty');
 const list = require('./list');
 const ThemeStorage = require('./ThemeStorage');
 const themeLoader = require('./loader');
@@ -45,7 +45,7 @@ module.exports = {
 
         let checkedTheme;
 
-        return validate.checkSafe(zip, true)
+        return dirty.prepareTheme(zip, true)
             .then((_checkedTheme) => {
                 checkedTheme = _checkedTheme;
 
