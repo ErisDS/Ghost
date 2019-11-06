@@ -6,6 +6,25 @@ const fs = require('fs-extra'),
     yamlParser = require('./yaml-parser'),
     validate = require('./validate');
 
+module.exports.readYaml = (yamlString, fileName) => {
+    const object = yamlParser(yamlString, fileName);
+    return validate(object);
+};
+
+module.exports.readYamlFile = async (filePath) => {
+    try {
+        const fileName = path.basename(filePath);
+        const fileContents = await fs.readFile(filePath, 'utf8');
+        debug('settings file read for', fileName);
+
+        module.exports.readYaml(fileContents, fileName);
+    } catch (err) {
+        if (common.errors.utils.isIgnitionError(err)) {
+            throw err;
+        }
+    }
+};
+
 /**
  * Reads the desired settings YAML file and passes the
  * file to the YAML parser which then returns a JSON object.
