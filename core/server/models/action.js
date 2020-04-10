@@ -1,20 +1,34 @@
 const _ = require('lodash');
 const ghostBookshelf = require('./base');
 
-const candidates = [];
-
-_.each(ghostBookshelf._models, (model) => {
-    candidates.push([model, model.prototype.tableName.replace(/s$/, '')]);
-});
-
 const Action = ghostBookshelf.Model.extend({
     tableName: 'actions',
 
     actor() {
+        console.log('actor');
+        const candidates = [];
+
+        console.log('ALL MODELS', Object.keys(ghostBookshelf._models));
+
+        _.each(ghostBookshelf._models, (model, key) => {
+            console.log('candidate key', key);
+
+            if (key !== 'Action' && key !== 'actor_type') {
+                console.log('candidate tableName', model.prototype.tableName);
+                candidates.push([model, model.prototype.tableName.replace(/s$/, '')]);
+            }
+        });
         return this.morphTo('actor', ['actor_type', 'actor_id'], ...candidates);
     },
 
     resource() {
+        console.log('resource');
+        const candidates = [];
+
+        _.each(ghostBookshelf._models, (model) => {
+            console.log('candidate', model.prototype.tableName);
+            candidates.push([model, model.prototype.tableName.replace(/s$/, '')]);
+        });
         return this.morphTo('resource', ['resource_type', 'resource_id'], ...candidates);
     },
 

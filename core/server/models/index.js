@@ -2,9 +2,8 @@
  * Dependencies
  */
 
-var _ = require('lodash'),
-    exports,
-    models;
+const _ = require('lodash');
+const glob = require('glob');
 
 // enable event listeners
 require('./base/listeners');
@@ -14,36 +13,20 @@ require('./base/listeners');
  */
 exports = module.exports;
 
-models = [
-    'permission',
-    'post',
-    'role',
-    'settings',
-    'session',
-    'tag',
-    'tag-public',
-    'user',
-    'author',
-    'invite',
-    'webhook',
-    'integration',
-    'api-key',
-    'mobiledoc-revision',
-    'member',
-    'action',
-    'posts-meta',
-    'member-stripe-customer',
-    'stripe-customer-subscription',
-    'email',
-    'label'
-];
+// We use glob here because it's already a dependency
+// If we want to get rid of glob we could use E.g. requiredir
+// Or require('fs').readdirSync(__dirname + '/')
+const modelFiles = glob.sync('!(index).js', {cwd: __dirname}).reverse();
 
 function init() {
     exports.Base = require('./base');
 
-    models.forEach(function (name) {
+    modelFiles.forEach(function (model) {
+        let name = model.replace(/.js$/, '');
         _.extend(exports, require('./' + name));
     });
+
+    console.log('loaded all');
 }
 
 /**
