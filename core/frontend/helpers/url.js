@@ -13,5 +13,9 @@ module.exports = function url(options) {
 
     outputUrl = encodeURI(decodeURI(outputUrl));
 
+    if (options.data.site._preview) {
+        outputUrl += `?p=${encodeURIComponent(options.data.site._preview)}`;
+    }
+
     return new SafeString(outputUrl);
 };

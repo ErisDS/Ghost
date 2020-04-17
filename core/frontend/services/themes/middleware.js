@@ -98,6 +98,26 @@ function updateGlobalTemplateOptions(req, res, next) {
     };
     const priceData = haxGetMembersPriceData();
 
+    const optCodes = {
+        l: 'brand.oneColumn',
+        c: 'brand.primaryColor'
+    };
+
+    // DIRTY HAXXOR
+    if (req.query && req.query.p) {
+        console.log('req.query', req.query.p);
+        let opts = decodeURIComponent(req.query.p).split('-');
+
+        opts.forEach((opt) => {
+            let [key, value] = opt.split(':');
+            if (optCodes[key]) {
+                _.set(siteData, optCodes[key], value);
+            }
+        });
+
+        siteData._preview = req.query.p;
+    }
+
     // @TODO: only do this if something changed?
     // @TODO: remove blog if we drop v2 (Ghost 4.0)
     hbs.updateTemplateOptions({
