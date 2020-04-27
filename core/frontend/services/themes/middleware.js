@@ -103,7 +103,7 @@ function updateGlobalTemplateOptions(req, res, next) {
         c: 'brand.primaryColor'
     };
 
-    console.log(siteData, themeData, priceData);
+    // console.log(siteData, themeData, priceData);
 
     // DIRTY HAXXOR
     if (req.query && req.query.p) {
