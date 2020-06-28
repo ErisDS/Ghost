@@ -696,7 +696,7 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
         case 'findAll':
             return baseOptions.concat(extraOptions, ['filter', 'columns', 'mongoTransformer']);
         case 'findPage':
-            return baseOptions.concat(extraOptions, ['filter', 'order', 'page', 'limit', 'columns', 'mongoTransformer']);
+            return baseOptions.concat(extraOptions, ['filter', 'order', 'orderRaw', 'page', 'limit', 'columns', 'mongoTransformer']);
         default:
             return baseOptions.concat(extraOptions);
         }
@@ -802,6 +802,7 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
      * @return {Object} The filtered results of `options`.
      */
     filterOptions: function filterOptions(unfilteredOptions, methodName, filterConfig) {
+        console.log('unfilteredOptions', unfilteredOptions);
         unfilteredOptions = unfilteredOptions || {};
         filterConfig = filterConfig || {};
 
@@ -907,6 +908,9 @@ ghostBookshelf.Model = ghostBookshelf.Model.extend({
 
         if (options.order) {
             options.order = this.parseOrderOption(options.order, options.withRelated);
+        } else if (options.orderRaw) {
+            // Do we need to do anything here?
+            console.log(options.orderRaw);
         } else if (this.orderDefaultRaw) {
             options.orderRaw = this.orderDefaultRaw(options);
         } else if (this.orderDefaultOptions) {

@@ -3,8 +3,27 @@ const url = require('./utils/url');
 const utils = require('../../index');
 
 function setDefaultOrder(frame) {
-    if (!frame.options.order) {
-        frame.options.order = 'name asc';
+    let defaultOrder = 'name asc';
+
+    if (!frame.options.order && frame.options.filter) {
+        let orderMatch = frame.options.filter.match(/slug:\s?\[(.*)\]/);
+
+        if (orderMatch) {
+            let orderStuff = orderMatch[1].split(',');
+            let order = 'CASE ';
+
+            orderStuff.forEach((item, index) => {
+                order += `WHEN slug = '${item}' THEN ${index} `;
+            });
+
+            order += 'END ASC';
+
+            frame.options.orderRaw = order;
+        }
+    }
+
+    if (!frame.options.order && !frame.options.orderRaw) {
+        frame.options.order = defaultOrder;
     }
 }
 
