@@ -21,6 +21,9 @@ module.exports = function foreach(items, options) {
 
     // Initial values set based on parameters sent through. If nothing sent, set to defaults
     const {fn, inverse, hash, data, ids} = options;
+    let page = _.get(this, 'pagination.page') || 1;
+    let pageSize = _.get(this, 'pagination.limit') || 15;
+    let pageOffset = pageSize * (page - 1);
     let {columns, limit, from, to} = hash;
     let length = _.size(items);
     let output = '';
@@ -44,12 +47,16 @@ module.exports = function foreach(items, options) {
     if (data) {
         frame = createFrame(data);
     }
+    console.log('foreach', this.pagination, page, pageOffset);
 
     function execIteration(field, index, last) {
         if (frame) {
+            console.log('page', page, index, pageOffset);
             frame.key = field;
             frame.index = index;
             frame.number = index + 1;
+            frame.gIndex = index + pageOffset;
+            frame.gNumber = index + pageOffset + 1;
             frame.first = index === from - 1; // From uses 1-indexed, but array uses 0-indexed
             frame.last = !!last;
             frame.even = index % 2 === 1;
