@@ -9,6 +9,7 @@ const helpers = {};
 let helperFiles = glob.sync('!(index).js', {cwd: __dirname});
 helperFiles.forEach((helper) => {
     let name = helper.replace(/.js$/, '');
+    console.log('helper name', name);
     helpers[name] = require(path.join(__dirname, helper));
 });
 

@@ -28,6 +28,7 @@ registerAllCoreHelpers = function registerAllCoreHelpers() {
     registerThemeHelper('meta_description', coreHelpers.meta_description);
     registerThemeHelper('meta_title', coreHelpers.meta_title);
     registerThemeHelper('navigation', coreHelpers.navigation);
+    registerThemeHelper('number', coreHelpers.number);
     registerThemeHelper('page_url', coreHelpers.page_url);
     registerThemeHelper('pagination', coreHelpers.pagination);
     registerThemeHelper('plural', coreHelpers.plural);
