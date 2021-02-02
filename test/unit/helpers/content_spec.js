@@ -2,8 +2,31 @@ const should = require('should');
 
 // Stuff we are testing
 const helpers = require('../../../core/frontend/helpers');
+const handlebars = require('../../../core/frontend/services/themes/engine').handlebars;
 
 describe('{{content}} helper', function () {
+    describe('(compile)', function () {
+        function shouldCompileToExpected(templateString, hash, expected) {
+            const template = handlebars.compile(templateString);
+            const result = template(hash);
+
+            result.should.eql(expected);
+        }
+
+        before(function () {
+            handlebars.registerPartial('content', '<div>{{content}}</div>')
+            handlebars.registerHelper('content', helpers.content);
+        });
+
+        /** Many of these are copied direct from the handlebars spec */
+        it('object and @key', function () {
+            const templateString = '<ul>{{#foreach posts}}<li>{{@key}} {{title}}</li>{{/foreach}}</ul>';
+            const expected = '<ul><li>first first</li><li>second second</li><li>third third</li><li>fourth fourth</li><li>fifth fifth</li></ul>';
+
+            shouldCompileToExpected(templateString, objectHash, expected);
+        });
+
+
     it('renders empty string when null', function () {
         const html = null;
         const rendered = helpers.content.call({html: html});
