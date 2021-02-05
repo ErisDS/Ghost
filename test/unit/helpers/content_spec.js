@@ -1,90 +1,122 @@
 const should = require('should');
 
 // Stuff we are testing
-const helpers = require('../../../core/frontend/helpers');
-const handlebars = require('../../../core/frontend/services/themes/engine').handlebars;
+const {helpers, handlebars, shouldCompileToExpected} = require('./helper_test_utils');
 
 describe('{{content}} helper', function () {
-    describe('(compile)', function () {
-        function shouldCompileToExpected(templateString, hash, expected) {
-            const template = handlebars.compile(templateString);
-            const result = template(hash);
-
-            result.should.eql(expected);
-        }
-
-        before(function () {
-            handlebars.registerPartial('content', '<div>{{content}}</div>')
-            handlebars.registerHelper('content', helpers.content);
-        });
-
-        /** Many of these are copied direct from the handlebars spec */
-        it('object and @key', function () {
-            const templateString = '<ul>{{#foreach posts}}<li>{{@key}} {{title}}</li>{{/foreach}}</ul>';
-            const expected = '<ul><li>first first</li><li>second second</li><li>third third</li><li>fourth fourth</li><li>fifth fifth</li></ul>';
-
-            shouldCompileToExpected(templateString, objectHash, expected);
-        });
-
-
-    it('renders empty string when null', function () {
-        const html = null;
-        const rendered = helpers.content.call({html: html});
-
-        should.exist(rendered);
-        rendered.string.should.equal('');
+    before(function () {
+        handlebars.registerPartial('somepartial', '<div>{{content}}</div>');
+        handlebars.registerHelper('content', helpers.content);
     });
 
     it('can render content', function () {
-        const html = 'Hello World';
-        const rendered = helpers.content.call({html: html});
+        const hashObj = {html: '<h1>Hello World</h1>'};
 
-        should.exist(rendered);
-        rendered.string.should.equal(html);
+        const templateString = '<div>{{content}}</div>';
+        const expected = '<div><h1>Hello World</h1></div>';
+
+        shouldCompileToExpected(templateString, hashObj, expected);
+    });
+
+    it('renders empty string when null', function () {
+        const hashObj = {html: null};
+
+        const templateString = '<div>{{content}}</div>';
+        const expected = '<div></div>';
+
+        shouldCompileToExpected(templateString, hashObj, expected);
+    });
+
+    it('renders CTA when access is false', function () {
+        const hashObj = {
+            html: null,
+            access: false
+        };
+
+        const templateString = '<div>{{content}}</div>';
+        const expected = '<div>CTA HERE</div>';
+
+        shouldCompileToExpected(templateString, hashObj, expected);
+    });
+
+    it('allows content to be wrapped in a partial', function () {
+        const hashObj = {
+            html: '<h1>Hello World</h1>'
+        };
+
+        const templateString = '<div>{{> somepartial}}</div>';
+        const expected = '<div><div><h1>Hello World</h1></div></div>';
+
+        shouldCompileToExpected(templateString, hashObj, expected);
+    });
+
+    describe('partial called content contains content helper', function () {
+        beforeEach(function () {
+            handlebars.registerPartial('content', '<div>{{content}}</div>');
+        });
+
+        it('allows content to be wrapped in a partial called content with access undefined', function () {
+            const hashObj = {
+                html: '<h1>Hello World</h1>'
+            };
+
+            const templateString = '<div>{{> "content"}}</div>';
+            const expected = '<div><div><h1>Hello World</h1></div></div>';
+
+            shouldCompileToExpected(templateString, hashObj, expected);
+        });
+
+        it('allows content to be wrapped in a partial called content with access false', function () {
+            const hashObj = {
+                html: '<h1>Hello World</h1>',
+                access: false
+            };
+
+            const templateString = '<div>{{> "content"}}</div>';
+            const expected = '<div><div>CTA HERE</div></div>';
+
+            shouldCompileToExpected(templateString, hashObj, expected);
+        });
+
+        it('allows content to be wrapped in a partial called content with access true', function () {
+            const hashObj = {
+                html: '<h1>Hello World</h1>',
+                access: true
+            };
+
+            const templateString = '<div>{{> "content"}}</div>';
+            const expected = '<div><div><h1>Hello World</h1></div></div>';
+
+            shouldCompileToExpected(templateString, hashObj, expected);
+        });
     });
 
     it('can truncate html by word', function () {
-        const html = '<p>Hello <strong>World! It\'s me!</strong></p>';
+        const hashObj = {
+            html: '<p>Hello <strong>World! It\'s me!</strong></p>'
+        };
 
-        const rendered = (
-            helpers.content
-                .call(
-                    {html: html},
-                    {hash: {words: 2}}
-                )
-        );
+        const templateString = '{{content words="2"}}';
+        const expected = '<p>Hello <strong>World!</strong></p>';
 
-        should.exist(rendered);
-        rendered.string.should.equal('<p>Hello <strong>World!</strong></p>');
+        shouldCompileToExpected(templateString, hashObj, expected);
     });
 
     it('can truncate html to 0 words', function () {
-        const html = '<p>Hello <strong>World! It\'s me!</strong></p>';
+        const hashObj = {html: '<p>Hello <strong>World! It\'s me!</strong></p>'};
 
-        const rendered = (
-            helpers.content
-                .call(
-                    {html: html},
-                    {hash: {words: '0'}}
-                )
-        );
+        const templateString = '{{content words="0"}}';
+        const expected = '';
 
-        should.exist(rendered);
-        rendered.string.should.equal('');
+        shouldCompileToExpected(templateString, hashObj, expected);
     });
 
     it('can truncate html by character', function () {
-        const html = '<p>Hello <strong>World! It\'s me!</strong></p>';
+        const hashObj = {html: '<p>Hello <strong>World! It\'s me!</strong></p>'};
 
-        const rendered = (
-            helpers.content
-                .call(
-                    {html: html},
-                    {hash: {characters: 8}}
-                )
-        );
+        const templateString = '{{content characters="8"}}';
+        const expected = '<p>Hello <strong>Wo</strong></p>';
 
-        should.exist(rendered);
-        rendered.string.should.equal('<p>Hello <strong>Wo</strong></p>');
+        shouldCompileToExpected(templateString, hashObj, expected);
     });
 });

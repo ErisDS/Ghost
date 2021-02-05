@@ -13,7 +13,7 @@ const downsize = require('downsize');
 const _ = require('lodash');
 const createFrame = hbs.handlebars.createFrame;
 
-function restrictedCta(options) {
+const restrictedCta = (options) => {
     options = options || {};
     options.data = options.data || {};
     _.merge(this, {
@@ -21,12 +21,9 @@ function restrictedCta(options) {
     });
     const data = createFrame(options.data);
     return templates.execute('content', this, {data});
-}
+};
 
 module.exports = function content(options = {}) {
-    let self = this;
-    let args = arguments;
-
     const hash = options.hash || {};
     const truncateOptions = {};
     let runTruncate = false;
@@ -43,7 +40,7 @@ module.exports = function content(options = {}) {
     }
 
     if (!_.isUndefined(this.access) && !this.access) {
-        return restrictedCta.apply(self, args);
+        return restrictedCta(options);
     }
 
     if (runTruncate) {
