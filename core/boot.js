@@ -41,7 +41,7 @@ async function initCore({ghostServer}) {
     const settings = require('./server/services/settings');
     const jobService = require('./server/services/jobs');
     const models = require('./server/models');
-    const {events, i18n} = require('./server/lib/common');
+    const {i18n} = require('./server/lib/common');
 
     ghostServer.registerCleanupTask(async () => {
         await jobService.shutdown();
@@ -56,13 +56,12 @@ async function initCore({ghostServer}) {
 
     await settings.init();
 
-    // @TODO: fix this - has to happen before db.ready is emitted
+    // This is core to Ghost, not a frontend service (needs moving)
     debug('Begin: Url Service');
-    require('./frontend/services/url');
+    const urlService = require('./frontend/services/url');
+    urlService.init();
     debug('End: Url Service');
 
-    // @TODO: fix this location
-    events.emit('db.ready');
     debug('End: initCore');
 }
 
