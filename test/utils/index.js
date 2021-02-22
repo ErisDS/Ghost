@@ -198,6 +198,7 @@ const restartModeGhostStart = async () => {
     // Reload the URL service & wait for it to be ready again
     // @TODO: Prob B: why/how is this different to urlService.resetGenerators?
     urlServiceUtils.reset();
+    urlServiceUtils.init();
     await urlServiceUtils.isFinished();
     // @TODO: why does this happen _after_ URL service
     web.shared.middlewares.customRedirects.reload();
@@ -227,9 +228,15 @@ const freshModeGhostStart = async (options) => {
     // Reset the DB
     await knexMigrator.reset({force: true});
 
-    // Stop the serve (forceStart Mode)
-    if (ghostServer && ghostServer.httpServer) {
-        await ghostServer.stop();
+    // If this is force start mode
+    if (options.forceStart) {
+        // Reset the URL service
+        urlServiceUtils.reset();
+
+        // Stop any listening server
+        if (ghostServer && ghostServer.httpServer) {
+            await ghostServer.stop();
+        }
     }
 
     // Reset the settings cache
@@ -239,20 +246,17 @@ const freshModeGhostStart = async (options) => {
 
     // Do a full database initialisation
     await knexMigrator.init();
+    await urlServiceUtils.init();
 
     if (config.get('database:client') === 'sqlite3') {
         await db.knex.raw('PRAGMA journal_mode = TRUNCATE;');
     }
 
-    // Reset the URL service generators
-    // @TODO: Prob B: why/how is this different to urlService.reset?
-    urlService.resetGenerators();
-
     // Actually boot Ghost
     await bootGhost(options);
 
-    // Wait for the URL service to be ready, which happens after boot, but don't re-trigger db.ready
-    await urlServiceUtils.isFinished({disableDbReadyEvent: true});
+    // Wait for the URL service to be ready, which happens after boot
+    await urlServiceUtils.isFinished();
 };
 
 const startGhost = async (options) => {
