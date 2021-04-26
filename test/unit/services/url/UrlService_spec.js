@@ -1,5 +1,4 @@
 const errors = require('@tryghost/errors');
-const _ = require('lodash');
 const Promise = require('bluebird');
 const rewire = require('rewire');
 const should = require('should');

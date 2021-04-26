@@ -1,6 +1,5 @@
 const should = require('should');
 const sinon = require('sinon');
-const _ = require('lodash');
 const cheerio = require('cheerio');
 const testUtils = require('../../../utils');
 const mockUtils = require('../../../utils/mocks');
@@ -1440,8 +1439,6 @@ describe('Integration - Web - Site canary', function () {
 
                 return mockUtils.express.invoke(app, req)
                     .then(function (response) {
-                        const $ = cheerio.load(response.body);
-
                         response.statusCode.should.eql(200);
                         response.template.should.eql('channel3');
                     });

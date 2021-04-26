@@ -1,7 +1,5 @@
 const should = require('should');
-const sinon = require('sinon');
 const serializers = require('../../../../../../../core/server/api/canary/utils/serializers');
-const urlUtils = require('../../../../../../utils/urlUtils');
 
 describe('Unit: canary/utils/serializers/input/posts', function () {
     describe('browse', function () {

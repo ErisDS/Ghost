@@ -21,7 +21,7 @@ describe('getRssUrl', function () {
     });
 
     it('forwards absolute/secure flags', function () {
-        const rssUrl = getRssUrl({
+        getRssUrl({
             secure: false
         }, true);
 

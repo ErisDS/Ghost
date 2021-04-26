@@ -1,6 +1,5 @@
 const should = require('should');
 const sinon = require('sinon');
-const _ = require('lodash');
 
 const validate = require('../../../../core/frontend/services/themes/validate');
 

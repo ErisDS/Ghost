@@ -77,15 +77,12 @@ describe('Admin Routing', function () {
 
     // we'll use X-Forwarded-Proto: https to simulate an 'https://' request behind a proxy
     describe('Require HTTPS - redirect', function () {
-        let ghostServer;
-
         before(function () {
             configUtils.set('url', 'https://localhost:2390');
             urlUtils.stubUrlUtilsFromConfig();
 
             return ghost({forceStart: true})
                 .then(function (_ghostServer) {
-                    ghostServer = _ghostServer;
                     request = supertest.agent(config.get('server:host') + ':' + config.get('server:port'));
                 });
         });

@@ -1,6 +1,5 @@
 const should = require('should');
 const sinon = require('sinon');
-const _ = require('lodash');
 const testUtils = require('../../../../utils');
 const helpers = require('../../../../../core/frontend/services/routing/helpers');
 const labs = require('../../../../../core/server/services/labs');

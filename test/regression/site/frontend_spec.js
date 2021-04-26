@@ -6,15 +6,11 @@ const should = require('should');
 
 const sinon = require('sinon');
 const supertest = require('supertest');
-const moment = require('moment');
 const cheerio = require('cheerio');
-const _ = require('lodash');
 const testUtils = require('../../utils');
 const configUtils = require('../../utils/configUtils');
 const urlUtils = require('../../utils/urlUtils');
 const config = require('../../../core/shared/config');
-const settingsCache = require('../../../core/server/services/settings/cache');
-const origCache = _.cloneDeep(settingsCache);
 const ghost = testUtils.startGhost;
 let request;
 
@@ -294,16 +290,12 @@ describe('Frontend Routing', function () {
 
     // @TODO: unskip this, need to fix rebooting ghost with a subdirectory
     describe.skip('Subdirectory (no slash)', function () {
-        let ghostServer;
-
         before(function () {
             configUtils.set('url', 'http://localhost/blog');
             urlUtils.stubUrlUtilsFromConfig();
 
             return ghost({forceStart: true, subdir: true})
                 .then(function (_ghostServer) {
-                    ghostServer = _ghostServer;
-
                     request = supertest.agent(config.get('server:host') + ':' + config.get('server:port'));
                 });
         });
@@ -375,15 +367,12 @@ describe('Frontend Routing', function () {
 
     // @TODO: unskip this, need to fix rebooting ghost with a subdirectory
     describe.skip('Subdirectory (with slash)', function () {
-        let ghostServer;
-
         before(function () {
             configUtils.set('url', 'http://localhost/blog/');
             urlUtils.stubUrlUtilsFromConfig();
 
             return ghost({forceStart: true, subdir: true})
                 .then(function (_ghostServer) {
-                    ghostServer = _ghostServer;
                     request = supertest.agent(config.get('server:host') + ':' + config.get('server:port'));
                 });
         });
@@ -463,15 +452,12 @@ describe('Frontend Routing', function () {
 
     // we'll use X-Forwarded-Proto: https to simulate an 'https://' request behind a proxy
     describe('HTTPS', function () {
-        let ghostServer;
-
         before(function () {
             configUtils.set('url', 'http://localhost:2370/');
             urlUtils.stubUrlUtilsFromConfig();
 
             return ghost({forceStart: true})
                 .then(function (_ghostServer) {
-                    ghostServer = _ghostServer;
                     request = supertest.agent(config.get('server:host') + ':' + config.get('server:port'));
                 });
         });
@@ -791,15 +777,12 @@ describe('Frontend Routing', function () {
 
         // @TODO: unskip this, need to fix rebooting ghost with a subdirectory
         describe.skip(`Subdirectory redirects (use redirects${ext} from test/utils/fixtures/data)`, function () {
-            var ghostServer;
-
             before(function () {
                 configUtils.set('url', 'http://localhost:2370/blog/');
                 urlUtils.stubUrlUtilsFromConfig();
 
                 return ghost({forceStart: true, subdir: true, redirectsFileExt: ext})
                     .then(function (_ghostServer) {
-                        ghostServer = _ghostServer;
                         request = supertest.agent(config.get('server:host') + ':' + config.get('server:port'));
                     });
             });

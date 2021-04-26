@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const sinon = require('sinon');
 const UrlUtils = require('@tryghost/url-utils');
 const config = require('../../core/shared/config');

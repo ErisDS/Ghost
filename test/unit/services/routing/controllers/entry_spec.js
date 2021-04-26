@@ -15,13 +15,10 @@ describe('Unit - services/routing/controllers/entry', function () {
     let secureStub;
     let renderStub;
     let post;
-    let page;
 
     beforeEach(function () {
         post = testUtils.DataGenerator.forKnex.createPost();
         post.url = '/does-exist/';
-
-        page = testUtils.DataGenerator.forKnex.createPost({page: 1});
 
         secureStub = sinon.stub();
         entryLookUpStub = sinon.stub();

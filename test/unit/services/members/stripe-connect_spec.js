@@ -22,7 +22,7 @@ describe('Members - Stripe Connect', function () {
     });
 
     it('getStripeConnectTokenData returns token data when the state is correct', async function () {
-        const getSessionProp = prop => 'correct_state';
+        const getSessionProp = () => 'correct_state';
 
         const data = {
             p: 'publishable_stripe_key',
@@ -41,7 +41,7 @@ describe('Members - Stripe Connect', function () {
     });
 
     it('getStripeConnectTokenData throws when the state is incorrect', async function () {
-        const getSessionProp = prop => 'incorrect_state';
+        const getSessionProp = () => 'incorrect_state';
 
         const data = {
             p: 'publishable_stripe_key',

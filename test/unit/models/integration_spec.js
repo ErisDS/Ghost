@@ -1,5 +1,4 @@
 const should = require('should');
-const url = require('url');
 const sinon = require('sinon');
 const models = require('../../../core/server/models');
 const testUtils = require('../../utils');

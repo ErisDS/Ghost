@@ -130,7 +130,6 @@ describe('Posts Content API', function () {
             .expect(200);
 
         const jsonResponse = res.body;
-        const ids = _.map(jsonResponse.posts, 'id');
 
         should.not.exist(res.headers['x-cache-invalidate']);
         should.exist(jsonResponse.posts);

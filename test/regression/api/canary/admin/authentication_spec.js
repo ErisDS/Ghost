@@ -139,7 +139,6 @@ describe('Authentication API v3', function () {
         before(function () {
             return ghost()
                 .then(function (_ghostServer) {
-                    ghostServer = _ghostServer;
                     request = supertest.agent(config.get('url'));
 
                     // simulates blog setup (initialises the owner)

@@ -1,7 +1,5 @@
 const should = require('should');
-const sinon = require('sinon');
 const serializers = require('../../../../../../../core/server/api/v3/utils/serializers');
-const urlUtils = require('../../../../../../utils/urlUtils');
 
 describe('Unit: v3/utils/serializers/input/posts', function () {
     describe('browse', function () {
