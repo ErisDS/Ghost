@@ -13,7 +13,8 @@ module.exports = {
         // @TODO: remove this rule once it's turned into "error" in the base plugin
         'no-shadow': 'error',
         'no-var': 'error',
-        'one-var': [2, 'never']
+        'one-var': [2, 'never'],
+        'ghost/unicorn/filename-case': ['warn', {case: 'kebabCase'}]
     },
     overrides: [
         {
