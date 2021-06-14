@@ -83,6 +83,7 @@
     "brute-knex": "4.0.1",
     "bson-objectid": "2.0.1",
     "bthreads": "0.5.1",
+    "cache-manager": "3.4.3",
     "cheerio": "0.22.0",
     "compression": "1.7.4",
     "connect-slashes": "1.4.0",

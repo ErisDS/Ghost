@@ -166,6 +166,18 @@ module.exports = function setupSiteApp(options = {}) {
         }
     });
 
+    const cache = require('../../adapters/cache').getCache();
+
+    siteApp.get('/testset', (req, res) => {
+        cache.set('foo', 'bar');
+        res.sendStatus(200);
+    });
+
+    siteApp.get('/testget', (req, res) => {
+        const result = cache.get('foo');
+        res.status(200).send(result);
+    });
+
     debug('General middleware done');
 
     router = siteRoutes(options);
