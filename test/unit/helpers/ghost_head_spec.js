@@ -311,11 +311,13 @@ describe('{{ghost_head}} helper', function () {
         beforeEach(function () {
             sandbox = sinon.createSandbox();
 
-            testUrlUtils.stubUrlUtils({url: 'http://localhost:65530/'}, sandbox);
+            testUrlUtils.stubUrlUtils({ url: 'http://localhost:65530/' }, sandbox);
+            configUtils.set({url: 'http://localhost:65530/'});
         });
 
         afterEach(function () {
             sandbox.restore();
+            configUtils.restore();
         });
 
         it('returns meta tag string on paginated index page without structured data and schema', function (done) {
@@ -1293,12 +1295,14 @@ describe('{{ghost_head}} helper', function () {
             settingsCache.get.withArgs('icon').returns('/content/images/favicon.png');
 
             testUrlUtils.stubUrlUtils({url: 'http://localhost:65530/site'}, sandbox);
+            configUtils.set({url: 'http://localhost:65530/site'});
 
             routing.registry.getRssUrl.returns('http://localhost:65530/site/rss/');
         });
 
         afterEach(function () {
             sandbox.restore();
+            configUtils.restore();
             routing.registry.getRssUrl.returns('http://localhost:65530/rss/');
         });
 
@@ -1334,10 +1338,12 @@ describe('{{ghost_head}} helper', function () {
             });
 
             testUrlUtils.stubUrlUtils({url: 'http://localhost:65530/site'}, sandbox);
+            configUtils.set({url: 'http://localhost:65530/site'});
         });
 
         afterEach(function () {
             sandbox.restore();
+            configUtils.restore();
         });
 
         it('contains the changed origin', function (done) {
@@ -1371,10 +1377,12 @@ describe('{{ghost_head}} helper', function () {
             });
 
             testUrlUtils.stubUrlUtils({url: 'http://localhost:65530/'}, sandbox);
+            configUtils.set({url: 'http://localhost:65530/'});
         });
 
         afterEach(function () {
             sandbox.restore();
+            configUtils.restore();
         });
 
         it('does not return structured data', function (done) {
@@ -1414,10 +1422,12 @@ describe('{{ghost_head}} helper', function () {
             settingsCache.get.withArgs('codeinjection_head').returns('<style>body {background: red;}</style>');
 
             testUrlUtils.stubUrlUtils({url: 'http://localhost:65530/'}, sandbox);
+            configUtils.set({url: 'http://localhost:65530/'});
         });
 
         afterEach(function () {
             sandbox.restore();
+            configUtils.restore();
         });
 
         it('returns meta tag plus injected code', function (done) {
