@@ -19,6 +19,7 @@ class Frame {
          * file:        Uploaded file
          * files:       Uploaded files
          * apiType:     Content or admin api access
+         * version:     The API version
          */
         this.options = {};
         this.data = {};
@@ -26,6 +27,7 @@ class Frame {
         this.file = {};
         this.files = [];
         this.apiType = null;
+        this.version = 'canary';
     }
 
     /**
@@ -89,6 +91,13 @@ class Frame {
         debug('original', this.original);
         debug('options', this.options);
         debug('data', this.data);
+
+        if (this.url) {
+            let match = this.url.pathname.match(/api\/([^/]*?)\//)[1];
+            if (match && match[1]) {
+                this.version = match[1];
+            }
+        }
     }
 }
 
