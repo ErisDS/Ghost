@@ -2,3 +2,6 @@
 
 /core/server/data/schema/       @daniellockyer
 /core/server/data/migrations/   @daniellockyer
+
+# All changes to the boot file need to be reviewed by Hannah
+/core/boot.js                   @erisds
