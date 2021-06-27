@@ -43,7 +43,7 @@ module.exports = {
         {
             files: 'core/frontend/**',
             rules: {
-                'ghost/node/no-restricted-require': ['off', [
+                'ghost/node/no-restricted-require': ['warn', [
                     {
                         name: path.resolve(__dirname, 'core/server/**'),
                         message: 'Invalid require of core/server from core/frontend.'
@@ -54,7 +54,7 @@ module.exports = {
         {
             files: 'core/server/**',
             rules: {
-                'ghost/node/no-restricted-require': ['off', [
+                'ghost/node/no-restricted-require': ['warn', [
                     {
                         name: path.resolve(__dirname, 'core/frontend/**'),
                         message: 'Invalid require of core/frontend from core/server.'
