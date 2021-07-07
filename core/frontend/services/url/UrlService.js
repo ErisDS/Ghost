@@ -87,7 +87,7 @@ class UrlService {
             return;
         }
 
-        debug('router.created');
+        debug('on router.created');
 
         let urlGenerator = new UrlGenerator(router, this.queue, this.resources, this.urls, this.urlGenerators.length);
         this.urlGenerators.push(urlGenerator);

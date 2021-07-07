@@ -40,6 +40,7 @@ module.exports.init = ({start = false, routerSettings, apiVersion}) => {
     registry.setRouter('siteRouter', siteRouter);
 
     if (start) {
+        debug('init calling start');
         apiVersion = apiVersion || defaultApiVersion;
         this.start(apiVersion, routerSettings);
     }
