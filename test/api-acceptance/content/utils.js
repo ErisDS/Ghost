@@ -1,6 +1,6 @@
 const url = require('url');
+const tpl = require('@tryghost/tpl');
 const _ = require('lodash');
-const testUtils = require('../../utils');
 
 const API_URL = '/ghost/api/canary/content/';
 
@@ -83,18 +83,52 @@ const expectedProperties = {
     ]
 };
 
+const getValidKey = () => {
+    const DataGenerator = require('../../utils/fixtures/data-generator');
+    return DataGenerator.Content.api_keys[1].secret;
+};
+
+const resolveURL = (route) => {
+    // new URL doesn't work for relative urls :(
+    // @TODO: implement a simple url resolver https://github.com/nodejs/node/commit/0fac27d546
+    return url.resolve(API_URL, route);
+};
+
+const should = require('should');
+
+should.Assertion.add('CacheInvalidationHeaders', function (match) {
+    this.params = {operator: 'to have cache invalidation headers'};
+    this.obj.should.have.property('x-cache-invalidate');
+
+    if (match) {
+        this.obj['x-cache-invalidate'].should.eql(match);
+    }
+});
+
+should.Assertion.add('ValidContentAPIResponse', function (resource) {
+
+});
+
 module.exports = {
     API: {
         getApiQuery(route) {
-            return url.resolve(API_URL, route);
+            return resolveURL(route);
         },
 
         checkResponse(...args) {
             this.expectedProperties = expectedProperties;
+            const testUtils = require('../../utils');
             return testUtils.API.checkResponse.call(this, ...args);
         }
     },
-    getValidKey() {
-        return testUtils.DataGenerator.Content.api_keys[1].secret;
+
+    getValidKey,
+
+    ContentAPI: {
+        getURL: (routeString) => {
+            let key = getValidKey();
+            let route = tpl(routeString, {key});
+            return resolveURL(route);
+        }
     }
 };

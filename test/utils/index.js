@@ -93,6 +93,11 @@ const createEmailedPost = async function createEmailedPost({postOptions, emailOp
 };
 
 module.exports = {
+    // New Acceptance test utilities
+    getGhostAgent: acceptanceUtils.getGhostAgent,
+    ContentAPI: require('../api-acceptance/content/utils').ContentAPI,
+
+    // Old stuff
     startGhost: acceptanceUtils.startGhost,
     stopGhost: acceptanceUtils.stopGhost,
     getExistingData: acceptanceUtils.getExistingData,
@@ -104,6 +109,7 @@ module.exports = {
     createPost: createPost,
     createEmailedPost,
 
+    // REALLY old stuff
     integrationTesting: oldIntegrationUtils,
 
     /**

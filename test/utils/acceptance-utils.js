@@ -98,33 +98,33 @@ const prepareContentFolder = (options) => {
 // - reload affected services
 const restartModeGhostStart = async () => {
     debug('Reload Mode');
-    // Teardown truncates all tables and also calls urlServiceUtils.reset();
-    await dbUtils.teardown();
+    // // Teardown truncates all tables and also calls urlServiceUtils.reset();
+    // await dbUtils.teardown();
 
-    // The tables have been truncated, this runs the fixture init task (init file 2) to re-add our default fixtures
-    await knexMigrator.init({only: 2});
-    debug('init done');
+    // // The tables have been truncated, this runs the fixture init task (init file 2) to re-add our default fixtures
+    // await knexMigrator.init({only: 2});
+    // debug('init done');
 
-    // Reset the settings cache
-    await settingsService.init();
-    debug('settings done');
+    // // Reset the settings cache
+    // await settingsService.init();
+    // debug('settings done');
 
-    // Reload the frontend
-    await frontendSettingsService.init();
-    await themeService.init();
-    debug('frontend done');
+    // // Reload the frontend
+    // await frontendSettingsService.init();
+    // await themeService.init();
+    // debug('frontend done');
 
-    // Reload the URL service & wait for it to be ready again
-    // @TODO: why/how is this different to urlService.resetGenerators?
-    urlServiceUtils.reset();
-    urlServiceUtils.init();
-    await urlServiceUtils.isFinished();
-    debug('routes done');
-    // @TODO: why does this happen _after_ URL service
-    web.shared.middlewares.customRedirects.reload();
+    // // Reload the URL service & wait for it to be ready again
+    // // @TODO: why/how is this different to urlService.resetGenerators?
+    // urlServiceUtils.reset();
+    // urlServiceUtils.init();
+    // await urlServiceUtils.isFinished();
+    // debug('routes done');
+    // // @TODO: why does this happen _after_ URL service
+    // web.shared.middlewares.customRedirects.reload();
 
-    // Reload limits service
-    limits.init();
+    // // Reload limits service
+    // limits.init();
 };
 
 const bootGhost = async () => {
@@ -213,9 +213,25 @@ const stopGhost = async () => {
     }
 };
 
+const restoreGhost = async () => {
+
+};
+
+const getGhostAgent = async () => {
+    const supertest = require('supertest');
+    await startGhost();
+    const request = supertest.agent(config.get('url'));
+
+    return {
+        request,
+        restore: restoreGhost
+    };
+};
+
 module.exports = {
     startGhost,
     stopGhost,
+    getGhostAgent,
     getExistingData: () => {
         return existingData;
     }
