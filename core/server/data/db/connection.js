@@ -13,10 +13,15 @@ function configure(dbConfig) {
         // Backwards compatibility with old knex behaviour
         dbConfig.useNullAsDefault = Object.prototype.hasOwnProperty.call(dbConfig, 'useNullAsDefault') ? dbConfig.useNullAsDefault : true;
 
-        // Enables foreign key checks and delete on cascade
         dbConfig.pool = {
             afterCreate(conn, cb) {
-                conn.run('PRAGMA foreign_keys = ON', cb);
+                if (config.get('env') === 'TESTING') {
+                    // In test mode, enable foreign key checks AND set the journal mode to truncate
+                    conn.run('PRAGMA journal_mode = TRUNCATE; PRAGMA foreign_keys = ON', cb);
+                } else {
+                    // Enables foreign key checks and delete on cascade
+                    conn.run('PRAGMA foreign_keys = ON', cb);
+                }
             }
         };
 
