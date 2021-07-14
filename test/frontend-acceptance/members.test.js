@@ -4,7 +4,8 @@ const supertest = require('supertest');
 const moment = require('moment');
 const testUtils = require('../utils');
 const configUtils = require('../utils/configUtils');
-const settingsCache = require('../../core/shared/settings-cache');
+const settingsCacheUtils = require('../utils/settings-cache-utils');
+const themeUtils = require('../utils/theme-utils');
 
 function assertContentIsPresent(res) {
     res.text.should.containEql('<h2 id="markdown">markdown</h2>');
@@ -38,26 +39,20 @@ describe('Front-end members behaviour', function () {
     }
 
     before(async function () {
-        const originalSettingsCacheGetFn = settingsCache.get;
+        settingsCacheUtils.stub(sinon, {labs: {members: true}, active_theme: 'price-data-test-theme'});
 
-        sinon.stub(settingsCache, 'get').callsFake(function (key, options) {
-            if (key === 'labs') {
-                return {members: true};
-            }
-
-            if (key === 'active_theme') {
-                return 'price-data-test-theme';
-            }
-
-            return originalSettingsCacheGetFn(key, options);
-        });
         await testUtils.startGhost();
         await testUtils.initFixtures('members');
+
+        // Ensure the frontend renders using the new theme
+        await themeUtils.changeTheme();
+
         request = supertest.agent(configUtils.config.get('url'));
     });
 
-    after(function () {
+    after(async function () {
         sinon.restore();
+        await themeUtils.changeTheme();
     });
 
     describe('Member routes', function () {

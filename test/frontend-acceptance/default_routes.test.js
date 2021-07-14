@@ -13,8 +13,7 @@ const cheerio = require('cheerio');
 const _ = require('lodash');
 const testUtils = require('../utils');
 const configUtils = require('../utils/configUtils');
-const settingsCache = require('../../core/shared/settings-cache');
-const origCache = _.cloneDeep(settingsCache);
+const settingsCacheUtils = require('../utils/settings-cache-utils');
 
 function assertCorrectFrontendHeaders(res) {
     should.not.exist(res.headers['x-cache-invalidate']);
@@ -227,12 +226,7 @@ describe('Default Frontend routing', function () {
 
         describe('AMP Disabled', function () {
             it('/amp/ should redirect to regular post, including any query params', async function () {
-                sinon.stub(settingsCache, 'get').callsFake(function (key, options) {
-                    if (key === 'amp' && !options) {
-                        return false;
-                    }
-                    return origCache.get(key, options);
-                });
+                settingsCacheUtils.stub(sinon, {amp: false});
 
                 await request.get('/welcome/amp/?q=a')
                     .expect('Location', '/welcome/?q=a')
@@ -387,12 +381,7 @@ describe('Default Frontend routing', function () {
 
     describe('Private Blogging', function () {
         beforeEach(function () {
-            sinon.stub(settingsCache, 'get').callsFake(function (key, options) {
-                if (key === 'is_private') {
-                    return true;
-                }
-                return origCache.get(key, options);
-            });
+            settingsCacheUtils.stub(sinon, {is_private: true});
         });
 
         it('/ should redirect to /private/', async function () {
@@ -423,7 +412,7 @@ describe('Default Frontend routing', function () {
         });
 
         it('should still serve private RSS feed', async function () {
-            await request.get(`/${settingsCache.get('public_hash')}/rss/`)
+            await request.get(`/${settingsCacheUtils.get('public_hash')}/rss/`)
                 .expect(200)
                 .expect('Cache-Control', testUtils.cacheRules.private)
                 .expect('Content-Type', 'text/xml; charset=utf-8')
@@ -434,7 +423,7 @@ describe('Default Frontend routing', function () {
         });
 
         it('should still serve private tag RSS feed', async function () {
-            await request.get(`/tag/getting-started/${settingsCache.get('public_hash')}/rss/`)
+            await request.get(`/tag/getting-started/${settingsCacheUtils.get('public_hash')}/rss/`)
                 .expect(200)
                 .expect('Cache-Control', testUtils.cacheRules.private)
                 .expect('Content-Type', 'text/xml; charset=utf-8')
@@ -445,8 +434,8 @@ describe('Default Frontend routing', function () {
         });
 
         it('should redirect, NOT 404 for private tag RSS feed with extra path', async function () {
-            await request.get(`/tag/getting-started/${settingsCache.get('public_hash')}/rss/hack/`)
-                .expect('Location', `/private/?r=%2Ftag%2Fgetting-started%2F${settingsCache.get('public_hash')}%2Frss%2Fhack%2F`)
+            await request.get(`/tag/getting-started/${settingsCacheUtils.get('public_hash')}/rss/hack/`)
+                .expect('Location', `/private/?r=%2Ftag%2Fgetting-started%2F${settingsCacheUtils.get('public_hash')}%2Frss%2Fhack%2F`)
                 .expect(302)
                 .expect(assertCorrectFrontendHeaders);
         });
@@ -455,7 +444,7 @@ describe('Default Frontend routing', function () {
         it('should redirect, NOT 404 for unknown private RSS feed', async function () {
             // NOTE: the redirect will be to /hack/rss because we strip the hash from the URL before trying to serve RSS
             // This isn't ideal, but it's better to expose this internal logic than it is a 404 page
-            await request.get(`/hack/${settingsCache.get('public_hash')}/rss/`)
+            await request.get(`/hack/${settingsCacheUtils.get('public_hash')}/rss/`)
                 .expect('Location', '/private/?r=%2Fhack%2Frss%2F')
                 .expect(302)
                 .expect(assertCorrectFrontendHeaders);
