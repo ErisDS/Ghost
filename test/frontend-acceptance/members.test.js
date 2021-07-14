@@ -39,7 +39,7 @@ describe('Front-end members behaviour', function () {
     }
 
     before(async function () {
-        settingsCacheUtils.stub(sinon, {labs: {members: true}, active_theme: 'price-data-test-theme'});
+        settingsCacheUtils.stubGet(sinon, {labs: {members: true}, active_theme: 'price-data-test-theme'});
 
         await testUtils.startGhost();
         await testUtils.initFixtures('members');

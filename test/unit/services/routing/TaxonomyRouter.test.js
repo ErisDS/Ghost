@@ -16,7 +16,7 @@ describe('UNIT - services/routing/TaxonomyRouter', function () {
     let next;
 
     beforeEach(function () {
-        settingsCacheUtils.stub(sinon, {permalinks: '/:slug/'});
+        settingsCacheUtils.stubGet(sinon, {permalinks: '/:slug/'});
 
         sinon.stub(events, 'emit');
         sinon.stub(events, 'on');

@@ -226,7 +226,7 @@ describe('Default Frontend routing', function () {
 
         describe('AMP Disabled', function () {
             it('/amp/ should redirect to regular post, including any query params', async function () {
-                settingsCacheUtils.stub(sinon, {amp: false});
+                settingsCacheUtils.stubGet(sinon, {amp: false});
 
                 await request.get('/welcome/amp/?q=a')
                     .expect('Location', '/welcome/?q=a')
@@ -381,7 +381,7 @@ describe('Default Frontend routing', function () {
 
     describe('Private Blogging', function () {
         beforeEach(function () {
-            settingsCacheUtils.stub(sinon, {is_private: true});
+            settingsCacheUtils.stubGet(sinon, {is_private: true});
         });
 
         it('/ should redirect to /private/', async function () {

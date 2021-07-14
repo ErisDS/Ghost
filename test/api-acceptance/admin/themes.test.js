@@ -304,7 +304,7 @@ describe('Themes API', function () {
     it('Can re-upload the active theme to override', async function () {
         // The tricky thing about this test is the default active theme is Casper and you're not allowed to override it.
         // So we upload a valid theme, activate it, and then upload again.
-        settingsCacheUtils.stub(sinon, {active_theme: 'valid'});
+        settingsCacheUtils.stubGet(sinon, {active_theme: 'valid'});
 
         // Upload the valid theme
         const res = await uploadTheme({themePath: path.join(__dirname, '..', '..', 'utils', 'fixtures', 'themes', 'valid.zip')});

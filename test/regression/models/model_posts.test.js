@@ -864,7 +864,7 @@ describe('Post Model', function () {
             });
 
             it('can add, default visibility is taken from settings cache', function (done) {
-                settingsCacheUtils.stub(sinon, {labs: {members: true}, default_content_visibility: 'paid'});
+                settingsCacheUtils.stubGet(sinon, {labs: {members: true}, default_content_visibility: 'paid'});
 
                 let createdPostUpdatedDate;
                 const newPost = testUtils.DataGenerator.forModel.posts[2];

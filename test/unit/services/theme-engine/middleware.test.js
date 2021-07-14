@@ -59,7 +59,7 @@ describe('Themes middleware', function () {
         sandbox.stub(activeTheme, 'get')
             .returns(fakeActiveTheme);
 
-        settingsCacheUtils.stub(sandbox, {
+        settingsCacheUtils.stubGet(sandbox, {
             active_theme: fakeActiveThemeName,
             labs: fakeLabsData
         });
