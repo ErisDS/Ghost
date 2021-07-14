@@ -5,6 +5,7 @@ const middleware = require('../../../../core/frontend/services/theme-engine').mi
 // is only exposed via themeEngine.getActive()
 const activeTheme = require('../../../../core/frontend/services/theme-engine/active');
 const settingsCache = require('../../../../core/shared/settings-cache');
+const settingsCacheUtils = require('../../../utils/settings-cache-utils');
 
 const sandbox = sinon.createSandbox();
 
@@ -58,9 +59,10 @@ describe('Themes middleware', function () {
         sandbox.stub(activeTheme, 'get')
             .returns(fakeActiveTheme);
 
-        sandbox.stub(settingsCache, 'get')
-            .withArgs('labs').returns(fakeLabsData)
-            .withArgs('active_theme').returns(fakeActiveThemeName);
+        settingsCacheUtils.stub(sandbox, {
+            active_theme: fakeActiveThemeName,
+            labs: fakeLabsData
+        });
 
         sandbox.stub(settingsCache, 'getPublic')
             .returns(fakeSiteData);

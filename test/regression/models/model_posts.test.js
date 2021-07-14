@@ -10,9 +10,9 @@ const urlService = require('../../../core/frontend/services/url');
 const ghostBookshelf = require('../../../core/server/models/base');
 const models = require('../../../core/server/models');
 const db = require('../../../core/server/data/db');
-const settingsCache = require('../../../core/shared/settings-cache');
 const events = require('../../../core/server/lib/common/events');
 const configUtils = require('../../utils/configUtils');
+const settingsCacheUtils = require('../../utils/settings-cache-utils');
 const context = testUtils.context.owner;
 const markdownToMobiledoc = testUtils.DataGenerator.markdownToMobiledoc;
 
@@ -864,19 +864,7 @@ describe('Post Model', function () {
             });
 
             it('can add, default visibility is taken from settings cache', function (done) {
-                const originalSettingsCacheGetFn = settingsCache.get;
-                sinon.stub(settingsCache, 'get')
-                    .callsFake(function (key, options) {
-                        if (key === 'labs') {
-                            return {
-                                members: true
-                            };
-                        } else if (key === 'default_content_visibility') {
-                            return 'paid';
-                        }
-
-                        return originalSettingsCacheGetFn(key, options);
-                    });
+                settingsCacheUtils.stub(sinon, {labs: {members: true}, default_content_visibility: 'paid'});
 
                 let createdPostUpdatedDate;
                 const newPost = testUtils.DataGenerator.forModel.posts[2];

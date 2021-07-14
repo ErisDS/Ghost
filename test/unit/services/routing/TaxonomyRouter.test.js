@@ -1,7 +1,6 @@
 const should = require('should');
 const sinon = require('sinon');
 const _ = require('lodash');
-const settingsCache = require('../../../../core/shared/settings-cache');
 const events = require('../../../../core/server/lib/common/events');
 const controllers = require('../../../../core/frontend/services/routing/controllers');
 const TaxonomyRouter = require('../../../../core/frontend/services/routing/TaxonomyRouter');
@@ -9,13 +8,15 @@ const RESOURCE_CONFIG_V2 = require('../../../../core/frontend/services/routing/c
 const RESOURCE_CONFIG_CANARY = require('../../../../core/frontend/services/routing/config/canary');
 const RESOURCE_CONFIG_V3 = require('../../../../core/frontend/services/routing/config/v3');
 
+const settingsCacheUtils = require('../../../utils/settings-cache-utils');
+
 describe('UNIT - services/routing/TaxonomyRouter', function () {
     let req;
     let res;
     let next;
 
     beforeEach(function () {
-        sinon.stub(settingsCache, 'get').withArgs('permalinks').returns('/:slug/');
+        settingsCacheUtils.stub(sinon, {permalinks: '/:slug/'});
 
         sinon.stub(events, 'emit');
         sinon.stub(events, 'on');
