@@ -2,10 +2,10 @@ const should = require('should');
 const sinon = require('sinon');
 const supertest = require('supertest');
 const localUtils = require('./utils');
-const testUtils = require('../../../../utils/index');
+const testUtils = require('../../../../utils');
 const models = require('../../../../../core/server/models/index');
 const security = require('@tryghost/security');
-const settingsCache = require('../../../../../core/shared/settings-cache');
+const settingsCacheUtils = require('../../../../utils/settings-cache-utils');
 const config = require('../../../../../core/shared/config/index');
 const mailService = require('../../../../../core/server/services/mail/index');
 
@@ -257,7 +257,7 @@ describe('Authentication API v3', function () {
                     const token = security.tokens.resetToken.generateHash({
                         expires: Date.now() + (1000 * 60),
                         email: user.email,
-                        dbHash: settingsCache.get('db_hash'),
+                        dbHash: settingsCacheUtils.get('db_hash'),
                         password: ownerUser.get('password')
                     });
 
@@ -318,7 +318,7 @@ describe('Authentication API v3', function () {
                     const token = security.tokens.resetToken.generateHash({
                         expires: dateInThePast,
                         email: user.email,
-                        dbHash: settingsCache.get('db_hash'),
+                        dbHash: settingsCacheUtils.get('db_hash'),
                         password: ownerUser.get('password')
                     });
 
@@ -349,7 +349,7 @@ describe('Authentication API v3', function () {
             const token = security.tokens.resetToken.generateHash({
                 expires: Date.now() + (1000 * 60),
                 email: user.email,
-                dbHash: settingsCache.get('db_hash'),
+                dbHash: settingsCacheUtils.get('db_hash'),
                 password: 'invalid_password'
             });
 

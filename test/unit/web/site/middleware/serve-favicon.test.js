@@ -98,6 +98,7 @@ describe('Serve Favicon', function () {
                 storage.getStorage().storagePath = path.join(__dirname, '../../../../../test/utils/fixtures/images/');
                 localSettingsCache.icon = 'myicon.ico';
 
+
                 res = {
                     writeHead: function (statusCode) {
                         statusCode.should.eql(200);

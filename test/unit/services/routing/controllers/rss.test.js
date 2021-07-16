@@ -1,10 +1,10 @@
 const sinon = require('sinon');
 const testUtils = require('../../../../utils');
 const security = require('@tryghost/security');
-const settingsCache = require('../../../../../core/shared/settings-cache');
 const controllers = require('../../../../../core/frontend/services/routing/controllers');
 const helpers = require('../../../../../core/frontend/services/routing/helpers');
 const rssService = require('../../../../../core/frontend/services/rss');
+const settingsCacheUtils = require('../../../../utils/settings-cache-utils');
 
 // Helper function to prevent unit tests
 // from failing via timeout when they
@@ -51,9 +51,10 @@ describe('Unit - services/routing/controllers/rss', function () {
 
         sinon.stub(rssService, 'render');
 
-        sinon.stub(settingsCache, 'get');
-        settingsCache.get.withArgs('title').returns('Ghost');
-        settingsCache.get.withArgs('description').returns('Ghost is cool!');
+        settingsCacheUtils.stubGet(sinon, {
+            title: 'Ghost',
+            description: 'Ghost is cool!'
+        });
     });
 
     afterEach(function () {
