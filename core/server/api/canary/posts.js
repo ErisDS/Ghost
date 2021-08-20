@@ -48,7 +48,8 @@ module.exports = {
             'absolute_urls',
             // NOTE: only for internal context
             'forUpdate',
-            'transacting'
+            'transacting',
+            'require'
         ],
         data: [
             'id',
@@ -69,15 +70,25 @@ module.exports = {
             unsafeAttrs: unsafeAttrs
         },
         query(frame) {
+            console.log('query gets frame.options', frame.options);
             return models.Post.findOne(frame.data, frame.options)
                 .then((model) => {
-                    if (!model) {
-                        throw new errors.NotFoundError({
-                            message: i18n.t('errors.api.posts.postNotFound')
-                        });
-                    }
+                    // if (!model) {
+                    //     throw new errors.NotFoundError({
+                    //         message: i18n.t('errors.api.posts.postNotFound')
+                    //     });
+                    // }
 
                     return model;
+                })
+                .catch((err) => {
+                    console.error(err);
+                    console.error(err.type);
+                    console.error(err instanceof models.Post.NotFoundError);
+                    console.error(err instanceof models.Base.Model.NotFoundError);
+                    console.error(typeof err);
+
+                    throw err;
                 });
         }
     },

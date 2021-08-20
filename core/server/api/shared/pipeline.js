@@ -149,6 +149,8 @@ const STAGES = {
     query(apiUtils, apiConfig, apiImpl, frame) {
         debug('stages: query');
 
+        console.log('apiImpl', apiImpl);
+
         if (!apiImpl.query) {
             return Promise.reject(new errors.IncorrectUsageError());
         }
@@ -174,7 +176,7 @@ const STAGES = {
  * @param {Function} apiController
  * @param {Object} apiUtils - Local utils (validation & serialisation) from target API version
  * @param {String} [apiType] - Content or Admin API access
- * @return {Function}
+ * @return {Object}
  */
 const pipeline = (apiController, apiUtils, apiType) => {
     const keys = Object.keys(apiController);
@@ -231,15 +233,19 @@ const pipeline = (apiController, apiUtils, apiType) => {
 
             return Promise.resolve()
                 .then(() => {
+                    console.log('validation', frame)
                     return STAGES.validation.input(apiUtils, apiConfig, apiImpl, frame);
                 })
                 .then(() => {
+                    console.log('serialisation', frame)
                     return STAGES.serialisation.input(apiUtils, apiConfig, apiImpl, frame);
                 })
                 .then(() => {
+                    console.log('permissions', frame)
                     return STAGES.permissions(apiUtils, apiConfig, apiImpl, frame);
                 })
                 .then(() => {
+                    console.log('query', frame)
                     return STAGES.query(apiUtils, apiConfig, apiImpl, frame);
                 })
                 .then((response) => {
