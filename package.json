@@ -46,7 +46,8 @@
     "lint": "yarn lint:server && yarn lint:shared && yarn lint:frontend && yarn lint:test",
     "fix:client": "yarn cache clean && cd core/client && rm -rf node_modules tmp dist && yarn && cd ../../",
     "fix:server": "yarn cache clean && rm -rf node_modules && yarn",
-    "fix": "yarn fix:client && yarn fix:server"
+    "fix": "yarn fix:client && yarn fix:server",
+    "jest": "jest"
   },
   "engines": {
     "node": "^12.22.1 || ^14.16.1",
