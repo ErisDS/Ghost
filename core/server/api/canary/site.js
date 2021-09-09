@@ -6,7 +6,9 @@ const site = {
     read: {
         permissions: false,
         query() {
-            return publicConfig.site;
+            let result = publicConfig.site;
+            result.blah = 'bloop';
+            return result;
         }
     }
 };
