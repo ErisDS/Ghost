@@ -2,6 +2,7 @@ const _ = require('lodash');
 const hbs = require('./engine');
 const urlUtils = require('../../../shared/url-utils');
 const {api} = require('../proxy');
+const debug = require('@tryghost/debug')('thememw');
 const errors = require('@tryghost/errors');
 const tpl = require('@tryghost/tpl');
 const settingsCache = require('../../../shared/settings-cache');
@@ -104,6 +105,7 @@ function getSiteData(req) {
 }
 
 async function updateGlobalTemplateOptions(req, res, next) {
+    debug('updateGlobalTemplateOptions START');
     // Static information, same for every request unless the settings change
     // @TODO: bind this once and then update based on events?
     // @TODO: decouple theme layer from settings cache using the Content API
@@ -141,6 +143,7 @@ async function updateGlobalTemplateOptions(req, res, next) {
         });
     }
 
+    debug('updateGlobalTemplateOptions END');
     next();
 }
 
@@ -153,6 +156,7 @@ function updateLocalTemplateData(req, res, next) {
 }
 
 function updateLocalTemplateOptions(req, res, next) {
+    debug('updateLocalTemplateOptions START');
     const localTemplateOptions = hbs.getLocalTemplateOptions(res.locals);
     const siteData = {
         url: urlUtils.urlFor('home', {secure: req.secure, trailingSlash: false}, true)
@@ -172,6 +176,8 @@ function updateLocalTemplateOptions(req, res, next) {
         paid: req.member.status !== 'free'
     } : null;
 
+    console.log('BEFORE', localTemplateOptions);
+
     hbs.updateLocalTemplateOptions(res.locals, _.merge({}, localTemplateOptions, {
         data: {
             member: member,
@@ -181,6 +187,9 @@ function updateLocalTemplateOptions(req, res, next) {
         }
     }));
 
+    console.log('AFTER', hbs.getLocalTemplateOptions(res.locals));
+
+    debug('updateLocalTemplateOptions END');
     next();
 }
 

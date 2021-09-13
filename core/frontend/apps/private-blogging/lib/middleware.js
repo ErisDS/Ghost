@@ -11,6 +11,7 @@ const settingsCache = require('../../../../shared/settings-cache');
 // routeKeywords.private: 'private'
 const privateRoute = '/private/';
 
+
 function verifySessionHash(salt, hash) {
     if (!salt || !hash) {
         return false;

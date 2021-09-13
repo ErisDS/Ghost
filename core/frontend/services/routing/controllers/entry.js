@@ -15,6 +15,8 @@ const helpers = require('../helpers');
 module.exports = function entryController(req, res, next) {
     debug('entryController', res.routerOptions);
 
+    console.log('entry controller', res.locals, res.locals._templateOptions);
+
     return helpers.entryLookup(req.path, res.routerOptions, res.locals)
         .then(function then(lookup) {
             // Format data 1
