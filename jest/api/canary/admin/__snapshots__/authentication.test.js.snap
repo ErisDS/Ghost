@@ -1,0 +1,24 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Authentication API It should respond to the GET method 1`] = `
+Object {
+  "setup": Array [
+    Object {
+      "status": false,
+    },
+  ],
+}
+`;
+
+exports[`Authentication API It should respond to the GET method 2`] = `
+Object {
+  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+  "connection": "close",
+  "content-length": "28",
+  "content-type": "application/json; charset=utf-8",
+  "date": Any<String>,
+  "etag": "W/\\"1c-sQKS0vX9z/0iYRVKKjytkkIupoI\\"",
+  "vary": "Accept-Encoding",
+  "x-powered-by": "Express",
+}
+`;

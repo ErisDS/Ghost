@@ -6,7 +6,8 @@
             "filename": "/tmp/ghost-test.db"
         },
         "useNullAsDefault": true,
-        "debug": false
+        "debug": false,
+        "pool": { "min": 0, "max": 1}
     },
     "server": {
         "port": 2369

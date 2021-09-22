@@ -378,8 +378,6 @@ async function bootGhost() {
 
         logging.error(serverStartError);
 
-        console.log('IN ERROR', serverStartError);
-
         // If ghost was started and something else went wrong, we shut it down
         if (ghostServer) {
             notifyServerReady(serverStartError);

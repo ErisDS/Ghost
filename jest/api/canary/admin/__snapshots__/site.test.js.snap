@@ -26,30 +26,3 @@ Object {
   "x-powered-by": "Express",
 }
 `;
-
-exports[`Test the site path It should respond to the GET method with a query param 1`] = `
-Object {
-  "site": Object {
-    "accent_color": "#FF1A75",
-    "description": "Thoughts, stories and ideas",
-    "icon": null,
-    "logo": null,
-    "title": "Ghost",
-    "url": "http://127.0.0.1:2369/",
-    "version": StringMatching /\\\\d\\+\\\\\\.\\\\d\\+/,
-  },
-}
-`;
-
-exports[`Test the site path It should respond to the GET method with a query param 2`] = `
-Object {
-  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
-  "connection": "close",
-  "content-length": "167",
-  "content-type": "application/json; charset=utf-8",
-  "date": Any<String>,
-  "etag": "W/\\"a7-H9k7h78AqU076IgnRhYhv7DMefM\\"",
-  "vary": "Accept-Encoding",
-  "x-powered-by": "Express",
-}
-`;
