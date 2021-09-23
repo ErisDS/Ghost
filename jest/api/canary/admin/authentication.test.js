@@ -4,7 +4,7 @@ const API_URL = '/ghost/api/canary/admin';
 
 let request;
 
-describe.skip('Authentication API', () => {
+describe('Authentication API', () => {
     beforeAll(async () => {
         request = await jestUtils.getRequestAgent();
     }, 10000);
@@ -29,7 +29,7 @@ describe.skip('Authentication API', () => {
         expect(result.body).toMatchSnapshot();
 
         expect(result.headers).toMatchSnapshot({
-            date: expect.any(String)
+            date: expect.toBeDateString()
         });
     });
 
@@ -47,32 +47,28 @@ describe.skip('Authentication API', () => {
             })
             .expect(201);
 
-            expect(result.body).toMatchSnapshot();
+        expect(result.body).toMatchSnapshot();
 
-            expect(result.headers).toMatchSnapshot({
-                date: expect.any(String)
-            });
+        expect(result.headers).toMatchSnapshot({
+            date: expect.toBeDateString()
+        });
 
+        // .then((res) => {
+        //     const jsonResponse = res.body;
+        //     should.exist(jsonResponse.users);
+        //     should.not.exist(jsonResponse.meta);
+        //     should.exist(res.headers['x-cache-invalidate']);
 
+        //     jsonResponse.users.should.have.length(1);
+        //     localUtils.API.checkResponse(jsonResponse.users[0], 'user');
 
-            // .then((res) => {
-            //     const jsonResponse = res.body;
-            //     should.exist(jsonResponse.users);
-            //     should.not.exist(jsonResponse.meta);
-            //     should.exist(res.headers['x-cache-invalidate']);
+        //     const newUser = jsonResponse.users[0];
+        //     newUser.id.should.equal(testUtils.DataGenerator.Content.users[0].id);
+        //     newUser.name.should.equal('test user');
+        //     newUser.email.should.equal('test@example.com');
 
-            //     jsonResponse.users.should.have.length(1);
-            //     localUtils.API.checkResponse(jsonResponse.users[0], 'user');
-
-            //     const newUser = jsonResponse.users[0];
-            //     newUser.id.should.equal(testUtils.DataGenerator.Content.users[0].id);
-            //     newUser.name.should.equal('test user');
-            //     newUser.email.should.equal('test@example.com');
-
-            //     mailService.GhostMailer.prototype.send.called.should.be.true();
-            //     mailService.GhostMailer.prototype.send.args[0][0].to.should.equal('test@example.com');
-            // });
-
-
+        //     mailService.GhostMailer.prototype.send.called.should.be.true();
+        //     mailService.GhostMailer.prototype.send.args[0][0].to.should.equal('test@example.com');
+        // });
     });
 });
