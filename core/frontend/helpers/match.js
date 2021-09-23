@@ -6,7 +6,8 @@ const tpl = require('@tryghost/tpl');
 const _ = require('lodash');
 
 const messages = {
-    invalidAttribute: 'Invalid or no attribute given to match helper'
+    invalidAttribute: 'Invalid or no attribute given to match helper',
+    unknownOperator: 'Unkown operator passed to match helper'
 };
 
 /**
@@ -38,15 +39,62 @@ const handleConditional = (conditional, options) => {
     }
 };
 
+const handleTwoSidedAnyAllMatch = (op, data, values) => {
+    console.log('two sided match');
+    if (Array.isArray(data)) {
+        console.log('data is array', data, values);
+        return _.some(values, (value) => {
+            console.log('for value', value, data.indexOf(value));
+            return data.indexOf(value) > -1;
+        });
+    } else {
+        console.log('data is not array', data, values);
+        return _.some(values, (value) => {
+
+        });
+    }
+};
+
+const handleOneSidesAnyAllMatch = (op, data, value) => {
+    console.log('one sided match');
+    let result;
+    if (Array.isArray(data)) {
+        console.log('data is array', data, value);
+        result = data.indexOf(value) > -1;
+    } else {
+        console.log('data is not array', data, value);
+        result = false;
+    }
+
+    return result;
+};
+
+const handleAnyAll = (op, data, value) => {
+    if (value.indexOf(',') > 0) {
+        return handleTwoSidedAnyAllMatch(op, data, value.split(','));
+    }
+
+    return handleOneSidesAnyAllMatch(op, data, value);
+};
+
 const handleMatch = (data, operator, value) => {
     let result;
 
     switch (operator) {
+    case '=':
+        result = data === value;
+        break;
     case '!=':
         result = data !== value;
         break;
+    case 'any':
+    case 'all':
+        result = handleAnyAll(operator, data, value);
+        break;
     default:
-        result = data === value;
+        // throw new errors.IncorrectUsageError({ message: 'Unknown operator' });
+        logging.warn(tpl(messages.unknownOperator));
+        result = false;
     }
 
     return result;

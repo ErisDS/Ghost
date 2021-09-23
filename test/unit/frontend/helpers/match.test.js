@@ -59,11 +59,24 @@ describe('Match helper', function () {
             string_five: '5',
             empty: '',
             null: null,
-            object: {
+            simple_object: {
                 foo: 'foo',
                 bar: 'bar'
             },
-            array: ['foo', 'bar']
+            array_of_strings: ['foo', 'bar', 'baz'],
+            array_of_objects: [
+                {
+                    slug: 'foo',
+                    name: 'Foo'
+                },
+                {
+                    slug: 'bar',
+                    name: 'Bar'
+                },
+                {
+                    name: 'Baz'
+                }
+            ]
         };
 
         describe('Basic values', function () {
@@ -83,8 +96,8 @@ describe('Match helper', function () {
                 '{{match null}}': 'false',
                 '{{match undefined}}': 'false',
                 '{{match unknown}}': 'false',
-                '{{match object}}': 'true',
-                '{{match array}}': 'true',
+                '{{match simple_object}}': 'true',
+                '{{match array_of_strings}}': 'true',
 
                 '{{match (title)}}': 'true',
 
@@ -126,10 +139,10 @@ describe('Match helper', function () {
                 '{{match (title) "The Title"}}': 'true',
                 '{{match (title) "The Title!"}}': 'false',
 
-                '{{match object "foo"}}': 'false',
-                '{{match object.foo "foo"}}': 'true',
-                '{{match array "foo"}}': 'false',
-                '{{match array.[0] "foo"}}': 'true'
+                '{{match simple_object "foo"}}': 'false',
+                '{{match simple_object.foo "foo"}}': 'true',
+                '{{match array_of_strings "foo"}}': 'false',
+                '{{match array_of_strings.[0] "foo"}}': 'true'
 
             }, hash);
         });
@@ -162,10 +175,10 @@ describe('Match helper', function () {
                 '{{match (title) "=" "The Title"}}': 'true',
                 '{{match (title) "=" "The Title!"}}': 'false',
 
-                '{{match object "=" "foo"}}': 'false',
-                '{{match object.foo "=" "foo"}}': 'true',
-                '{{match array "=" "foo"}}': 'false',
-                '{{match array.[0] "=" "foo"}}': 'true'
+                '{{match simple_object "=" "foo"}}': 'false',
+                '{{match simple_object.foo "=" "foo"}}': 'true',
+                '{{match array_of_strings "=" "foo"}}': 'false',
+                '{{match array_of_strings.[0] "=" "foo"}}': 'true'
             }, hash);
         });
 
@@ -197,10 +210,10 @@ describe('Match helper', function () {
                 '{{match (title) "!=" "The Title"}}': 'false',
                 '{{match (title) "!=" "The Title!"}}': 'true',
 
-                '{{match object "!=" "foo"}}': 'true',
-                '{{match object.foo "!=" "foo"}}': 'false',
-                '{{match array "!=" "foo"}}': 'true',
-                '{{match array.[0] "!=" "foo"}}': 'false'
+                '{{match simple_object "!=" "foo"}}': 'true',
+                '{{match simple_object.foo "!=" "foo"}}': 'false',
+                '{{match array_of_strings "!=" "foo"}}': 'true',
+                '{{match array_of_strings.[0] "!=" "foo"}}': 'false'
             }, hash);
         });
 
@@ -243,6 +256,25 @@ describe('Match helper', function () {
                 '{{match false "=" (match title "!=" "The Title")}}': 'true',
                 '{{match  "false" "=" (match (title) "!=" "The Title")}}': 'false'
             }, {title: 'The Title'});
+        });
+
+        describe('Any and all', function () {
+            runTests({
+                '{{match array_of_strings "any" "bar,baz"}}': 'true',
+                '{{match array_of_strings "any" "baz, bar"}}': 'true',
+                '{{match array_of_strings "any" "duck,bar"}}': 'true',
+                '{{match array_of_strings "any" "duck, buck"}}': 'false',
+                '{{match array_of_strings "any" "bar"}}': 'true',
+                '{{match array_of_strings "any" "duck"}}': 'false'
+
+                // '{{match array_of_strings "all" "bar,baz"}}': 'true',
+                // '{{match array_of_strings "all" "bar, baz"}}': 'true',
+                // '{{match array_of_strings "all" "bar,duck"}}': 'false',
+                // '{{match array_of_strings "all" "duck, duck"}}': 'false',
+                // '{{match array_of_strings "all" "bar"}}': 'true',
+                // '{{match array_of_strings "all" "duck"}}': 'false'
+
+            }, hash);
         });
     });
 
