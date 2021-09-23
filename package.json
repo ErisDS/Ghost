@@ -47,7 +47,7 @@
     "fix:client": "yarn cache clean && cd core/client && rm -rf node_modules tmp dist && yarn && cd ../../",
     "fix:server": "yarn cache clean && rm -rf node_modules && yarn",
     "fix": "yarn fix:client && yarn fix:server",
-    "jest": "jest --forceExit"
+    "jest": "jest"
   },
   "engines": {
     "node": "^12.22.1 || ^14.16.1",

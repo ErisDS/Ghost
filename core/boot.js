@@ -97,9 +97,13 @@ async function initCore({ghostServer, config}) {
     // Job Service allows parts of Ghost to run in the background
     debug('Begin: Job Service');
     const jobService = require('./server/services/jobs');
-    ghostServer.registerCleanupTask(async () => {
-        await jobService.shutdown();
-    });
+
+    // Don't assume server start... URGH coupling...
+    if (ghostServer) {
+        ghostServer.registerCleanupTask(async () => {
+            await jobService.shutdown();
+        });
+    }
     debug('End: Job Service');
 
     debug('End: initCore');
@@ -276,7 +280,7 @@ async function initBackgroundServices({config}) {
 
  * @returns {Promise<object>} ghostServer
  */
-async function bootGhost() {
+async function bootGhost({serverStart = true}) {
     // Metrics
     const startTime = Date.now();
     debug('Begin Boot');
@@ -327,13 +331,18 @@ async function bootGhost() {
         debug('End: i18n');
 
         // Step 2 - Start server with minimal app in global maintenance mode
-        debug('Begin: load server + minimal app');
+        debug('Begin: load minimal app');
         const rootApp = require('./app');
-        const GhostServer = require('./server/ghost-server');
-        ghostServer = new GhostServer({url: config.getSiteUrl()});
-        await ghostServer.start(rootApp);
-        bootLogger.log('server started');
-        debug('End: load server + minimal app');
+        debug('End: load minimal app');
+
+        if (serverStart) {
+            debug('Begin: load server');
+            const GhostServer = require('./server/ghost-server');
+            ghostServer = new GhostServer({url: config.getSiteUrl()});
+            await ghostServer.start(rootApp);
+            bootLogger.log('server started');
+            debug('End: load server');
+        }
 
         // Step 3 - Get the DB ready
         debug('Begin: Get DB ready');
@@ -359,14 +368,21 @@ async function bootGhost() {
 
         // Step 6 - We are technically done here - let everyone know!
         bootLogger.log('booted');
-        notifyServerReady();
+        if (serverStart) {
+            notifyServerReady();
+        }
 
         // Step 7 - Init our background services, we don't wait for this to finish
         initBackgroundServices({config});
 
         // We return the server purely for testing purposes
-        debug('End Boot: Returning Ghost Server');
-        return ghostServer;
+        if (serverStart) {
+            debug('End Boot: Returning Ghost Server');
+            return ghostServer;
+        } else {
+            debug('End boot: Returning Root App');
+            return rootApp;
+        }
     } catch (error) {
         const errors = require('@tryghost/errors');
 

@@ -5,18 +5,22 @@ const urlServiceUtils = require('../test/utils/url-service-utils');
 const mail = require('../core/server/services/mail');
 // const jest = require('jest');
 
-let ghostServer;
+let rootApp;
 
 module.exports.getRequestAgent = async () => {
-    ghostServer = await boot();
+    rootApp = await boot({serverStart: false});
+
+    console.log('got rootApp', rootApp);
     await urlServiceUtils.isFinished();
 
-    const agent = supertest(ghostServer.rootApp);
+    console.log('urlservice finished');
+
+    const agent = supertest(rootApp);
     return agent;
 };
 
 module.exports.shutdown = async () => {
-    await ghostServer.shutdown();
+    // Hmm... how to shutdown the db ?
 };
 
 module.exports.mockMail = () => {

@@ -4,7 +4,7 @@ const API_URL = '/ghost/api/canary/admin';
 
 let request;
 
-describe('Authentication API', () => {
+describe.skip('Authentication API', () => {
     beforeAll(async () => {
         request = await jestUtils.getRequestAgent();
     }, 10000);
