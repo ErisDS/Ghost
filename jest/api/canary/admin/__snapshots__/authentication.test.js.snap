@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Authentication API GET /authentication/setup 1`] = `
+exports[`Authentication API GET /authentication/setup: Check site is not setup. 1`] = `
 Object {
   "setup": Array [
     Object {
@@ -10,7 +10,7 @@ Object {
 }
 `;
 
-exports[`Authentication API GET /authentication/setup 2`] = `
+exports[`Authentication API GET /authentication/setup: Check site is not setup. 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",
@@ -19,6 +19,49 @@ Object {
   "date": toBeDateString<>,
   "etag": Any<String>,
   "vary": "Accept-Encoding",
+  "x-powered-by": "Express",
+}
+`;
+
+exports[`Authentication API POST /authentication/setup: Complete setup 1`] = `
+Object {
+  "users": Array [
+    Object {
+      "accessibility": null,
+      "bio": null,
+      "cover_image": null,
+      "created_at": toBeDateString<>,
+      "email": "test@example.com",
+      "facebook": null,
+      "id": "1",
+      "last_seen": null,
+      "location": null,
+      "meta_description": null,
+      "meta_title": null,
+      "name": "test user",
+      "profile_image": null,
+      "slug": "test",
+      "status": "active",
+      "tour": null,
+      "twitter": null,
+      "updated_at": toBeDateString<>,
+      "url": "http://127.0.0.1:2369/404/",
+      "website": null,
+    },
+  ],
+}
+`;
+
+exports[`Authentication API POST /authentication/setup: Complete setup 2`] = `
+Object {
+  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+  "connection": "close",
+  "content-length": "420",
+  "content-type": "application/json; charset=utf-8",
+  "date": toBeDateString<>,
+  "etag": Any<String>,
+  "vary": "Accept-Encoding",
+  "x-cache-invalidate": "/*",
   "x-powered-by": "Express",
 }
 `;
