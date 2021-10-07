@@ -20,8 +20,8 @@ Object {
   "connection": "close",
   "content-length": "167",
   "content-type": "application/json; charset=utf-8",
-  "date": Any<String>,
-  "etag": "W/\\"a7-H9k7h78AqU076IgnRhYhv7DMefM\\"",
+  "date": toBeDateString<>,
+  "etag": Any<String>,
   "vary": "Accept-Encoding",
   "x-powered-by": "Express",
 }

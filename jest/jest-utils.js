@@ -3,6 +3,7 @@ const supertest = require('supertest');
 const boot = require('../core/boot');
 const urlServiceUtils = require('../test/utils/url-service-utils');
 const mail = require('../core/server/services/mail');
+const db = require('../core/server/data/db');
 // const jest = require('jest');
 
 let rootApp;
@@ -10,10 +11,7 @@ let rootApp;
 module.exports.getRequestAgent = async () => {
     rootApp = await boot({serverStart: false});
 
-    console.log('got rootApp', rootApp);
     await urlServiceUtils.isFinished();
-
-    console.log('urlservice finished');
 
     const agent = supertest(rootApp);
     return agent;
@@ -21,6 +19,8 @@ module.exports.getRequestAgent = async () => {
 
 module.exports.shutdown = async () => {
     // Hmm... how to shutdown the db ?
+    // await db.knex.destroy();
+
 };
 
 module.exports.mockMail = () => {
