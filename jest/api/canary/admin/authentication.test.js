@@ -11,16 +11,17 @@ describe('Authentication API', () => {
         request = await jestUtils.getRequestAgent();
     }, 10000);
 
+    // This is needed for any tests which are writing to the DB
     afterAll(async () => {
-        await jestUtils.shutdown();
+        await jestUtils.resetDb();
     });
 
     beforeEach(function () {
-        mailSpy = jestUtils.mockMail();
+        mailSpy = jestUtils.mocks.mail();
     });
 
     afterEach(function () {
-        jestUtils.restoreAllMocks();
+        jestUtils.mocks.restoreAll();
     });
 
     test('GET /authentication/setup: Check site is not setup.', async () => {

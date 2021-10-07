@@ -9,10 +9,6 @@ describe('Test the site path', () => {
         request = await jestUtils.getRequestAgent();
     }, 10000);
 
-    afterAll(async () => {
-        jestUtils.shutdown();
-    });
-
     test('GET /site/', async () => {
         const result = await request
             .get(`${API_URL}/site/`)
