@@ -16,5 +16,5 @@ const mode = argv[2];
 switch (mode) {
 default:
     // New boot sequence
-    require('./core/boot')();
+    require('./core/boot')({});
 }

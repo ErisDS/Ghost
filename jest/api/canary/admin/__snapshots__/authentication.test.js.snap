@@ -4,7 +4,7 @@ exports[`Authentication API GET /authentication/setup 1`] = `
 Object {
   "setup": Array [
     Object {
-      "status": true,
+      "status": false,
     },
   ],
 }
@@ -14,10 +14,10 @@ exports[`Authentication API GET /authentication/setup 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",
-  "content-length": "27",
+  "content-length": "28",
   "content-type": "application/json; charset=utf-8",
   "date": toBeDateString<>,
-  "etag": "W/\\"1b-06ef8FdrIIahUXEQyo6H3V0+dJg\\"",
+  "etag": Any<String>,
   "vary": "Accept-Encoding",
   "x-powered-by": "Express",
 }

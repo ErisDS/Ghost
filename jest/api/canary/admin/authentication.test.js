@@ -29,7 +29,8 @@ describe('Authentication API', () => {
         expect(result.body).toMatchSnapshot();
 
         expect(result.headers).toMatchSnapshot({
-            date: expect.toBeDateString()
+            date: expect.toBeDateString(),
+            etag: expect.any(String)
         });
     });
 

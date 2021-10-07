@@ -17,30 +17,30 @@ module.exports = {
     clearMocks: true,
 
     // Indicates whether the coverage information should be collected while executing the test
-    collectCoverage: true,
+    // collectCoverage: true,
 
-    // An array of glob patterns indicating a set of files for which coverage information should be collected
-    collectCoverageFrom: [
-        '../**/*.{js}'
+    // // An array of glob patterns indicating a set of files for which coverage information should be collected
+    // collectCoverageFrom: [
+    //     '../**/*.{js}'
 
-    ],
-
-    // The directory where Jest should output its coverage files
-    coverageDirectory: 'coverage',
-
-    // An array of regexp pattern strings used to skip coverage collection
-    // coveragePathIgnorePatterns: [
-    //     '/node_modules/'
     // ],
 
-    // Indicates which provider should be used to instrument code for coverage
-    coverageProvider: 'v8',
+    // // The directory where Jest should output its coverage files
+    // coverageDirectory: 'coverage',
 
-    // A list of reporter names that Jest uses when writing coverage reports
-    coverageReporters: [
-        'text-summary',
-        'lcov'
-    ],
+    // // An array of regexp pattern strings used to skip coverage collection
+    // // coveragePathIgnorePatterns: [
+    // //     '/node_modules/'
+    // // ],
+
+    // // Indicates which provider should be used to instrument code for coverage
+    // coverageProvider: 'v8',
+
+    // // A list of reporter names that Jest uses when writing coverage reports
+    // coverageReporters: [
+    //     'text-summary',
+    //     'lcov'
+    // ],
 
     // An object that configures minimum threshold enforcement for coverage results
     // coverageThreshold: undefined,
@@ -51,10 +51,10 @@ module.exports = {
     // Make calling deprecated APIs throw helpful error messages
     // errorOnDeprecated: false,
 
-    // Force coverage collection from ignored files using an array of glob patterns
-    forceCoverageMatch: [
-        '**/*.{js}'
-    ],
+    // // Force coverage collection from ignored files using an array of glob patterns
+    // forceCoverageMatch: [
+    //     '**/*.{js}'
+    // ],
 
     // A path to a module which exports an async function that is triggered once before all test suites
     globalSetup: './setup.js',
