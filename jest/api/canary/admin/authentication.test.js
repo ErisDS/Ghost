@@ -31,16 +31,12 @@ describe('Authentication API', () => {
 
         expect(result.body).toMatchSnapshot();
 
-        expect(result.headers).toMatchSnapshot({
-            date: expect.toBeDateString(),
-            etag: expect.any(String)
-        });
+        expect(result.headers).toMatchHeaderSnapshot();
     });
 
     test('POST /authentication/setup: Complete setup', async () => {
         const result = await request
             .post(`${API_URL}/authentication/setup/`)
-            // .set('Origin', config.get('url'))
             .send({
                 setup: [{
                     name: 'test user',
@@ -58,12 +54,43 @@ describe('Authentication API', () => {
             }]
         });
 
-        expect(result.headers).toMatchSnapshot({
-            date: expect.toBeDateString(),
-            etag: expect.any(String)
-        });
+        expect(result.headers).toMatchHeaderSnapshot();
 
         expect(mailSpy).toHaveBeenCalled();
         expect(mailSpy).toHaveBeenCalledWith(expect.objectContaining({to: 'test@example.com'}));
+    });
+
+    it('GET /authentication/setup: Check site is setup now!', async () => {
+        const result = await request
+            .get(`${API_URL}/authentication/setup/`)
+            .expect(200);
+
+        expect(result.body).toMatchSnapshot();
+
+        expect(result.headers).toMatchHeaderSnapshot();
+    });
+
+    test('POST /authentication/setup: Cannot complete setup a second time', async () => {
+        const result = await request
+            .post(`${API_URL}/authentication/setup/`)
+            .send({
+                setup: [{
+                    name: 'test user',
+                    email: 'test-leo@example.com',
+                    password: 'thisissupersafe',
+                    blogTitle: 'a test blog'
+                }]
+            })
+            .expect(403);
+
+        expect(result.body).toMatchSnapshot({
+            errors: [{
+                id: expect.any(String)
+            }]
+        });
+
+        expect(result.headers).toMatchHeaderSnapshot();
+
+        expect(mailSpy).not.toHaveBeenCalled();
     });
 });

@@ -21,9 +21,6 @@ describe('Test the site path', () => {
 
         });
 
-        expect(result.headers).toMatchSnapshot({
-            date: expect.toBeDateString(),
-            etag: expect.any(String)
-        });
+        expect(result.headers).toMatchHeaderSnapshot();
     });
 });

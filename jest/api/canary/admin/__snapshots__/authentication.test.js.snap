@@ -23,6 +23,59 @@ Object {
 }
 `;
 
+exports[`Authentication API GET /authentication/setup: Check site is setup now! 1`] = `
+Object {
+  "setup": Array [
+    Object {
+      "status": true,
+    },
+  ],
+}
+`;
+
+exports[`Authentication API GET /authentication/setup: Check site is setup now! 2`] = `
+Object {
+  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+  "connection": "close",
+  "content-length": "27",
+  "content-type": "application/json; charset=utf-8",
+  "date": toBeDateString<>,
+  "etag": Any<String>,
+  "vary": "Accept-Encoding",
+  "x-powered-by": "Express",
+}
+`;
+
+exports[`Authentication API POST /authentication/setup: Cannot complete setup a second time 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "code": null,
+      "context": null,
+      "details": null,
+      "help": null,
+      "id": Any<String>,
+      "message": "Setup has already been completed.",
+      "property": null,
+      "type": "NoPermissionError",
+    },
+  ],
+}
+`;
+
+exports[`Authentication API POST /authentication/setup: Cannot complete setup a second time 2`] = `
+Object {
+  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+  "connection": "close",
+  "content-length": "201",
+  "content-type": "application/json; charset=utf-8",
+  "date": toBeDateString<>,
+  "etag": Any<String>,
+  "vary": "Accept-Encoding",
+  "x-powered-by": "Express",
+}
+`;
+
 exports[`Authentication API POST /authentication/setup: Complete setup 1`] = `
 Object {
   "users": Array [
