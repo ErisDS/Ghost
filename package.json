@@ -117,6 +117,7 @@
     "cookie-session": "1.4.0",
     "cors": "2.8.5",
     "downsize": "0.0.8",
+    "eslint-plugin-jest": "^24.5.2",
     "express": "4.17.1",
     "express-brute": "1.0.1",
     "express-hbs": "2.4.0",

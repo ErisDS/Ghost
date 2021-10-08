@@ -2,15 +2,15 @@ const jestUtils = require('../../../jest-utils');
 
 let agent;
 
-describe('Authentication API', () => {
+describe('Authentication API', function () {
     let mailSpy;
 
-    beforeAll(async () => {
+    beforeAll(async function () {
         agent = await jestUtils.getAgent('/ghost/api/canary/admin');
     });
 
     // This is needed for any tests which are writing to the DB
-    afterAll(async () => {
+    afterAll(async function () {
         await jestUtils.resetDb();
     });
 
@@ -22,103 +22,105 @@ describe('Authentication API', () => {
         jestUtils.mocks.restoreAll();
     });
 
-    test('GET /authentication/setup: Check site is not setup.', async () => {
-        await agent
-            .get('/authentication/setup/')
-            .expect((response) => {
-                expect(response.body).toMatchSnapshot();
+    describe('Setup', function () {
+        test('GET /authentication/setup: Check site is not setup.', async function () {
+            await agent
+                .get('/authentication/setup/')
+                .expect((response) => {
+                    expect(response.body).toMatchSnapshot();
 
-                expect(response.headers).toMatchHeaderSnapshot();
-            })
-            .expect(200);
-    });
+                    expect(response.headers).toMatchHeaderSnapshot();
+                })
+                .expect(200);
+        });
 
-    test('POST /authentication/setup: Complete setup', async () => {
-        await agent
-            .post('/authentication/setup/')
-            .send({
-                setup: [{
-                    name: 'test user',
-                    email: 'test@example.com',
-                    password: 'thisissupersafe',
-                    blogTitle: 'a test blog'
-                }]
-            })
-            .expect((response) => {
-                expect(response.body).toMatchSnapshot({
-                    users: [{
-                        created_at: expect.toBeDateString(),
-                        updated_at: expect.toBeDateString()
+        test('POST /authentication/setup: Complete setup', async function () {
+            await agent
+                .post('/authentication/setup/')
+                .send({
+                    setup: [{
+                        name: 'test user',
+                        email: 'test@example.com',
+                        password: 'thisissupersafe',
+                        blogTitle: 'a test blog'
                     }]
-                });
+                })
+                .expect((response) => {
+                    expect(response.body).toMatchSnapshot({
+                        users: [{
+                            created_at: expect.toBeDateString(),
+                            updated_at: expect.toBeDateString()
+                        }]
+                    });
 
-                expect(response.headers).toMatchHeaderSnapshot();
+                    expect(response.headers).toMatchHeaderSnapshot();
 
-                expect(mailSpy).toHaveBeenCalled();
-                expect(mailSpy).toHaveBeenCalledWith(expect.objectContaining({to: 'test@example.com'}));
-            })
-            .expect(201);
-    });
+                    expect(mailSpy).toHaveBeenCalled();
+                    expect(mailSpy).toHaveBeenCalledWith(expect.objectContaining({to: 'test@example.com'}));
+                })
+                .expect(201);
+        });
 
-    it('GET /authentication/setup: Check site is setup now!', async () => {
-        const response = await agent
-            .get('/authentication/setup/')
-            .expect(200);
+        it('GET /authentication/setup: Check site is setup now!', async function () {
+            const response = await agent
+                .get('/authentication/setup/')
+                .expect(200);
 
-        expect(response.body).toMatchSnapshot();
+            expect(response.body).toMatchSnapshot();
 
-        expect(response.headers).toMatchHeaderSnapshot();
-    });
+            expect(response.headers).toMatchHeaderSnapshot();
+        });
 
-    test('POST /authentication/setup: Cannot complete setup a second time', async () => {
-        await agent
-            .post('/authentication/setup/')
-            .send({
-                setup: [{
-                    name: 'test user',
-                    email: 'test-leo@example.com',
-                    password: 'thisissupersafe',
-                    blogTitle: 'a test blog'
-                }]
-            })
-            .expect((response) => {
-                expect(response.body).toMatchSnapshot({
-                    errors: [{
-                        id: expect.any(String)
+        test('POST /authentication/setup: Cannot complete setup a second time', async function () {
+            await agent
+                .post('/authentication/setup/')
+                .send({
+                    setup: [{
+                        name: 'test user',
+                        email: 'test-leo@example.com',
+                        password: 'thisissupersafe',
+                        blogTitle: 'a test blog'
                     }]
-                });
+                })
+                .expect((response) => {
+                    expect(response.body).toMatchSnapshot({
+                        errors: [{
+                            id: expect.any(String)
+                        }]
+                    });
 
-                expect(response.headers).toMatchHeaderSnapshot();
+                    expect(response.headers).toMatchHeaderSnapshot();
 
-                expect(mailSpy).not.toHaveBeenCalled();
-            })
-            .expect(403);
-    });
+                    expect(mailSpy).not.toHaveBeenCalled();
+                })
+                .expect(403);
+        });
 
-    test('PUT /authentication/setup/', async () => {
-        // Login as the user we just created
-        await agent.loginAs('test@example.com', 'thisissupersafe');
+        test('PUT /authentication/setup/', async function () {
+            // Login as the user we just created
+            await agent.loginAs('test@example.com', 'thisissupersafe');
 
-        await agent
-            .put('/authentication/setup/')
-            .send({
-                setup: [{
-                    name: 'test user edit',
-                    email: 'test-edit@example.com',
-                    password: 'thisissupersafe',
-                    blogTitle: 'an updated test blog'
-                }]
-            })
-            .expect((response) => {
-                expect(response.body).toMatchSnapshot({
-                    users: [{
-                        created_at: expect.toBeDateString(),
-                        updated_at: expect.toBeDateString()
+            await agent
+                .put('/authentication/setup/')
+                .send({
+                    setup: [{
+                        name: 'test user edit',
+                        email: 'test-edit@example.com',
+                        password: 'thisissupersafe',
+                        blogTitle: 'an updated test blog'
                     }]
-                });
+                })
+                .expect((response) => {
+                    expect(response.body).toMatchSnapshot({
+                        users: [{
+                            created_at: expect.toBeDateString(),
+                            updated_at: expect.toBeDateString()
+                        }]
+                    });
 
-                expect(response.headers).toMatchHeaderSnapshot();
-            })
-            .expect(200);
+                    expect(response.headers).toMatchHeaderSnapshot();
+                })
+                .expect(200);
+        });
     });
 });

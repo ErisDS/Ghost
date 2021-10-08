@@ -133,7 +133,7 @@ module.exports = {
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
     setupFilesAfterEnv: [
         '<rootDir>/expect.js'
-    ]
+    ],
 
     // The number of seconds after which a test is considered as slow and reported as such in the results.
     // slowTestThreshold: 5,
@@ -169,6 +169,8 @@ module.exports = {
 
     // This option allows use of a custom test runner
     // testRunner: "jest-circus/runner",
+
+    testTimeout: 10000
 
     // This option sets the URL for the jsdom environment. It is reflected in properties such as location.href
     // testURL: "http://localhost",

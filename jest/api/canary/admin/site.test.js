@@ -1,15 +1,13 @@
 const jestUtils = require('../../../jest-utils');
 
-const API_URL = '/ghost/api/canary/admin';
-
 let agent;
 
-describe('Test the site path', () => {
-    beforeAll(async () => {
-        agent = await jestUtils.getAgent(API_URL);
+describe('Test the site path', function () {
+    beforeAll(async function () {
+        agent = await jestUtils.getAgent('/ghost/api/canary/admin');
     });
 
-    test('GET /site/', async () => {
+    test('GET /site/', async function () {
         await agent
             .get('/site/')
             .expect((response) => {
