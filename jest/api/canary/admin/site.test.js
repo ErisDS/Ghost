@@ -2,25 +2,26 @@ const jestUtils = require('../../../jest-utils');
 
 const API_URL = '/ghost/api/canary/admin';
 
-let request;
+let agent;
 
 describe('Test the site path', () => {
     beforeAll(async () => {
-        request = await jestUtils.getRequestAgent();
-    }, 10000);
+        agent = await jestUtils.getAgent(API_URL);
+    });
 
     test('GET /site/', async () => {
-        const result = await request
-            .get(`${API_URL}/site/`)
+        await agent
+            .get('/site/')
+            .expect((response) => {
+                expect(response.body).toMatchSnapshot({
+                    site: {
+                        version: expect.stringMatching(/\d+\.\d+/)
+                    }
+
+                });
+
+                expect(response.headers).toMatchHeaderSnapshot();
+            })
             .expect(200);
-
-        expect(result.body).toMatchSnapshot({
-            site: {
-                version: expect.stringMatching(/\d+\.\d+/)
-            }
-
-        });
-
-        expect(result.headers).toMatchHeaderSnapshot();
     });
 });
