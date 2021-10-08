@@ -7,6 +7,8 @@ const Promise = require('bluebird');
 const _ = require('lodash');
 const errors = require('@tryghost/errors');
 const tpl = require('@tryghost/tpl');
+const validator = require('@tryghost/validator');
+const request = require('@tryghost/request');
 
 const messages = {
     invalidDimensions: 'Could not fetch image dimensions.'
@@ -18,13 +20,11 @@ const FETCH_ONLY_FORMATS = [
 ];
 
 class ImageSize {
-    constructor({config, storage, storageUtils, validator, urlUtils, request}) {
+    constructor({config, storage, storageUtils, urlUtils}) {
         this.config = config;
         this.storage = storage;
         this.storageUtils = storageUtils;
-        this.validator = validator;
         this.urlUtils = urlUtils;
-        this.request = request;
 
         this.REQUEST_OPTIONS = {
             // we need the user-agent, otherwise some https request may fail (e.g. cloudfare)
@@ -63,7 +63,7 @@ class ImageSize {
     _probeImageSizeFromUrl(imageUrl) {
         // probe-image-size uses `request` npm module which doesn't have our `got`
         // override with custom URL validation so it needs duplicating here
-        if (_.isEmpty(imageUrl) || !this.validator.isURL(imageUrl)) {
+        if (_.isEmpty(imageUrl) || !validator.isURL(imageUrl)) {
             return Promise.reject(new errors.InternalServerError({
                 message: 'URL empty or invalid.',
                 code: 'URL_MISSING_INVALID',
@@ -71,13 +71,13 @@ class ImageSize {
             }));
         }
 
-        return probeSizeOf(imageUrl, this.REQUEST_OPTIONS);
+        return probeSizeOf(imageUrl, REQUEST_OPTIONS);
     }
 
     // download full image then use image-size to get it's dimensions
     // returns promise which resolves dimensions
     _fetchImageSizeFromUrl(imageUrl) {
-        return this.request(imageUrl, this.REQUEST_OPTIONS).then((response) => {
+        return request(imageUrl, REQUEST_OPTIONS).then((response) => {
             return this._imageSizeFromBuffer(response.body);
         });
     }
