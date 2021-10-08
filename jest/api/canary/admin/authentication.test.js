@@ -5,15 +5,6 @@ let agent;
 describe('Authentication API', function () {
     let mailSpy;
 
-    beforeAll(async function () {
-        agent = await jestUtils.getAgent('/ghost/api/canary/admin');
-    });
-
-    // This is needed for any tests which are writing to the DB
-    afterAll(async function () {
-        await jestUtils.resetDb();
-    });
-
     beforeEach(function () {
         mailSpy = jestUtils.mocks.mail();
     });
@@ -23,6 +14,15 @@ describe('Authentication API', function () {
     });
 
     describe('Setup', function () {
+        beforeAll(async function () {
+            agent = await jestUtils.getAgent('/ghost/api/canary/admin');
+        });
+
+        // This is needed for any tests which are writing to the DB
+        afterAll(async function () {
+            await jestUtils.resetDb();
+        });
+
         test('GET /authentication/setup: Check site is not setup.', async function () {
             await agent
                 .get('/authentication/setup/')
@@ -114,10 +114,52 @@ describe('Authentication API', function () {
                     expect(response.body).toMatchSnapshot({
                         users: [{
                             created_at: expect.toBeDateString(),
-                            updated_at: expect.toBeDateString()
+                            updated_at: expect.toBeDateString(),
+                            last_seen: expect.toBeDateString()
                         }]
                     });
 
+                    expect(response.headers).toMatchHeaderSnapshot();
+                })
+                .expect(200);
+        });
+    });
+
+    describe('Invitations', function () {
+        beforeAll(async function () {
+            agent = await jestUtils.getAgent('/ghost/api/canary/admin');
+            await agent.initFixtures('invites');
+            await agent.loginAsOwner();
+        });
+
+        // This is needed for any tests which are writing to the DB
+        afterAll(async function () {
+            await jestUtils.resetDb();
+        });
+
+        test('GET authentication/invitation - rejects invalid email', async function () {
+            await agent
+                .get('authentication/invitation?email=invalidemail')
+                .expect((response) => {
+                    expect(response.body).toMatchSnapshot({
+                        errors: [{
+                            id: expect.any(String)
+                        }]
+                    });
+                    expect(response.headers).toMatchHeaderSnapshot();
+                })
+                .expect(400);
+        });
+
+        test('GET authentication/invitation - checks valid email', async function () {
+            const validEmail = agent.getFixture('invites').email;
+
+            await agent
+                .get(`authentication/invitation?email=${validEmail}`)
+                .expect((response) => {
+                    expect(response.body).toMatchSnapshot({
+
+                    });
                     expect(response.headers).toMatchHeaderSnapshot();
                 })
                 .expect(200);

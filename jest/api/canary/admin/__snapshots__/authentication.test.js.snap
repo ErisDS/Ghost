@@ -1,6 +1,59 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Authentication API GET /authentication/setup: Check site is not setup. 1`] = `
+exports[`Authentication API Invitations GET authentication/invitation - checks valid email 1`] = `
+Object {
+  "invitation": Array [
+    Object {
+      "valid": true,
+    },
+  ],
+}
+`;
+
+exports[`Authentication API Invitations GET authentication/invitation - checks valid email 2`] = `
+Object {
+  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+  "connection": "close",
+  "content-length": "31",
+  "content-type": "application/json; charset=utf-8",
+  "date": toBeDateString<>,
+  "etag": Any<String>,
+  "vary": "Accept-Encoding",
+  "x-powered-by": "Express",
+}
+`;
+
+exports[`Authentication API Invitations GET authentication/invitation - rejects invalid email 1`] = `
+Object {
+  "errors": Array [
+    Object {
+      "code": null,
+      "context": null,
+      "details": null,
+      "help": null,
+      "id": Any<String>,
+      "message": "The server did not receive a valid email",
+      "property": null,
+      "type": "BadRequestError",
+    },
+  ],
+}
+`;
+
+exports[`Authentication API Invitations GET authentication/invitation - rejects invalid email 2`] = `
+Object {
+  "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
+  "connection": "close",
+  "content-length": "206",
+  "content-type": "application/json; charset=utf-8",
+  "date": toBeDateString<>,
+  "etag": Any<String>,
+  "vary": "Accept-Encoding",
+  "x-powered-by": "Express",
+}
+`;
+
+exports[`Authentication API Setup GET /authentication/setup: Check site is not setup. 1`] = `
 Object {
   "setup": Array [
     Object {
@@ -10,7 +63,7 @@ Object {
 }
 `;
 
-exports[`Authentication API GET /authentication/setup: Check site is not setup. 2`] = `
+exports[`Authentication API Setup GET /authentication/setup: Check site is not setup. 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",
@@ -23,7 +76,7 @@ Object {
 }
 `;
 
-exports[`Authentication API GET /authentication/setup: Check site is setup now! 1`] = `
+exports[`Authentication API Setup GET /authentication/setup: Check site is setup now! 1`] = `
 Object {
   "setup": Array [
     Object {
@@ -33,7 +86,7 @@ Object {
 }
 `;
 
-exports[`Authentication API GET /authentication/setup: Check site is setup now! 2`] = `
+exports[`Authentication API Setup GET /authentication/setup: Check site is setup now! 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",
@@ -46,7 +99,7 @@ Object {
 }
 `;
 
-exports[`Authentication API POST /authentication/setup: Cannot complete setup a second time 1`] = `
+exports[`Authentication API Setup POST /authentication/setup: Cannot complete setup a second time 1`] = `
 Object {
   "errors": Array [
     Object {
@@ -63,7 +116,7 @@ Object {
 }
 `;
 
-exports[`Authentication API POST /authentication/setup: Cannot complete setup a second time 2`] = `
+exports[`Authentication API Setup POST /authentication/setup: Cannot complete setup a second time 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",
@@ -76,7 +129,7 @@ Object {
 }
 `;
 
-exports[`Authentication API POST /authentication/setup: Complete setup 1`] = `
+exports[`Authentication API Setup POST /authentication/setup: Complete setup 1`] = `
 Object {
   "users": Array [
     Object {
@@ -105,7 +158,7 @@ Object {
 }
 `;
 
-exports[`Authentication API POST /authentication/setup: Complete setup 2`] = `
+exports[`Authentication API Setup POST /authentication/setup: Complete setup 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",
@@ -119,7 +172,7 @@ Object {
 }
 `;
 
-exports[`Authentication API PUT /authentication/setup/ 1`] = `
+exports[`Authentication API Setup PUT /authentication/setup/ 1`] = `
 Object {
   "users": Array [
     Object {
@@ -130,7 +183,7 @@ Object {
       "email": "test-edit@example.com",
       "facebook": null,
       "id": "1",
-      "last_seen": "2021-10-08T09:22:19.000Z",
+      "last_seen": toBeDateString<>,
       "location": null,
       "meta_description": null,
       "meta_title": null,
@@ -148,7 +201,7 @@ Object {
 }
 `;
 
-exports[`Authentication API PUT /authentication/setup/ 2`] = `
+exports[`Authentication API Setup PUT /authentication/setup/ 2`] = `
 Object {
   "cache-control": "no-cache, private, no-store, must-revalidate, max-stale=0, post-check=0, pre-check=0",
   "connection": "close",

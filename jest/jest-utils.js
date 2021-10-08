@@ -1,12 +1,15 @@
 const supertest = require('supertest');
 const errors = require('@tryghost/errors');
+const {sequence} = require('@tryghost/promise');
+const _ = require('lodash');
 
 const boot = require('../core/boot');
 const urlServiceUtils = require('../test/utils/url-service-utils');
+const fixtures = require('../test/utils/fixture-utils');
 
 const db = require('./utils/db.js');
 
-let rootApp;
+const oldDbUtils = require('../test/utils/db-utils');
 
 // function prefixUrl(prefix) {
 //     return function (request) {
@@ -53,6 +56,23 @@ class TestAgent {
         return this.request.delete(this.makeUrl(url));
     }
 
+    async initFixtures(...options) {
+        // No DB setup, but override the owner
+        options = _.merge({'owner:post': true}, _.transform(options, function (result, val) {
+            if (val) {
+                result[val] = true;
+            }
+        }));
+
+        const fixtureOps = fixtures.getFixtureOps(options);
+
+        return sequence(fixtureOps);
+    }
+
+    getFixture(type, index = 0) {
+        return fixtures.DataGenerator.forKnex[type][index];
+    }
+
     async loginAs(email, password) {
         await this.post('/session/')
             .send({
@@ -67,10 +87,7 @@ class TestAgent {
                         message: 'Ghost is redirecting, do you have an instance already running on port 2369?'
                     });
                 } else if (res.statusCode !== 200 && res.statusCode !== 201) {
-                    console.error(res);
-                    throw new errors.GhostError({
-                        message: res.body.errors[0].message
-                    });
+                    throw new errors.GhostError(res.body.errors[0]);
                 }
 
                 return res.headers['set-cookie'];
@@ -94,7 +111,7 @@ class TestAgent {
 }
 
 module.exports.getAgent = async (API_URL) => {
-    rootApp = await boot({serverStart: false});
+    const rootApp = await boot({serverStart: false});
 
     await urlServiceUtils.isFinished();
 
@@ -104,7 +121,9 @@ module.exports.getAgent = async (API_URL) => {
 };
 
 module.exports.resetDb = async () => {
+    await urlServiceUtils.reset();
     await db.teardown();
+    // oldDbUtils.teardown();
 };
 
 module.exports.mocks = require('./utils/mocks');
