@@ -1,3 +1,5 @@
+const debug = require('@tryghost/debug')('test:jest');
+
 const supertest = require('supertest');
 const errors = require('@tryghost/errors');
 const {sequence} = require('@tryghost/promise');
@@ -8,8 +10,9 @@ const urlServiceUtils = require('../test/utils/url-service-utils');
 const fixtures = require('../test/utils/fixture-utils');
 
 const db = require('./utils/db.js');
-
 const oldDbUtils = require('../test/utils/db-utils');
+const KnexMigrator = require('knex-migrator');
+const knexMigrator = new KnexMigrator();
 
 // function prefixUrl(prefix) {
 //     return function (request) {
@@ -121,9 +124,16 @@ module.exports.getAgent = async (API_URL) => {
 };
 
 module.exports.resetDb = async () => {
-    await urlServiceUtils.reset();
-    await db.teardown();
-    // oldDbUtils.teardown();
+    await oldDbUtils.teardown();
+    debug('teardown done');
+    // The tables have been truncated, this runs the fixture init task (init file 2) to re-add our default fixtures
+    await knexMigrator.init({only: 2});
+
+    debug('init done');
+    urlServiceUtils.reset();
+    urlServiceUtils.init();
+    await urlServiceUtils.isFinished();
+    debug('urlservice done');
 };
 
 module.exports.mocks = require('./utils/mocks');
