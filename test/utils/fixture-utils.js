@@ -702,7 +702,7 @@ const getFixtureOps = (toDos) => {
             });
         } else {
             if (!toDoList[toDo]) {
-                throw new Error('setup todo does not exist - spell mistake?');
+                throw new Error(`The fixture ${toDo} does not exist.`);
             }
 
             fixtureOps.push(toDoList[toDo]);
@@ -714,5 +714,6 @@ const getFixtureOps = (toDos) => {
 
 module.exports = {
     fixtures,
-    getFixtureOps
+    getFixtureOps,
+    DataGenerator
 };
