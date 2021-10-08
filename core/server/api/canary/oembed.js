@@ -1,6 +1,6 @@
 const config = require('../../../shared/config');
 const externalRequest = require('../../lib/request-external');
-const tpl = require('@tryghost/tpl');
+
 const OEmbed = require('../../services/oembed');
 const oembed = new OEmbed({config, externalRequest, tpl});
 
