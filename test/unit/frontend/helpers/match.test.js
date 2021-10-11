@@ -305,4 +305,30 @@ describe('Match helper', function () {
             shouldCompileToExpected(templateString, {title}, expected);
         });
     });
+
+    // This doesn't really make sense until we have "any" / "all" support, but is useful for testing match inline
+    describe('{{#match (match)}} (nested)', function () {
+        const templateString = '{{#match (match title "=" "Hello World")}}case a{{else match (match title "=" "Hello World!")}}case b{{else}}case c{{/match}}';
+
+        it('Executes the first block when match is true', function () {
+            const title = 'Hello World';
+            const expected = 'case a';
+
+            shouldCompileToExpected(templateString, {title}, expected);
+        });
+
+        it('Executes secondary blocks correctly', function () {
+            const title = 'Hello World!';
+            const expected = 'case b';
+
+            shouldCompileToExpected(templateString, {title}, expected);
+        });
+
+        it('Executes the else block when match is false', function () {
+            const title = 'Hello';
+            const expected = 'case c';
+
+            shouldCompileToExpected(templateString, {title}, expected);
+        });
+    });
 });

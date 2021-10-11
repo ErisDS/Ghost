@@ -107,7 +107,7 @@ module.exports = function match(...attrs) {
 
     const options = attrs.pop();
     const isBlock = _.has(options, 'fn');
-    let result;
+    let result = '';
 
     if (_.isEmpty(attrs)) {
         logging.warn(tpl(messages.invalidAttribute));
