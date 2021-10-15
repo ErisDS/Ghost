@@ -39,42 +39,42 @@ const handleConditional = (conditional, options) => {
     }
 };
 
-const handleTwoSidedAnyAllMatch = (op, data, values) => {
-    console.log('two sided match');
+const matchTwoSides = (op, data, values) => {
+    const fn = op === 'any' ? 'some' : 'every';
+
+    // The data we're matching against is an array
     if (Array.isArray(data)) {
-        console.log('data is array', data, values);
-        return _.some(values, (value) => {
-            console.log('for value', value, data.indexOf(value));
-            return data.indexOf(value) > -1;
-        });
-    } else {
+        // In Ghost we don't have mixed arrays, so if there's an object in the array, they're all objects
+        if (data[0] instanceof Object) {
+            return _[fn](values, (value) => {
+                // By default, we look for slugs
+                // @TODO: make it possible to look at a different property?
+                return _.find(data, _.matchesProperty('slug', value));
+            });
+
+        // Otherwise we have single values and can do a simple indexOf
+        } else {
+            return _[fn](values, (value) => {
+                return data.indexOf(value) > -1;
+            });
+        }
+    } else if (Object.isObject(data)) {
         console.log('data is not array', data, values);
-        return _.some(values, (value) => {
+        return _[fn](values, (value) => {
 
         });
     }
-};
-
-const handleOneSidesAnyAllMatch = (op, data, value) => {
-    console.log('one sided match');
-    let result;
-    if (Array.isArray(data)) {
-        console.log('data is array', data, value);
-        result = data.indexOf(value) > -1;
-    } else {
-        console.log('data is not array', data, value);
-        result = false;
-    }
-
-    return result;
 };
 
 const handleAnyAll = (op, data, value) => {
+    let values = [];
     if (value.indexOf(',') > 0) {
-        return handleTwoSidedAnyAllMatch(op, data, value.split(','));
+        values = value.split(',').map(item => item.trim());
+    } else {
+        values.push(value.trim());
     }
 
-    return handleOneSidesAnyAllMatch(op, data, value);
+    return matchTwoSides(op, data, values);
 };
 
 const handleMatch = (data, operator, value) => {

@@ -110,7 +110,6 @@ describe('Match helper', function () {
             }, hash);
         });
 
-        // @TODO: Implement Implicit Equals
         describe('Implicit Equals', function () {
             runTests({
                 '{{match string "Hello world"}}': 'true',
@@ -217,6 +216,47 @@ describe('Match helper', function () {
             }, hash);
         });
 
+        describe.only('Any and all', function () {
+            runTests({
+                // Test that strings are trimmed
+                '{{match array_of_strings "any" " duck , bar "}}': 'true',
+                '{{match array_of_strings "all" " bar , baz "}}': 'true',
+
+                // Array of strings
+                // Any
+                '{{match array_of_strings "any" "bar,baz"}}': 'true',
+                '{{match array_of_strings "any" "duck,bar"}}': 'true',
+                '{{match array_of_strings "any" "buck,buck"}}': 'false',
+                '{{match array_of_strings "any" "bar"}}': 'true',
+                '{{match array_of_strings "any" "duck"}}': 'false',
+
+                // All
+                '{{match array_of_strings "all" "bar,baz"}}': 'true',
+                '{{match array_of_strings "all" "bar,duck"}}': 'false',
+                '{{match array_of_strings "all" "duck,duck"}}': 'false',
+                '{{match array_of_strings "all" "bar"}}': 'true',
+                '{{match array_of_strings "all" "duck"}}': 'false',
+
+                // Array of objects
+                // Any
+                '{{match array_of_objects "any" "foo,bar"}}': 'true',
+                '{{match array_of_objects "any" "bar,baz"}}': 'true',
+                '{{match array_of_objects "any" "duck,bar"}}': 'true',
+                '{{match array_of_objects "any" "buck,buck"}}': 'false',
+                '{{match array_of_objects "any" "bar"}}': 'true',
+                '{{match array_of_objects "any" "duck"}}': 'false',
+
+                // All
+                '{{match array_of_objects "all" "foo,bar"}}': 'true',
+                '{{match array_of_objects "all" "bar,baz"}}': 'false',
+                '{{match array_of_objects "all" "bar,duck"}}': 'false',
+                '{{match array_of_objects "all" "duck,duck"}}': 'false',
+                '{{match array_of_objects "all" "bar"}}': 'true',
+                '{{match array_of_objects "all" "duck"}}': 'false'
+
+            }, hash);
+        });
+
         // SafeStrings represent the original value as an object for example:
         // SafeString { string: true } vs SafeString { string: 'true' }
         // allows us to know if the original value was a boolean or a string
@@ -256,25 +296,6 @@ describe('Match helper', function () {
                 '{{match false "=" (match title "!=" "The Title")}}': 'true',
                 '{{match  "false" "=" (match (title) "!=" "The Title")}}': 'false'
             }, {title: 'The Title'});
-        });
-
-        describe('Any and all', function () {
-            runTests({
-                '{{match array_of_strings "any" "bar,baz"}}': 'true',
-                '{{match array_of_strings "any" "baz, bar"}}': 'true',
-                '{{match array_of_strings "any" "duck,bar"}}': 'true',
-                '{{match array_of_strings "any" "duck, buck"}}': 'false',
-                '{{match array_of_strings "any" "bar"}}': 'true',
-                '{{match array_of_strings "any" "duck"}}': 'false'
-
-                // '{{match array_of_strings "all" "bar,baz"}}': 'true',
-                // '{{match array_of_strings "all" "bar, baz"}}': 'true',
-                // '{{match array_of_strings "all" "bar,duck"}}': 'false',
-                // '{{match array_of_strings "all" "duck, duck"}}': 'false',
-                // '{{match array_of_strings "all" "bar"}}': 'true',
-                // '{{match array_of_strings "all" "duck"}}': 'false'
-
-            }, hash);
         });
     });
 
