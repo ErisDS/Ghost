@@ -30,6 +30,12 @@ describe('Post Model', function () {
     before(testUtils.stopGhost);
     after(testUtils.teardownDb);
 
+    async function truncateContent() {
+        console.time('truncate');
+        await testUtils.teardownDb('posts_tags', 'tags', 'posts_meta', 'posts');
+        console.timeEnd('truncate');
+    }
+
     before(testUtils.setup('users:roles'));
 
     afterEach(function () {
@@ -47,17 +53,9 @@ describe('Post Model', function () {
 
         describe('fetchOne/fetchAll/fetchPage', function () {
             before(testUtils.fixtures.insertPostsAndTags);
-            after(function () {
-                return testUtils.truncate('posts_tags')
-                    .then(function () {
-                        return testUtils.truncate('tags');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts_meta');
-                    });
+
+            after(async function () {
+                await truncateContent();
             });
 
             describe('findOne', function () {
@@ -85,27 +83,13 @@ describe('Post Model', function () {
 
             describe('findPage', function () {
                 describe('with more posts/tags', function () {
-                    beforeEach(function () {
-                        return testUtils.truncate('posts_tags')
-                            .then(function () {
-                                return testUtils.truncate('tags');
-                            })
-                            .then(function () {
-                                return testUtils.truncate('posts_meta');
-                            })
-                            .then(function () {
-                                return testUtils.truncate('posts');
-                            });
-                    });
-
-                    beforeEach(function () {
-                        return testUtils.fixtures.insertPostsAndTags()
-                            .then(function () {
-                                return testUtils.fixtures.insertExtraPosts();
-                            })
-                            .then(function () {
-                                return testUtils.fixtures.insertExtraPostsTags();
-                            });
+                    before(async function () {
+                        await truncateContent();
+                        console.time('insert');
+                        await testUtils.fixtures.insertPostsAndTags();
+                        await testUtils.fixtures.insertExtraPosts();
+                        await testUtils.fixtures.insertExtraPostsTags();
+                        console.timeEnd('insert');
                     });
 
                     it('can findPage, with various options', function (done) {
@@ -201,17 +185,8 @@ describe('Post Model', function () {
         describe('edit', function () {
             beforeEach(testUtils.fixtures.insertPostsAndTags);
 
-            afterEach(function () {
-                return testUtils.truncate('posts_tags')
-                    .then(function () {
-                        return testUtils.truncate('tags');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts_meta');
-                    });
+            afterEach(async function () {
+                await truncateContent();
             });
 
             beforeEach(function () {
@@ -778,17 +753,8 @@ describe('Post Model', function () {
         describe('add', function () {
             before(testUtils.fixtures.insertPostsAndTags);
 
-            after(function () {
-                return testUtils.truncate('posts_tags')
-                    .then(function () {
-                        return testUtils.truncate('tags');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts_meta');
-                    });
+            after(async function () {
+                await truncateContent();
             });
 
             beforeEach(function () {
@@ -1271,17 +1237,8 @@ describe('Post Model', function () {
         describe('destroy', function () {
             beforeEach(testUtils.fixtures.insertPostsAndTags);
 
-            afterEach(function () {
-                return testUtils.truncate('posts_tags')
-                    .then(function () {
-                        return testUtils.truncate('tags');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts_meta');
-                    });
+            afterEach(async function () {
+                await truncateContent();
             });
 
             beforeEach(function () {
@@ -1456,17 +1413,8 @@ describe('Post Model', function () {
         describe('Collision Protection', function () {
             before(testUtils.fixtures.insertPostsAndTags);
 
-            after(function () {
-                return testUtils.truncate('posts_tags')
-                    .then(function () {
-                        return testUtils.truncate('tags');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts');
-                    })
-                    .then(function () {
-                        return testUtils.truncate('posts_meta');
-                    });
+            after(async function () {
+                await truncateContent();
             });
 
             it('update post title, but updated_at is out of sync', function () {
@@ -1697,17 +1645,8 @@ describe('Post Model', function () {
         let editOptions;
         const createTag = testUtils.DataGenerator.forKnex.createTag;
 
-        beforeEach(function () {
-            return testUtils.truncate('posts_tags')
-                .then(function () {
-                    return testUtils.truncate('tags');
-                })
-                .then(function () {
-                    return testUtils.truncate('posts');
-                })
-                .then(function () {
-                    return testUtils.truncate('posts_meta');
-                });
+        beforeEach(async function () {
+            await truncateContent();
         });
 
         beforeEach(function () {
