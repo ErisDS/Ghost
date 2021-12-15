@@ -360,6 +360,8 @@ describe('Integration - Web - Site canary', function () {
     describe('extended routes.yaml: collections', function () {
         describe('2 collections', function () {
             before(async function () {
+                app = await localUtils.initGhost();
+
                 sinon.stub(routeSettingsService, 'loadRouteSettings').get(() => () => ({
                     routes: {
                         '/': {templates: ['home']}
@@ -431,7 +433,7 @@ describe('Integration - Web - Site canary', function () {
                     });
             });
 
-            it('serve post', function () {
+            it.only('serve post', function () {
                 const req = {
                     secure: true,
                     method: 'GET',
