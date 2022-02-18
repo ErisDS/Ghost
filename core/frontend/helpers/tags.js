@@ -5,8 +5,10 @@
 // By default, tags are separated by commas.
 //
 // Note that the standard {{#each tags}} implementation is unaffected by this helper
-const {urlService} = require('../services/proxy');
+
 const {SafeString, escapeExpression, templates} = require('../services/rendering');
+const {metaData} = require('../services/proxy');
+const {getMetaDataUrl} = metaData;
 
 const isString = require('lodash/isString');
 const ghostHelperUtils = require('@tryghost/helpers').utils;
@@ -27,7 +29,7 @@ module.exports = function tags(options) {
     function createTagList(tagsList) {
         function processTag(tag) {
             return autolink ? templates.link({
-                url: urlService.getUrlByResourceId(tag.id, {withSubdirectory: true}),
+                url: getMetaDataUrl(tag),
                 text: escapeExpression(tag.name)
             }) : escapeExpression(tag.name);
         }

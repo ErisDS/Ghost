@@ -6,8 +6,10 @@
 // By default, authors are separated by commas.
 //
 // Note that the standard {{#each authors}} implementation is unaffected by this helper.
-const {urlService} = require('../services/proxy');
 const {SafeString, escapeExpression, templates} = require('../services/rendering');
+const {metaData} = require('../services/proxy');
+const {getMetaDataUrl} = metaData;
+
 const isString = require('lodash/isString');
 const {utils} = require('@tryghost/helpers');
 
@@ -34,7 +36,7 @@ module.exports = function authors(options = {}) {
     function createAuthorsList(authorsList) {
         function processAuthor(author) {
             return autolink ? templates.link({
-                url: urlService.getUrlByResourceId(author.id, {withSubdirectory: true}),
+                url: getMetaDataUrl(author),
                 text: escapeExpression(author.name)
             }) : escapeExpression(author.name);
         }

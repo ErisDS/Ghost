@@ -9,8 +9,10 @@
 //
 // Block helper: `{{#author}}{{/author}}`
 // This is the default handlebars behaviour of dropping into the author object scope
-const {urlService} = require('../services/proxy');
+
 const {SafeString, escapeExpression, hbs, templates} = require('../services/rendering');
+const {metaData} = require('../services/proxy');
+const {getMetaDataUrl} = metaData;
 const isString = require('lodash/isString');
 
 const builtInHelpers = hbs.handlebars.helpers;
@@ -29,7 +31,7 @@ module.exports = function author(options) {
     if (this.author && this.author.name) {
         if (autolink) {
             output = templates.link({
-                url: urlService.getUrlByResourceId(this.author.id, {withSubdirectory: true}),
+                url: getMetaDataUrl(this.author),
                 text: escapeExpression(this.author.name)
             });
         } else {
