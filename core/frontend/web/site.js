@@ -179,6 +179,9 @@ module.exports = function setupSiteApp(options = {}) {
     // // Set up Frontend routes (including private blogging routes)
     // siteApp.use(SiteRouter);
 
+    const router = require('../router');
+    siteApp.use(router());
+
     // ### Error handlers
     siteApp.use(errorHandler.pageNotFound);
     config.get('apps:internal').forEach((appName) => {
