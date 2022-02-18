@@ -130,10 +130,10 @@ async function initCore({ghostServer, config, bootLogger, frontend}) {
 async function initServicesForFrontend() {
     debug('Begin: initServicesForFrontend');
 
-    debug('Begin: Routing Settings');
-    const routeSettings = require('./server/services/route-settings');
-    await routeSettings.init();
-    debug('End: Routing Settings');
+    // debug('Begin: Routing Settings');
+    // const routeSettings = require('./server/services/route-settings');
+    // await routeSettings.init();
+    // debug('End: Routing Settings');
 
     debug('Begin: Redirects');
     const customRedirects = require('./server/services/redirects');
@@ -203,21 +203,21 @@ async function initExpressApps({frontend, backend, config}) {
  */
 async function initDynamicRouting() {
     debug('Begin: Dynamic Routing');
-    const routing = require('./frontend/services/routing');
-    const routeSettingsService = require('./server/services/route-settings');
-    const bridge = require('./bridge');
-    bridge.init();
+    // const routing = require('./frontend/services/routing');
+    // const routeSettingsService = require('./server/services/route-settings');
+    // const bridge = require('./bridge');
+    // bridge.init();
 
-    // We pass the frontend API version + the dynamic routes here, so that the frontend services are slightly less tightly-coupled
-    const apiVersion = bridge.getFrontendApiVersion();
-    const routeSettings = await routeSettingsService.loadRouteSettings();
-    debug(`Frontend API Version: ${apiVersion}`);
+    // // We pass the frontend API version + the dynamic routes here, so that the frontend services are slightly less tightly-coupled
+    // const apiVersion = bridge.getFrontendApiVersion();
+    // const routeSettings = await routeSettingsService.loadRouteSettings();
+    // debug(`Frontend API Version: ${apiVersion}`);
 
-    routing.routerManager.start(apiVersion, routeSettings);
-    const getRoutesHash = () => routeSettingsService.api.getCurrentHash();
+    // routing.routerManager.start(apiVersion, routeSettings);
+    // const getRoutesHash = () => routeSettingsService.api.getCurrentHash();
 
-    const settings = require('./server/services/settings');
-    await settings.syncRoutesHash(getRoutesHash);
+    // const settings = require('./server/services/settings');
+    // await settings.syncRoutesHash(getRoutesHash);
 
     debug('End: Dynamic Routing');
 }
@@ -267,7 +267,7 @@ async function initServices({config}) {
         slack.listen(),
         mega.listen(),
         webhooks.listen(),
-        appService.init(),
+        // appService.init(),
         scheduling.init({
             apiUrl: urlUtils.urlFor('api', {version: defaultApiVersion, versionType: 'admin'}, true)
         })

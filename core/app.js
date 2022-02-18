@@ -7,7 +7,7 @@ const fs = require('fs');
 const path = require('path');
 
 const isMaintenanceModeEnabled = (req) => {
-    if (req.app.get('maintenance') || config.get('maintenance').enabled || !urlService.hasFinished()) {
+    if (req.app.get('maintenance') || config.get('maintenance').enabled) {
         return true;
     }
 

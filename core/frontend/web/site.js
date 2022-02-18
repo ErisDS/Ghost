@@ -12,13 +12,13 @@ const storage = require('../../server/adapters/storage');
 const urlService = require('../../server/services/url');
 const urlUtils = require('../../shared/url-utils');
 const sitemapHandler = require('../services/sitemap/handler');
-const appService = require('../services/apps');
+// const appService = require('../services/apps');
 const themeEngine = require('../services/theme-engine');
 const themeMiddleware = themeEngine.middleware;
 const membersService = require('../../server/services/members');
 const offersService = require('../../server/services/offers');
 const customRedirects = require('../../server/services/redirects');
-const siteRoutes = require('./routes');
+// const siteRoutes = require('./routes');
 const shared = require('../../server/web/shared');
 const errorHandler = require('@tryghost/mw-error-handler');
 const mw = require('./middleware');
@@ -27,7 +27,7 @@ const STATIC_IMAGE_URL_PREFIX = `/${urlUtils.STATIC_IMAGE_URL_PREFIX}`;
 const STATIC_MEDIA_URL_PREFIX = `/${constants.STATIC_MEDIA_URL_PREFIX}`;
 const STATIC_FILES_URL_PREFIX = `/${constants.STATIC_FILES_URL_PREFIX}`;
 
-let router;
+// let router;
 
 const corsOptionsDelegate = function corsOptionsDelegate(req, callback) {
     const origin = req.header('Origin');
@@ -73,9 +73,9 @@ const corsOptionsDelegate = function corsOptionsDelegate(req, callback) {
     callback(null, corsOptions);
 };
 
-function SiteRouter(req, res, next) {
-    router(req, res, next);
-}
+// function SiteRouter(req, res, next) {
+//     router(req, res, next);
+// }
 
 module.exports = function setupSiteApp(options = {}) {
     debug('Site setup start', options);
@@ -173,11 +173,11 @@ module.exports = function setupSiteApp(options = {}) {
 
     debug('General middleware done');
 
-    router = siteRoutes(options);
-    Object.setPrototypeOf(SiteRouter, router);
+    // router = siteRoutes(options);
+    // Object.setPrototypeOf(SiteRouter, router);
 
-    // Set up Frontend routes (including private blogging routes)
-    siteApp.use(SiteRouter);
+    // // Set up Frontend routes (including private blogging routes)
+    // siteApp.use(SiteRouter);
 
     // ### Error handlers
     siteApp.use(errorHandler.pageNotFound);
@@ -196,12 +196,13 @@ module.exports = function setupSiteApp(options = {}) {
 };
 
 module.exports.reload = ({apiVersion}) => {
-    // https://github.com/expressjs/express/issues/2596
-    router = siteRoutes({start: true, apiVersion});
-    Object.setPrototypeOf(SiteRouter, router);
+    console.log('Frontend reload called');
+    // // https://github.com/expressjs/express/issues/2596
+    // router = siteRoutes({start: true, apiVersion});
+    // Object.setPrototypeOf(SiteRouter, router);
 
     // re-initialize apps (register app routers, because we have re-initialized the site routers)
-    appService.init();
+    // appService.init();
 
     // connect routers and resources again
     urlService.queue.start({
