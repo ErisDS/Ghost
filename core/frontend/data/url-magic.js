@@ -10,6 +10,10 @@ module.exports = (thing, absolute) => {
         return `/author/${thing.slug}/`;
     }
 
+    if (checkType.isTag(thing)) {
+        return `/archive/?tag=${thing.slug}`;
+    }
+
     if (checkType.isNav(thing)) {
         return urlUtils.urlFor('nav', {nav: thing, secure: thing.secure}, absolute);
     }

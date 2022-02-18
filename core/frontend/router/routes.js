@@ -12,7 +12,7 @@ router.get(routeNames.archive, (req, res, next) => {
     res.routerOptions = {
         type: 'channel'
     };
-    return controllers.channel(req, res, next);
+    return controllers.archive(req, res, next);
 });
 
 router.get(routeNames.authors, (req, res, next) => {
