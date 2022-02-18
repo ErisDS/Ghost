@@ -8,6 +8,15 @@ router.get('/archive/', (req, res, next) => {
     return controllers.channel(req, res, next);
 });
 
+router.get('/author/:slug/', (req, res, next) => {
+    res.routerOptions = {
+        filter: 'authors:\'%s\'',
+        editRedirect: '#/settings/staff/:slug/',
+        resource: 'authors'
+    };
+    return controllers.channel(req, res, next);
+});
+
 router.get('/:slug/', (req, res, next) => {
     res.routerOptions = {
         type: 'entry',
@@ -21,8 +30,6 @@ router.get('/:slug/', (req, res, next) => {
             }
         }
     };
-
-    console.log('entry controller');
 
     return controllers.entry(req, res, next);
 });
