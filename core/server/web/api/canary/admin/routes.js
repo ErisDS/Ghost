@@ -87,6 +87,14 @@ module.exports = function apiRoutes() {
     router.put('/tags/:id', mw.authAdminApi, http(api.tags.edit));
     router.del('/tags/:id', mw.authAdminApi, http(api.tags.destroy));
 
+    // ## Channels
+    router.get('/channels', mw.authAdminApi, http(api.channels.browse));
+    router.get('/channels/:id', mw.authAdminApi, http(api.channels.read));
+    router.get('/channels/slug/:slug', mw.authAdminApi, http(api.channels.read));
+    router.post('/channels', mw.authAdminApi, http(api.channels.add));
+    router.put('/channels/:id', mw.authAdminApi, http(api.channels.edit));
+    router.del('/channels/:id', mw.authAdminApi, http(api.channels.destroy));
+
     // Products
     router.get('/products', mw.authAdminApi, http(api.products.browse));
     router.post('/products', mw.authAdminApi, http(api.products.add));

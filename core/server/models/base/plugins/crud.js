@@ -138,6 +138,9 @@ module.exports = function (Bookshelf) {
             }
 
             return model.fetch(options)
+                .then((res) => {
+                    return res;
+                })
                 .catch((err) => {
                     // CASE: SQL syntax is incorrect
                     if (err.errno === 1054 || err.errno === 1) {

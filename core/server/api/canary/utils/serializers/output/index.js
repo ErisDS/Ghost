@@ -151,5 +151,10 @@ module.exports = {
 
     get custom_theme_settings() {
         return require('./custom-theme-settings');
+    },
+
+    get channels() {
+        return require('./channels');
     }
+
 };

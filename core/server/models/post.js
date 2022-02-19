@@ -81,12 +81,13 @@ Post = ghostBookshelf.Model.extend({
         };
     },
 
-    relationships: ['tags', 'authors', 'mobiledoc_revisions', 'posts_meta', 'tiers'],
+    relationships: ['tags', 'authors', 'mobiledoc_revisions', 'posts_meta', 'tiers', 'channels'],
 
     // NOTE: look up object, not super nice, but was easy to implement
     relationshipBelongsTo: {
         tags: 'tags',
         tiers: 'products',
+        channels: 'channels',
         authors: 'users',
         posts_meta: 'posts_meta'
     },
@@ -100,17 +101,6 @@ Post = ghostBookshelf.Model.extend({
             targetTableName: 'emails',
             foreignKey: 'post_id'
         }
-    },
-
-    tiers() {
-        return this.belongsToMany('Product', 'posts_products', 'post_id', 'product_id')
-            .withPivot('sort_order')
-            .query('orderBy', 'sort_order', 'ASC')
-            .query((qb) => {
-                // avoids bookshelf adding a `DISTINCT` to the query
-                // we know the result set will already be unique and DISTINCT hurts query performance
-                qb.columns('products.*');
-            });
     },
 
     parse() {
@@ -306,6 +296,13 @@ Post = ghostBookshelf.Model.extend({
                 tableName: 'posts_meta',
                 type: 'oneToOne',
                 joinFrom: 'post_id'
+            },
+            channels: {
+                tableName: 'channels',
+                type: 'manyToMany',
+                joinTable: 'posts_channels',
+                joinFrom: 'post_id',
+                joinTo: 'channels_id'
             }
         };
     },
@@ -793,6 +790,23 @@ Post = ghostBookshelf.Model.extend({
 
     tags: function tags() {
         return this.belongsToMany('Tag', 'posts_tags', 'post_id', 'tag_id')
+            .withPivot('sort_order')
+            .query('orderBy', 'sort_order', 'ASC');
+    },
+
+    tiers() {
+        return this.belongsToMany('Product', 'posts_products', 'post_id', 'product_id')
+            .withPivot('sort_order')
+            .query('orderBy', 'sort_order', 'ASC')
+            .query((qb) => {
+                // avoids bookshelf adding a `DISTINCT` to the query
+                // we know the result set will already be unique and DISTINCT hurts query performance
+                qb.columns('products.*');
+            });
+    },
+
+    channels: function channels() {
+        return this.belongsToMany('Channel', 'posts_channels', 'post_id', 'channel_id')
             .withPivot('sort_order')
             .query('orderBy', 'sort_order', 'ASC');
     },

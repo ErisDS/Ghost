@@ -169,6 +169,10 @@ module.exports = {
         return shared.pipeline(require('./custom-theme-settings'), localUtils);
     },
 
+    get channels() {
+        return shared.pipeline(require('./channels'), localUtils);
+    },
+
     get serializers() {
         return require('./utils/serializers');
     },
@@ -187,6 +191,10 @@ module.exports = {
 
     get tagsPublic() {
         return shared.pipeline(require('./tags-public'), localUtils, 'content');
+    },
+
+    get channelsPublic() {
+        return shared.pipeline(require('./channels-public'), localUtils, 'content');
     },
 
     get publicSettings() {

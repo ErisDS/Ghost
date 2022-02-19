@@ -30,6 +30,9 @@ module.exports = function apiRoutes() {
     router.get('/tags/:id', mw.authenticatePublic, http(api.tagsPublic.read));
     router.get('/tags/slug/:slug', mw.authenticatePublic, http(api.tagsPublic.read));
 
+    router.get('/channels', mw.authenticatePublic, http(api.channelsPublic.browse));
+    router.get('/channels/:id', mw.authenticatePublic, http(api.channelsPublic.read));
+
     // ## Settings
     router.get('/settings', mw.authenticatePublic, http(api.publicSettings.browse));
 
