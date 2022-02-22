@@ -27,8 +27,26 @@ module.exports = createTransactionalMigration(
                 route: '/',
                 created_at: knex.raw(`CURRENT_TIMESTAMP`)
             });
+
+        const channels = await knex('channels').select('id').where('slug', 'home');
+
+        const posts = await knex('posts').select('id');
+
+        const postsChannels = posts.map((post) => {
+            return {
+                id: ObjectID().toHexString(),
+                post_id: post.id,
+                channel_id: channels[0].id,
+                sort_order: 0
+            };
+        });
+
+        await knex('posts_channels').insert(postsChannels);
     },
     async function down(knex) {
+        logging.info('Removing default post channel relations');
+        await knex('posts_channels').truncate(); // @TODO do this properly
+
         logging.info('Removing default index channel');
         await knex('channels')
             .where('name', 'Index')

@@ -38,7 +38,8 @@
                     "slug":             "home",
                     "description":      "Default post list",
                     "route":            "/",
-                    "type":             "automated"
+                    "type":             "automated",
+                    "active":           true
                 }
             ]
         },
@@ -908,6 +909,26 @@
                 "welcome": ["Getting Started"],
                 "portal": ["Getting Started"],
                 "sell": ["Getting Started"]
+            }
+        },
+        {
+            "from": {
+                "model": "Post",
+                "match": "slug",
+                "relation": "channels"
+            },
+            "to": {
+                "model": "Channel",
+                "match": "slug"
+            },
+            "entries": {
+                "integrations": ["home"],
+                "grow": ["home"],
+                "design": ["home"],
+                "write": ["home"],
+                "welcome": ["home"],
+                "portal": ["home"],
+                "sell":["home"]
             }
         },
         {
