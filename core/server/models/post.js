@@ -263,7 +263,14 @@ Post = ghostBookshelf.Model.extend({
         }, {
             key: 'tags',
             replacement: 'tags.slug'
-        }];
+        }, {
+            key: 'channel',
+            replacement: 'channels.slug'
+        }, {
+            key: 'channels',
+            replacement: 'channels.slug'
+        }
+        ];
 
         const postMetaKeyExpansions = postsMetaKeys.map((pmk) => {
             return {
@@ -302,7 +309,7 @@ Post = ghostBookshelf.Model.extend({
                 type: 'manyToMany',
                 joinTable: 'posts_channels',
                 joinFrom: 'post_id',
-                joinTo: 'channels_id'
+                joinTo: 'channel_id'
             }
         };
     },
