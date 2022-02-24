@@ -45,7 +45,7 @@ module.exports = {
         data: [
             'id',
             'slug',
-            'visibility'
+            'route'
         ],
         validation: {
             options: {

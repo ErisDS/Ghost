@@ -43,7 +43,9 @@ module.exports = {
             'debug'
         ],
         data: [
-            'id'
+            'id',
+            'slug',
+            'route'
         ],
         validation: {
             options: {
