@@ -10,7 +10,7 @@ module.exports = {
 
         if (models.meta) {
             frame.response = {
-                channels: models.data,
+                [apiConfig.docName]: models.data.map(model => model.toJSON(frame.options)),
                 meta: models.meta
             };
 
@@ -18,7 +18,7 @@ module.exports = {
         }
 
         frame.response = {
-            channels: [models]
+            [apiConfig.docName]: [models.toJSON(frame.options)]
         };
     }
 };
