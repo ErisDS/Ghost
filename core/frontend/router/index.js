@@ -1,8 +1,9 @@
 const router = require('./routes');
 
 module.exports = () => {
+    const mount = router();
     return (req, res, next) => {
         console.log('We are routing');
-        router(req, res, next);
+        mount(req, res, next);
     };
 };

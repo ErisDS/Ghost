@@ -20,33 +20,8 @@ const messages = {
  * @param {Function} next
  * @returns {Promise}
  */
-module.exports = async function channelController(req, res, next) {
-    // We have to lookup the channel
-    if (!res.routerOptions) {
-        try {
-            const channel = await data.findChannel(req.path, res.locals);
-
-            let filter = `channel:${channel.slug}`;
-
-            if (channel.filter) {
-                filter = `channel:${channel.slug}+${channel.filter}`;
-            }
-
-            res.routerOptions = {
-                filter: filter,
-                editRedirect: '#/channels/:slug/',
-                resource: 'channels'
-            };
-        } catch (error) {
-            if (error instanceof errors.NotFoundError) {
-                return next();
-            }
-
-            return next(error);
-        }
-    }
-
-    debug('channelController', req.params, res.routerOptions);
+module.exports = function channelController(req, res, next) {
+    debug('authorController', req.params, res.routerOptions);
 
     const pathOptions = {
         page: req.params.page !== undefined ? req.params.page : 1,
