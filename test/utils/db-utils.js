@@ -131,12 +131,25 @@ module.exports.teardown = () => {
                 return db.knex.raw('SET FOREIGN_KEY_CHECKS=1;').transacting(trx);
             })
             .catch(function (err) {
-                // CASE: table does not exist
-                if (err.errno === 1146) {
+                // CASE: table does not exist || DB does not exist
+                // If the table or DB are not present, we can safely ignore
+                if (err.errno === 1146 || err.errno === 1049) {
                     return Promise.resolve();
                 }
 
                 throw err;
+            })
+            .finally(() => {
+                debug('Database teardown end');
             });
-    });
+    })
+        .catch(function (err) {
+            // CASE: table does not exist || DB does not exist
+            // If the table or DB are not present, we can safely ignore
+            if (err.errno === 1146 || err.errno === 1049) {
+                return Promise.resolve();
+            }
+
+            throw err;
+        });
 };
