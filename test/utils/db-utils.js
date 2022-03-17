@@ -17,6 +17,15 @@ const urlServiceUtils = require('./url-service-utils');
 
 const dbHash = Date.now();
 
+/**
+ * Does a hard reset and init of Ghost's DB using Knex Migrator
+ * Brings back the default fixtures
+ */
+module.exports.restore = async () => {
+    await knexMigrator.reset({force: true});
+    await knexMigrator.init();
+};
+
 module.exports.reset = async ({truncate} = {truncate: false}) => {
     // Only run this copy in CI until it gets fleshed out
     if (process.env.CI && config.get('database:client') === 'sqlite3') {
@@ -29,23 +38,26 @@ module.exports.reset = async ({truncate} = {truncate: false}) => {
             await db.knex.destroy();
             await fs.copyFile(filenameOrig, filename);
         } else {
-            await knexMigrator.reset({force: true});
-
-            // Do a full database initialisation
-            await knexMigrator.init();
-
+            await module.exports.restore();
             await fs.copyFile(filename, filenameOrig);
         }
     } else {
+        debug('not CI');
         if (truncate) {
-            // Perform a fast reset by tearing down all the tables and
-            // inserting the fixtures
-            await module.exports.teardown();
-            await knexMigrator.init({only: 2});
+            debug('truncate mode');
+            // Perform a fast reset by tearing down all the tables and inserting the fixtures
+            try {
+                await module.exports.teardown();
+                await knexMigrator.init({only: 2});
+            } catch (err) {
+                // If it fails, try a normal restore
+                debug('fast reset failed, restore DB');
+                await module.exports.restore();
+            }
         } else {
-            // Do a full database reset + initialisation
-            await knexMigrator.reset({force: true});
-            await knexMigrator.init();
+            debug('restore');
+            // Do a full database restore
+            await module.exports.restore();
         }
     }
 };
@@ -83,6 +95,7 @@ module.exports.clearData = async () => {
 };
 
 /**
+ * Attempt to do a fast reset of the DB using truncate
  * Has to run in a transaction for MySQL, otherwise the foreign key check does not work.
  * Sqlite3 has no truncate command.
  */
