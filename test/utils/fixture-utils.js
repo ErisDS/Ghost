@@ -25,6 +25,17 @@ let postsInserted = 0;
 
 /** TEST FIXTURES **/
 const fixtures = {
+    insertChannels: function () {
+        return models.Channel.add({
+            name: 'Home',
+            slug: 'home',
+            description: 'Default post list',
+            route: '/',
+            type: 'automated',
+            active: true
+        });
+    },
+
     insertPosts: function insertPosts(posts) {
         return Promise.map(posts, function (post) {
             return models.Post.add(post, context.internal);
@@ -661,6 +672,9 @@ const toDoList = {
     },
     custom_theme_settings: function insertCustomThemeSettings() {
         return fixtures.insertCustomThemeSettings();
+    },
+    channels: function insertChannels() {
+        return fixtures.insertChannels();
     }
 };
 

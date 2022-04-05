@@ -1657,6 +1657,19 @@ describe('Post Model', function () {
         });
     });
 
+    describe.only('Default channel logic', function () {
+        before(testUtils.setup('channels'));
+
+        it('all new posts are added to the default channel', async function () {
+            const post = await models.Post.add({
+                title: 'testing automated channels',
+                tags: [{name: 'hello-world'}]
+            }, Object.assign({}, context, {withRelated: ['tags', 'channels']}));
+
+            console.log('made a post', post);
+        });
+    });
+
     describe('Multiauthor Posts', function () {
         before(testUtils.teardownDb);
 

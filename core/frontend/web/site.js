@@ -208,9 +208,9 @@ module.exports.reload = ({apiVersion}) => {
     // appService.init();
 
     // connect routers and resources again
-    urlService.queue.start({
-        event: 'init',
-        tolerance: 100,
-        requiredSubscriberCount: 1
-    });
+    // urlService.queue.start({
+    //     event: 'init',
+    //     tolerance: 100,
+    //     requiredSubscriberCount: 1
+    // });
 };

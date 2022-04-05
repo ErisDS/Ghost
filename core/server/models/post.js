@@ -1050,7 +1050,7 @@ Post = ghostBookshelf.Model.extend({
      */
     defaultRelations: function defaultRelations(methodName, options) {
         if (['edit', 'add', 'destroy'].indexOf(methodName) !== -1) {
-            options.withRelated = _.union(['authors', 'tags'], options.withRelated || []);
+            options.withRelated = _.union(['authors', 'tags', 'channels'], options.withRelated || []);
         }
 
         const META_ATTRIBUTES = _.without(ghostBookshelf.model('PostsMeta').prototype.permittedAttributes(), 'id', 'post_id');
@@ -1268,6 +1268,9 @@ Posts = ghostBookshelf.Collection.extend({
 
 // Extension for handling the logic for author + multiple authors
 Post = relations.authors.extendModel(Post, Posts, ghostBookshelf);
+
+// Extension for handling logig for channels
+Post = relations.channels.extendModel(Post, Posts, ghostBookshelf);
 
 module.exports = {
     Post: ghostBookshelf.model('Post', Post),
