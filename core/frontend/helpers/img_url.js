@@ -46,6 +46,7 @@ module.exports = function imgUrl(requestedImageUrl, options) {
     }
 
     const {requestedSize, imageSizes} = getImageSizeOptions(options);
+
     const absoluteUrlRequested = getAbsoluteOption(options);
 
     function applyImageSizes(image) {
