@@ -85,6 +85,21 @@ module.exports = function (Bookshelf) {
                     delete this.relations[key];
                 }
             });
+
+            if (this.relationsMeta) {
+                _.each(this.relationsMeta, (relation, name) => {
+                    if (relation.flatten && this.relations[name]) {
+                        const flatAttrs = _.omit(this.relations[name].attributes, ['id', relation.foreignKey]);
+                        const flatPrevAttrs = _.omit(this.relations[name]._previousAttributes, ['id', relation.foreignKey]);
+
+                        Object.assign(this.attributes, flatAttrs);
+                        Object.assign(this._previousAttributes, flatPrevAttrs);
+
+                        delete this.relations[name];
+                    }
+                });
+            }
+
             // CASE: get JSON of previous attrs
             if (options.previous) {
                 const clonedModel = _.cloneDeep(this);

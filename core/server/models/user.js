@@ -74,7 +74,8 @@ User = ghostBookshelf.Model.extend({
     relationsMeta: {
         user_settings: {
             targetTableName: 'user_settings',
-            foreignKey: 'user_id'
+            foreignKey: 'user_id',
+            flatten: true
         }
     },
 
