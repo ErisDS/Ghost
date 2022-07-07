@@ -671,7 +671,7 @@ User = ghostBookshelf.Model.extend({
                     return Promise.map(roles, function (roleName) {
                         return ghostBookshelf.model('Role').findOne({
                             name: roleName
-                        }, options);
+                        }, _.pick(options, ['context', 'transacting', 'migrating']));
                     }).then(function (roleModels) {
                         roles = [];
 
