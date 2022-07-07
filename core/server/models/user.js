@@ -313,8 +313,6 @@ User = ghostBookshelf.Model.extend({
         // remove password hash for security reasons
         delete attrs.password;
 
-        console.log(attrs);
-
         return attrs;
     },
 
