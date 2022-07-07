@@ -111,18 +111,6 @@ User = ghostBookshelf.Model.extend({
         return attrs;
     },
 
-    defaultRelations: function defaultRelations(methodName, options) {
-        const USER_SETTINGS = _.without(ghostBookshelf.model('UserSettings').prototype.permittedAttributes(), 'id', 'user_id');
-
-        // NOTE: only include user_settings relation when requested in 'columns' or by default
-        //       optimization is needed to be able to perform .findAll on large SQLite datasets
-        if (!options.columns || (options.columns && _.intersection(USER_SETTINGS, options.columns).length)) {
-            options.withRelated = _.union(['user_settings'], options.withRelated || []);
-        }
-
-        return options;
-    },
-
     emitChange: function emitChange(event, options) {
         const eventToTrigger = 'user' + '.' + event;
         ghostBookshelf.Model.prototype.emitChange.bind(this)(this, eventToTrigger, options);
@@ -778,6 +766,17 @@ User = ghostBookshelf.Model.extend({
         });
     },
 
+    defaultRelations: function defaultRelations(methodName, options) {
+        const USER_SETTINGS = _.without(ghostBookshelf.model('UserSettings').prototype.permittedAttributes(), 'id', 'user_id');
+
+        // NOTE: only include user_settings relation when requested in 'columns' or by default
+        //       optimization is needed to be able to perform .findAll on large SQLite datasets
+        if (!options.columns || (options.columns && _.intersection(USER_SETTINGS, options.columns).length)) {
+            options.withRelated = _.union(['user_settings'], options.withRelated || []);
+        }
+
+        return options;
+    },
     permissible: async function permissible(userModelOrId, action, context, unsafeAttrs, loadedPermissions, hasUserPermission, hasApiKeyPermission) {
         const self = this;
         const userModel = userModelOrId;
