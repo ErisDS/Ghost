@@ -119,6 +119,7 @@ async function initCore({ghostServer, config, bootLogger, frontend}) {
             bootLogger.metric('url-service', urlServiceStart);
             bootLogger.log('URL Service Ready');
         },
+        calculateRoutes: !frontend,
         urlCache: !frontend // hacky parameter to make the cache initialization kick in as we can't initialize labs before the boot
     });
     debug('End: Url Service');

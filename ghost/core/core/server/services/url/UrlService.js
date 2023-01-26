@@ -77,10 +77,15 @@ class UrlService {
      */
     _onQueueEnded(event) {
         if (event === 'init') {
-            this.finished = true;
-            if (this.onFinished) {
-                this.onFinished();
-            }
+            this.#finishInitialization();
+        }
+    }
+
+    #finishInitialization() {
+        this.finished = true;
+
+        if (this.onFinished) {
+            this.onFinished();
         }
     }
 
@@ -308,8 +313,9 @@ class UrlService {
      * @param {Object} options
      * @param {Function} [options.onFinished] - callback when url generation is finished
      * @param {Boolean} [options.urlCache] - whether to init using url cache or not
+     * @param {Boolean} [options.calculateRoutes] - controls if we should calculate URLs
      */
-    async init({onFinished, urlCache} = {}) {
+    async init({onFinished, urlCache, calculateRoutes} = {calculateRoutes: true}) {
         this.onFinished = onFinished;
 
         let persistedUrls;
@@ -329,12 +335,20 @@ class UrlService {
         } else {
             this.resources.initEventListeners();
             await this.resources.fetchResources();
-            // CASE: all resources are fetched, start the queue
-            this.queue.start({
-                event: 'init',
-                tolerance: 100,
-                requiredSubscriberCount: 1
-            });
+
+            if (!calculateRoutes) {
+                // CASE: skip route calculation logic when frontend is not initialized.
+                //       This is a hack we use while there's dependency between UrlService and
+                //       frontend's routing service
+                this.#finishInitialization();
+            } else {
+                // CASE: all resources are fetched, start the queue
+                this.queue.start({
+                    event: 'init',
+                    tolerance: 100,
+                    requiredSubscriberCount: 1
+                });
+            }
         }
     }
 
