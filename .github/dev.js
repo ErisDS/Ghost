@@ -12,12 +12,13 @@ const liveReloadBaseUrl = config.getSubdir() || '/ghost/';
 const siteUrl = config.getSiteUrl();
 
 const DASH_DASH_ARGS = process.argv.filter(a => a.startsWith('--')).map(a => a.slice(2));
+const OTHER_ARGS = process.argv.filter(a => !a.startsWith('--')).slice(2);
 
 let commands = [];
 
 const COMMAND_GHOST = {
     name: 'ghost',
-    command: 'yarn nodemon -q -i ghost/admin -i ghost/core/content -i ghost/core/core/built -i ghost/portal',
+    command: `yarn nodemon -q -i ghost/admin -i ghost/core/content -i ghost/core/core/built -i ghost/portal ${OTHER_ARGS.join(' ')}`,
     prefixColor: 'blue',
     env: {}
 };
