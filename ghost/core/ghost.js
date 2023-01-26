@@ -22,7 +22,11 @@ case 'generate-data':
 case 'record-test':
     command.run(mode);
     break;
+case 'nofe':
+    // Boot sequence without frontend
+    require('./core/boot')({frontend: false});
+    break;
 default:
-    // New boot sequence
+    // Standard boot sequence
     require('./core/boot')();
 }
