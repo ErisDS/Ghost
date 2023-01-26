@@ -19,13 +19,14 @@ const liveReloadBaseUrl = config.getSubdir() || '/ghost/';
 const siteUrl = config.getSiteUrl();
 
 const DASH_DASH_ARGS = process.argv.filter(a => a.startsWith('--')).map(a => a.slice(2));
+const OTHER_ARGS = process.argv.filter(a => !a.startsWith('--')).slice(2);
 
 let commands = [];
 
 const COMMAND_GHOST = {
     name: 'ghost',
     // Note: if this isn't working for you, please use Node 18 and above
-    command: 'node --watch index.js',
+    command: `node --watch index.js ${OTHER_ARGS.join(' ')}`,
     cwd: path.resolve(__dirname, '../ghost/core'),
     prefixColor: 'blue',
     env: {}
