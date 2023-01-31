@@ -3,6 +3,6 @@ module.exports = (model) => {
 
     return {
         id: json.id,
-        uri: json.uri
+        path: json.path
     };
 };

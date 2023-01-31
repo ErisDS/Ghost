@@ -8,18 +8,18 @@ module.exports = class Route {
     }
 
     /** @type {String} */
-    #uri;
-    get uri() {
-        return this.#uri;
+    #path;
+    get path() {
+        return this.#path;
     }
-    set uri(uri) {
-        this.#uri = validateUri(uri);
+    set path(path) {
+        this.#path = validatePath(path);
     }
 
     toJSON() {
         return {
             id: this.id,
-            uri: this.uri
+            path: this.path
         };
     }
 
@@ -27,24 +27,24 @@ module.exports = class Route {
     * @private
     * @param {object} data
     * @param {ObjectID} data.id
-    * @param {string} data.uri
+    * @param {string} data.path
     */
     constructor(data) {
         this.#id = data.id;
-        this.#uri = data.uri;
+        this.#path = data.path;
     }
 
     /**
      * @param {any} data
-     * @returns {Promise<Thing>}
+     * @returns {Promise<Route>}
      */
     static async create(data) {
         const id = validateId(data.id);
-        const uri = validateUri(data.uri);
+        const path = validatePath(data.path);
 
         return new Route({
             id,
-            uri
+            path
         });
     }
 };
@@ -75,10 +75,10 @@ function validateId(id) {
     return new ObjectID;
 }
 
-function validateUri(uri) {
-    if (!uri || typeof uri !== 'string') {
+function validatePath(path) {
+    if (!path || typeof path !== 'string') {
         return '/';
     }
 
-    return uri;
+    return path;
 }
