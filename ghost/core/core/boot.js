@@ -228,13 +228,15 @@ async function initFrontend(dataService) {
  * @param {Object} options
  * @param {Boolean} options.backend
  * @param {Boolean} options.frontend
+ * @param {Boolean} options.newfe
  * @param {Object} options.config
  */
-async function initExpressApps({frontend, backend, config}) {
+async function initExpressApps({frontend, backend, config, newfe}) {
     debug('Begin: initExpressApps');
 
     const parentApp = require('./server/web/parent/app')();
     const vhost = require('@tryghost/mw-vhost');
+    const express = require('./shared/express');
 
     // Mount the express apps on the parentApp
     if (backend) {
@@ -248,6 +250,10 @@ async function initExpressApps({frontend, backend, config}) {
         const urlService = require('./server/services/url');
         const frontendApp = require('./server/web/parent/frontend')({urlService});
         parentApp.use(vhost(config.getFrontendMountPath(), frontendApp));
+    } else if (newfe) {
+        const Frontend = require('@tryghost/frontend');
+        const newFrontend = new Frontend({express});
+        parentApp.use(vhost(config.getFrontendMountPath(), newFrontend.app));
     }
 
     debug('End: initExpressApps');
@@ -502,7 +508,7 @@ async function bootGhost({backend = true, frontend = true, server = true, newfe 
         if (frontend) {
             await initFrontend(dataService);
         }
-        const ghostApp = await initExpressApps({frontend, backend, config});
+        const ghostApp = await initExpressApps({frontend, backend, config, newfe});
 
         if (frontend) {
             await initDynamicRouting();
