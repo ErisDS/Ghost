@@ -466,6 +466,12 @@ const fixtures = {
         }));
     },
 
+    insertRoutes: function insertRoutes() {
+        return Promise.all(DataGenerator.forKnex.routes.map((mention) => {
+            return models.Route.add(mention, context.internal);
+        }));
+    },
+
     insertEmails: function insertEmails() {
         return Promise.all(DataGenerator.forKnex.emails.map((email) => {
             return models.Email.add(email, context.internal);
