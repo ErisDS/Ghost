@@ -26,6 +26,10 @@ case 'nofe':
     // Boot sequence without frontend
     require('./core/boot')({frontend: false});
     break;
+case 'newfe':
+    // Boot sequence with new frontend
+    require('./core/boot')({frontend: false, newfe: true});
+    break;
 default:
     // Standard boot sequence
     require('./core/boot')();
