@@ -11,6 +11,7 @@ module.exports = {
     integrations: require('./integrations'),
     pages: require('./pages'),
     posts: require('./posts'),
+    route: require('./routes'),
     settings: require('./settings'),
     snippets: require('./snippets'),
     tags: require('./tags'),
