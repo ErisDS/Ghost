@@ -423,7 +423,7 @@ async function initBackgroundServices({config}) {
 
  * @returns {Promise<object>} ghostServer
  */
-async function bootGhost({backend = true, frontend = true, server = true} = {}) {
+async function bootGhost({backend = true, frontend = true, server = true, newfe = false} = {}) {
     // Metrics
     const startTime = Date.now();
     debug('Begin Boot');
