@@ -45,6 +45,10 @@ module.exports = {
         return apiFramework.pipeline(require('./roles'), localUtils);
     },
 
+    get routes() {
+        return apiFramework.pipeline(require('./routes'), localUtils);
+    },
+
     get slugs() {
         return apiFramework.pipeline(require('./slugs'), localUtils);
     },
@@ -239,5 +243,5 @@ module.exports = {
 
     get feedbackMembers() {
         return apiFramework.pipeline(require('./feedback-members'), localUtils, 'members');
-    }   
+    }
 };
