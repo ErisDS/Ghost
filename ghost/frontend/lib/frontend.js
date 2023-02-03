@@ -1,13 +1,18 @@
 const debug = require('@tryghost/debug')('newfe');
 
 module.exports = class Frontend {
-    constructor({express}) {
+    constructor({express, api}) {
         this.app = express('newfe');
+        this.api = api;
 
-        this.app.get('/', (req, res) => {
-            debug('SERVING NEW FE');
-            res.send('Frontend 2.0!');
-        });
+        this.app.get('/', this.router.bind(this));
+    }
+
+    async router(req, res) {
+        const routes = await this.api.routes.browse({});
+        debug('SERVING NEW FE');
+        // res.send('Frontend 2.0 baby!');
+        res.json(routes);
     }
 };
 

@@ -252,7 +252,8 @@ async function initExpressApps({frontend, backend, config, newfe}) {
         parentApp.use(vhost(config.getFrontendMountPath(), frontendApp));
     } else if (newfe) {
         const Frontend = require('@tryghost/frontend');
-        const newFrontend = new Frontend({express});
+        const newFrontend = new Frontend({express, api: require('./server/api').endpoints});
+
         parentApp.use(vhost(config.getFrontendMountPath(), newFrontend.app));
     }
 
@@ -334,6 +335,7 @@ async function initServices({config}) {
     const mediaInliner = require('./server/services/media-inliner');
     const collections = require('./server/services/collections');
     const mailEvents = require('./server/services/mail-events');
+    const routeService = require('./server/services/route-service');
 
     const urlUtils = require('./shared/url-utils');
 
@@ -349,6 +351,7 @@ async function initServices({config}) {
         memberAttribution.init(),
         mentionsService.init(),
         mentionsEmailReport.init(),
+        routeService.init(),
         staffService.init(),
         members.init(),
         tiers.init(),
