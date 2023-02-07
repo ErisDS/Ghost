@@ -9,7 +9,7 @@ module.exports = class InMemoryRouteRepository {
             id: thing.id.toHexString(),
             path: thing.path,
             type: thing.type,
-            name: thing.name
+            template: thing.template
         };
     }
 
@@ -70,4 +70,4 @@ module.exports = class InMemoryRouteRepository {
             }
         };
     }
-}
+};

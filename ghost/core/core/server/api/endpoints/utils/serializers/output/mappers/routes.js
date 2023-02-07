@@ -3,6 +3,8 @@ module.exports = (model) => {
 
     return {
         id: json.id,
-        path: json.path
+        path: json.path,
+        type: json.type,
+        template: json.template
     };
 };
