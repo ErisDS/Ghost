@@ -5,14 +5,22 @@ module.exports = class Frontend {
         this.app = express('newfe');
         this.api = api;
 
-        this.app.get('/', this.router.bind(this));
+        this.app.use(this.router.bind(this));
     }
 
     async router(req, res) {
-        const routes = await this.api.routes.browse({});
-        debug('SERVING NEW FE');
-        // res.send('Frontend 2.0 baby!');
-        res.json(routes);
+        let response = {};
+
+        console.log('SERVING NEW FE from', req.path);
+
+        // Special debug route
+        if (req.path === '/debug/') {
+            response = await this.api.routes.browse({});
+        } else {
+            response = await this.api.routes.read({path: req.path});
+        }
+
+        res.json(response);
     }
 };
 

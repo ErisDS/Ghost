@@ -31,6 +31,12 @@ module.exports = class InMemoryRouteRepository {
         });
     }
 
+    async getByPath(path) {
+        return this.#store.find((item) => {
+            return item.path === path;
+        });
+    }
+
     async getPage(options) {
         const filter = nql(options.filter || '', {});
         const results = this.#store.slice().filter((item) => {

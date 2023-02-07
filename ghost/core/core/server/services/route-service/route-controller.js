@@ -42,4 +42,15 @@ module.exports = class RouteController {
 
         return results;
     }
+
+    /**
+     * @param {import('@tryghost/api-framework').Frame} frame
+     * @returns {Promise<Route>}
+     * @throws {NotFoundError}
+    */
+    async read(frame) {
+        const route = await this.#api.getRouteByPath(frame.data.path);
+
+        return route;
+    }
 };

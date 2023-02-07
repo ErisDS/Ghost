@@ -31,4 +31,10 @@ module.exports = class RoutesAPI {
 
         return page;
     }
+
+    async getRouteByPath(path) {
+        const route = await this.#repository.getByPath(path);
+
+        return route;
+    }
 };
