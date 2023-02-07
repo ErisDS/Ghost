@@ -7,7 +7,7 @@ const {
 
 const loadFakeRoutes = async (repository) => {
     const home = await Route.create({path: '/'});
-    const test = await Route.create({path: '/test/'});
+    const test = await Route.create({path: '/test/', type: 'entry'});
 
     await repository.save(home);
     await repository.save(test);

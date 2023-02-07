@@ -1,6 +1,12 @@
 const ObjectID = require('bson-objectid').default;
 
 const VALID_TYPES = ['custom', 'collection', 'entry', 'page'];
+const TEMPLATE_FOR_TYPE = {
+    custom: 'index.hbs',
+    collection: 'index.hbs',
+    entry: 'post.hbs',
+    page: 'pb.hbs'
+};
 
 module.exports = class Route {
     /** @type {ObjectID} */
@@ -68,7 +74,7 @@ module.exports = class Route {
         const id = validateId(data.id);
         const path = validatePath(data.path);
         const type = validateType(data.type);
-        const template = validateTemplate(data.template);
+        const template = validateTemplate(data.template, type);
 
         console.log('making route', {id, path, type, template});
 
@@ -114,9 +120,9 @@ function validateType(type) {
     return type;
 }
 
-function validateTemplate(template) {
+function validateTemplate(template, type) {
     if (!template || typeof template !== 'string') {
-        return 'index.hbs';
+        return TEMPLATE_FOR_TYPE[type];
     }
 
     return template;
