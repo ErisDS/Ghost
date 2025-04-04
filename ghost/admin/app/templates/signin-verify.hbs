@@ -8,7 +8,7 @@
                 </header>
 
                 <p>
-                    To keep your account safe, we've sent a 6-digit verification code to your email to make sure it's you.
+                    {{#if this.errorContext}}{{this.errorContext}}.&nbsp;{{/if}}To keep your account safe, we've sent a 6-digit verification code to your email to make sure it's you.
                 </p>
                 <GhFormGroup @errors={{this.verifyData.errors}} @hasValidated={{this.verifyData.hasValidated}} @property="token">
                     <label for="token">Verification code</label>

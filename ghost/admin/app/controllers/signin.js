@@ -58,7 +58,9 @@ export default class SigninController extends Controller.extend(ValidationEngine
             return SUCCESS;
         } catch (error) {
             if (isTwoFactorTokenRequiredError(error)) {
+                let errorContext = error.payload?.errors[0]?.context;
                 // login was successful, but 2FA verification is required
+                this.session.set('errorContext', errorContext);
                 this.router.transitionTo('signin-verify');
                 return SUCCESS;
             }

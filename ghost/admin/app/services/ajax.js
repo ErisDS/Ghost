@@ -186,7 +186,7 @@ export class TwoFactorTokenRequiredError extends AjaxError {
 }
 
 export function isTwoFactorTokenRequiredError(errorOrStatus, payload) {
-    const tokenRequiredCode = '2FA_TOKEN_REQUIRED';
+    const twoFactorErrorCodes = ['2FA_TOKEN_REQUIRED', 'DEVICE_VERIFICATION_REQUIRED'];
 
     // ember-simple-auth prevents ember-ajax parsing response as JSON but
     // we need a JSON object to test against
@@ -198,10 +198,13 @@ export function isTwoFactorTokenRequiredError(errorOrStatus, payload) {
         }
     }
 
+    console.log('errorOrStatus', errorOrStatus);
+    console.log('payload', payload);
+
     if (isAjaxError(errorOrStatus)) {
         return errorOrStatus instanceof TwoFactorTokenRequiredError || getErrorCode(errorOrStatus) === tokenRequiredCode;
     } else {
-        return get(payload || {}, 'errors.firstObject.code') === tokenRequiredCode;
+        return twoFactorErrorCodes.includes(get(payload || {}, 'errors.firstObject.code'));
     }
 }
 

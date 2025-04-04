@@ -2,8 +2,8 @@ import Service from '@ember/service';
 import sinon from 'sinon';
 import {describe, it} from 'mocha';
 import {expect} from 'chai';
+import {isTwoFactorTokenRequiredError} from 'ghost/app/services/ajax';
 import {setupTest} from 'ember-mocha';
-
 // Stub modals service
 class ModalsStub extends Service {
     open() {
@@ -18,41 +18,20 @@ describe('Unit: Re-authenticate error handling', function () {
         this.owner.register('service:modals', ModalsStub);
     });
 
-    it('identifies 2FA token required error', function () {
-        const isTwoFactorTokenRequiredError = (error) => {
-            return error?.payload?.errors?.[0]?.code === '2FA_TOKEN_REQUIRED';
-        };
-
-        const error2FA = {
-            payload: {
-                errors: [{
-                    code: '2FA_TOKEN_REQUIRED'
-                }]
-            }
-        };
-
-        const regularError = {
-            payload: {
-                errors: [{
-                    message: 'Access denied.'
-                }]
-            }
-        };
-
-        expect(isTwoFactorTokenRequiredError(error2FA)).to.be.true;
-        expect(isTwoFactorTokenRequiredError(regularError)).to.be.false;
-    });
-
-    it('identifies different error types', function () {
-        const isTwoFactorTokenRequiredError = (error) => {
-            return error?.payload?.errors?.[0]?.code === '2FA_TOKEN_REQUIRED';
-        };
-
+    it('can identify 2FA and device verification errors', function () {
         const errors = [
             {
                 payload: {
                     errors: [{
                         code: '2FA_TOKEN_REQUIRED'
+                    }]
+                },
+                expected: true
+            },
+            {
+                payload: {
+                    errors: [{
+                        code: 'DEVICE_VERIFICATION_REQUIRED'
                     }]
                 },
                 expected: true
@@ -88,7 +67,7 @@ describe('Unit: Re-authenticate error handling', function () {
         const openSpy = sinon.spy(modals, 'open');
 
         const handleError = async (error) => {
-            if (error?.payload?.errors?.[0]?.code === '2FA_TOKEN_REQUIRED') {
+            if (isTwoFactorTokenRequiredError(error)) {
                 await modals.open('editor/modals/re-verify');
                 return true;
             }
@@ -108,4 +87,4 @@ describe('Unit: Re-authenticate error handling', function () {
         expect(openSpy.calledOnce, 're-verify modal called once').to.be.true;
         expect(openSpy.firstCall.args[0]).to.equal('editor/modals/re-verify');
     });
-}); 
+});

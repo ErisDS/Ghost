@@ -9,6 +9,7 @@ const IPV4_REGEX = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]
 const IPV6_REGEX = /^(?:[A-F0-9]{1,4}:){7}[A-F0-9]{1,4}$/i;
 
 const {totp} = require('otplib');
+const logging = require('@tryghost/logging');
 totp.options = {
     digits: 6,
     step: 60,
@@ -46,6 +47,7 @@ totp.options = {
  * @prop {(req: Req, res: Res) => Promise<void>} sendAuthCodeToUser
  * @prop {(req: Req, res: Res) => Promise<boolean>} verifyAuthCodeForUser
  * @prop {(req: Req, res: Res) => Promise<boolean>} isVerifiedSession
+ * @prop {() => boolean} isVerificationRequired
  */
 
 /**
@@ -148,6 +150,10 @@ module.exports = function createSessionService({
         const secret = getSettingsCache('admin_session_secret') + session.user_id;
         const token = totp.generate(secret);
         return token;
+    }
+
+    function isVerificationRequired() {
+        return getSettingsCache('require_email_mfa') && getSettingsCache('require_email_mfa') !== 'false';
     }
 
     /**
@@ -265,16 +271,24 @@ module.exports = function createSessionService({
         });
 
         try {
+            let subject = `${token} is your Ghost sign in verification code`;
+            logging.warn('subject', subject);
             await mailer.send({
                 to: recipient,
-                subject: `${token} is your Ghost sign in verification code`,
+                subject: subject,
                 html: email
             });
         } catch (error) {
-            throw new errors.EmailError({
+            const emailError = new errors.EmailError({
                 ...error,
                 message: 'Failed to send email. Please check your site configuration and try again.'
             });
+
+            if (process.env.NODE_ENV === 'development') {
+                logging.error('EmailError', emailError);
+            } else {
+                throw emailError;
+            }
         }
     }
 
@@ -354,6 +368,7 @@ module.exports = function createSessionService({
         getUserForSession,
         createSessionForUser,
         createVerifiedSessionForUser,
+        isVerificationRequired,
         removeUserForSession,
         verifySession,
         isVerifiedSession,
