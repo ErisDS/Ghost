@@ -20,7 +20,7 @@ export async function init(): Promise<void> {
     const ghostVersion = require('@tryghost/version');
     const request = require('@tryghost/request');
     const settingsCache = require('../../../shared/settings-cache');
-    const posts = require('../posts/posts-service-instance');
+    const posts = require('../posts/posts-service-instance').service;
     const members = require('../members');
     const statsService = require('../stats');
 
@@ -30,7 +30,7 @@ export async function init(): Promise<void> {
         logging,
         ghostVersion,
         request,
-        posts: posts(),
+        posts,
         members,
         statsService
     });

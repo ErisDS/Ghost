@@ -1,8 +1,7 @@
 const models = require('../../models');
 const urlService = require('../../services/url');
 const {requiredUrlColumns} = require('./utils/serializers/input/utils/url');
-const getPostServiceInstance = require('../../services/posts/posts-service-instance');
-const postsService = getPostServiceInstance();
+const postsService = require('../../services/posts/posts-service-instance').service;
 
 const urlRelationsForRouting = () => {
     const withRelated = urlService.getRequiredRelations();

@@ -344,6 +344,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const mentionsService = require('./server/services/mentions');
     const tagsPublic = require('./server/services/tags-public');
     const postsPublic = require('./server/services/posts-public');
+    const postsService = require('./server/services/posts/posts-service-instance');
     const slackNotifications = require('./server/services/slack-notifications');
     const mediaInliner = require('./server/services/media-inliner');
     const announcementBarService = require('./server/services/announcement-bar-service');
@@ -411,7 +412,6 @@ async function initServices({ghostServer, config, prometheusClient}) {
         recommendationsService.init(),
         tinybird.init(),
         statsService.init(),
-        explorePingService.init(),
         giftService.init({
             apiUrl,
             schedulerAdapter,
@@ -426,6 +426,9 @@ async function initServices({ghostServer, config, prometheusClient}) {
             siteUuid: settingsCache.get('site_uuid')
         })
     ]);
+
+    postsService.init();
+    await explorePingService.init();
 
     if (schedulerAdapter.rescheduleOnBoot) {
         await postScheduling.rescheduleAll();
