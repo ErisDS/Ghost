@@ -350,6 +350,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const recommendationsService = require('./server/services/recommendations');
     const emailAddressService = require('./server/services/email-address');
     const statsService = require('./server/services/stats');
+    const tinybird = require('./server/services/tinybird');
     const explorePingService = require('./server/services/explore-ping');
     const domainEvents = require('@tryghost/domain-events');
     const automations = require('./server/services/automations');
@@ -406,6 +407,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
         mediaInliner.init(),
         donationService.init(),
         recommendationsService.init(),
+        tinybird.init(),
         statsService.init(),
         explorePingService.init(),
         giftService.init({

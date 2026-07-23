@@ -29,6 +29,18 @@ export function lazySingleton<T extends object>(name: string, getInstance: () =>
         },
         set(_target, property, value) {
             return Reflect.set(resolve(), property, value);
+        },
+        has(_target, property) {
+            return Reflect.has(resolve(), property);
+        },
+        defineProperty(_target, property, attributes) {
+            return Reflect.defineProperty(resolve(), property, attributes);
+        },
+        deleteProperty(_target, property) {
+            return Reflect.deleteProperty(resolve(), property);
+        },
+        getPrototypeOf() {
+            return Reflect.getPrototypeOf(resolve());
         }
     });
 }

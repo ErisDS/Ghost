@@ -38,7 +38,7 @@ export async function generateGiftKeyData(frame: Frame): Promise<{present: true;
         return undefined;
     }
 
-    const post = await giftLinksService!.getPostByToken(token);
+    const post = await giftLinksService.getPostByToken(token);
     const postId = post ? post.id : null;
     frame.giftLinkPostId = postId;
 

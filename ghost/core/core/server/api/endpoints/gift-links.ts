@@ -40,7 +40,7 @@ const controller = {
             return assertCanEditAndGift(frame);
         },
         query(frame: Frame) {
-            return service!.getPost(frame.options.id);
+            return service.getPost(frame.options.id);
         }
     },
 
@@ -53,7 +53,7 @@ const controller = {
             return assertCanEditAndGift(frame);
         },
         query(frame: Frame) {
-            return service!.ensure(requestContextFromFrame(frame), frame.options.id);
+            return service.ensure(requestContextFromFrame(frame), frame.options.id);
         }
     },
 
@@ -66,7 +66,7 @@ const controller = {
             return assertCanEditAndGift(frame);
         },
         query(frame: Frame) {
-            return service!.create(requestContextFromFrame(frame), frame.options.id);
+            return service.create(requestContextFromFrame(frame), frame.options.id);
         }
     },
 
@@ -77,7 +77,7 @@ const controller = {
             return permissionsService.canThis(frame.options.context).removeAll.gift_link();
         },
         async query(frame: Frame) {
-            const count = await service!.removeAll(requestContextFromFrame(frame));
+            const count = await service.removeAll(requestContextFromFrame(frame));
             return {count};
         }
     }

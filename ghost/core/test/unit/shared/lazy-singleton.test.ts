@@ -28,19 +28,23 @@ describe('lazySingleton', function () {
     });
 
     it('preserves method binding when a method is extracted', function () {
-        const instance = {
-            value: 1,
+        class ExampleService {
+            value = 1;
+
             increment() {
                 this.value += 1;
                 return this.value;
             }
-        };
+        }
+
+        const instance = new ExampleService();
         const facade = lazySingleton('ExampleService', () => instance);
 
         const increment = facade.increment;
 
         expect(increment()).toBe(2);
         expect(instance.value).toBe(2);
+        expect(facade).toBeInstanceOf(ExampleService);
     });
 
     it('forwards null values returned by an initialized service', function () {

@@ -22,7 +22,7 @@ describe('Gift link access', function () {
         // The service singleton is normally wired at boot; the stub replaces
         // its only query so no DB is touched.
         giftLinksService.init();
-        getPostByTokenStub = sinon.stub(giftLinksService.service!, 'getPostByToken');
+        getPostByTokenStub = sinon.stub(giftLinksService.service, 'getPostByToken');
 
         sinon.stub(Product, 'findAll').resolves([{
             get: sinon.stub().returns('silver')
