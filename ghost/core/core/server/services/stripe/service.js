@@ -9,7 +9,7 @@ const events = require('../../lib/common/events');
 const models = require('../../models');
 const {getConfig} = require('./config');
 const settingsHelpers = require('../settings-helpers');
-const donationService = require('../donations');
+const donationRepository = require('../donations').getRepository();
 const giftService = require('../gifts');
 const staffService = require('../staff');
 const labs = require('../../../shared/labs');
@@ -60,7 +60,7 @@ module.exports = new StripeService({
             }]);
         }
     },
-    donationService,
+    donationRepository,
     giftService,
     staffService,
     settingsCache

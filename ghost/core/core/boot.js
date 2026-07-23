@@ -322,6 +322,8 @@ async function initServices({ghostServer, config, prometheusClient}) {
 
     debug('Begin: Services');
     const identityTokens = require('./server/services/identity-tokens');
+    const donationService = require('./server/services/donations');
+    donationService.init();
     const stripe = require('./server/services/stripe');
     const members = require('./server/services/members');
     const tiers = require('./server/services/tiers');
@@ -344,7 +346,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const postsPublic = require('./server/services/posts-public');
     const slackNotifications = require('./server/services/slack-notifications');
     const mediaInliner = require('./server/services/media-inliner');
-    const donationService = require('./server/services/donations');
+    const announcementBarService = require('./server/services/announcement-bar-service');
     const giftService = require('./server/services/gifts');
     const machinePaymentsService = require('./server/services/machine-payments');
     const recommendationsService = require('./server/services/recommendations');
@@ -405,7 +407,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
         emailSuppressionList.init(),
         slackNotifications.init(),
         mediaInliner.init(),
-        donationService.init(),
+        announcementBarService.init(),
         recommendationsService.init(),
         tinybird.init(),
         statsService.init(),

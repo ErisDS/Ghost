@@ -1,4 +1,4 @@
-const announcementBarSettings = require('../../services/announcement-bar-service');
+const announcementBarSettings = require('../../services/announcement-bar-service').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {
