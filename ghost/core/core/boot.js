@@ -326,8 +326,8 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const members = require('./server/services/members');
     const tiers = require('./server/services/tiers');
     const permissions = require('./server/services/permissions');
-    const indexnow = require('./server/services/indexnow-ping').default;
-    const slack = require('./server/services/slack-ping').default;
+    const indexnow = require('./server/services/indexnow-ping');
+    const slack = require('./server/services/slack-ping');
     const webhooks = require('./server/services/webhooks');
     const postScheduling = require('./server/services/post-scheduling').default;
     const comments = require('./server/services/comments');
