@@ -23,6 +23,7 @@ function init() {
 
     instance = new TinybirdService({
         tinybirdConfig,
+        getTinybirdConfig: () => config.get('tinybird'),
         siteUuid
     });
 }
