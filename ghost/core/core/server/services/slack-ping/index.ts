@@ -1,35 +1,32 @@
 import {SlackPingService} from './slack-ping-service';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
-class SlackPingServiceWrapper {
-    service?: SlackPingService;
+let instance: SlackPingService | undefined;
 
-    init(): void {
-        if (this.service) {
-            // Already done
-            return;
-        }
+export const service = lazySingleton('SlackPingService', () => instance);
 
-        // Wire up all the dependencies
-        const {blogIcon} = require('../../lib/image');
-        const events = require('../../lib/common/events');
-        const logging = require('@tryghost/logging');
-        const request = require('../../lib/request-external');
-        const settingsCache = require('../../../shared/settings-cache');
-        const urlService = require('../url');
-        const urlUtils = require('../../../shared/url-utils').default;
-
-        this.service = new SlackPingService({
-            blogIcon,
-            events,
-            logging,
-            request,
-            settingsCache,
-            urlService,
-            urlUtils
-        });
-
-        this.service.subscribeEvents();
+export function init(): void {
+    if (instance) {
+        return;
     }
-}
 
-export default new SlackPingServiceWrapper();
+    const {blogIcon} = require('../../lib/image');
+    const events = require('../../lib/common/events');
+    const logging = require('@tryghost/logging');
+    const request = require('../../lib/request-external');
+    const settingsCache = require('../../../shared/settings-cache');
+    const urlService = require('../url');
+    const urlUtils = require('../../../shared/url-utils').default;
+
+    instance = new SlackPingService({
+        blogIcon,
+        events,
+        logging,
+        request,
+        settingsCache,
+        urlService,
+        urlUtils
+    });
+
+    instance.subscribeEvents();
+}

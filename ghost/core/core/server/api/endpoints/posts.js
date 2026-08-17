@@ -1,7 +1,7 @@
 const urlUtils = require('../../../shared/url-utils').default;
 const models = require('../../models');
 const {getCSVExportFileName} = require('./utils/csv-export-filename');
-const getPostServiceInstance = require('../../services/posts/posts-service-instance');
+const postsService = require('../../services/posts').service;
 const {rejectAdminApiRestrictedFieldsTransformer} = require('./utils/api-filter-utils');
 const allowedIncludes = [
     'tags',
@@ -22,7 +22,6 @@ const allowedIncludes = [
 ];
 const unsafeAttrs = ['status', 'authors', 'visibility'];
 
-const postsService = getPostServiceInstance();
 
 /**
  * @param {string} event

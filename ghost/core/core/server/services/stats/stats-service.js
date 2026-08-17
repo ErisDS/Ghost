@@ -248,13 +248,13 @@ class StatsService {
 
         if (settingsCache.get('web_analytics_enabled')) {
             // TODO: move the tinybird client to the tinybird service
-            const TinybirdServiceWrapper = require('../tinybird');
-            TinybirdServiceWrapper.init();
+            const tinybird = require('../tinybird');
+            tinybird.init();
             tinybirdClient = require('./utils/tinybird').create({
                 config,
                 request,
                 settingsCache,
-                tinybirdService: TinybirdServiceWrapper.instance
+                tinybirdService: tinybird.service
             });
         }
 

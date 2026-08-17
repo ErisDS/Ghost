@@ -172,5 +172,24 @@ describe('TinybirdService', function () {
             assert.equal(result.token, 'stats-token');
             assert.equal(result.exp, undefined);
         });
+
+        it('should use updated configuration without creating another service instance', function () {
+            let currentConfig = null;
+            tinybirdService = new TinybirdService({
+                tinybirdConfig: currentConfig,
+                getTinybirdConfig: () => currentConfig,
+                siteUuid
+            });
+
+            assert.equal(tinybirdService.getToken(), null);
+
+            currentConfig = {
+                stats: {
+                    token: 'updated-stats-token'
+                }
+            };
+
+            assert.deepEqual(tinybirdService.getToken(), {token: 'updated-stats-token'});
+        });
     });
 });

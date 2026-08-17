@@ -19,6 +19,7 @@ const jwt = require('jsonwebtoken');
 /**
  * @typedef {Object} TinybirdConstructorOptions
  * @property {TinybirdConfig} tinybirdConfig - Tinybird configuration object
+ * @property {() => TinybirdConfig} [getTinybirdConfig] - Returns the current Tinybird configuration
  * @property {string} siteUuid - Unique identifier for the site
  */
 
@@ -81,9 +82,15 @@ class TinybirdService {
      * Creates a new TinybirdService instance
      * @param {TinybirdConstructorOptions} options - Configuration options
      */
-    constructor({tinybirdConfig, siteUuid}) {
+    constructor({tinybirdConfig, getTinybirdConfig = () => tinybirdConfig, siteUuid}) {
+        this.getTinybirdConfig = getTinybirdConfig;
+        this.defaultSiteUuid = siteUuid;
+        this._configure(tinybirdConfig);
+    }
+
+    _configure(tinybirdConfig) {
         this.tinybirdConfig = tinybirdConfig;
-        this.siteUuid = tinybirdConfig?.stats?.id || siteUuid;
+        this.siteUuid = tinybirdConfig?.stats?.id || this.defaultSiteUuid;
 
         // Flags for determining which token to use
         // We should aim to simplify this in the future
@@ -100,7 +107,14 @@ class TinybirdService {
      * For now we need to remain backwards compatible with the old stats token
      * @returns {{token: string, exp?: number}|null} Object with token and optional exp, or null if generation fails
      */
-    getToken({name = `tinybird-jwt-${this.siteUuid}`, expiresInMinutes = 180} = {}) {
+    getToken({name, expiresInMinutes = 180} = {}) {
+        const tinybirdConfig = this.getTinybirdConfig();
+        if (tinybirdConfig !== this.tinybirdConfig) {
+            this._configure(tinybirdConfig);
+        }
+
+        name ??= `tinybird-jwt-${this.siteUuid}`;
+
         // Prefer JWT tokens if enabled
         if (this.isJwtEnabled) {
             // Generate a new JWT token if it doesn't exist or is expired

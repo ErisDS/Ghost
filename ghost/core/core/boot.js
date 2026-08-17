@@ -322,12 +322,14 @@ async function initServices({ghostServer, config, prometheusClient}) {
 
     debug('Begin: Services');
     const identityTokens = require('./server/services/identity-tokens');
+    const donationService = require('./server/services/donations');
+    donationService.init();
     const stripe = require('./server/services/stripe');
     const members = require('./server/services/members');
     const tiers = require('./server/services/tiers');
     const permissions = require('./server/services/permissions');
-    const indexnow = require('./server/services/indexnow-ping').default;
-    const slack = require('./server/services/slack-ping').default;
+    const indexnow = require('./server/services/indexnow-ping');
+    const slack = require('./server/services/slack-ping');
     const webhooks = require('./server/services/webhooks');
     const postScheduling = require('./server/services/post-scheduling').default;
     const comments = require('./server/services/comments');
@@ -342,14 +344,16 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const mentionsService = require('./server/services/mentions');
     const tagsPublic = require('./server/services/tags-public');
     const postsPublic = require('./server/services/posts-public');
+    const postsService = require('./server/services/posts');
     const slackNotifications = require('./server/services/slack-notifications');
     const mediaInliner = require('./server/services/media-inliner');
-    const donationService = require('./server/services/donations');
+    const announcementBarService = require('./server/services/announcement-bar-service');
     const giftService = require('./server/services/gifts');
     const machinePaymentsService = require('./server/services/machine-payments');
     const recommendationsService = require('./server/services/recommendations');
     const emailAddressService = require('./server/services/email-address');
     const statsService = require('./server/services/stats');
+    const tinybird = require('./server/services/tinybird');
     const explorePingService = require('./server/services/explore-ping');
     const domainEvents = require('@tryghost/domain-events');
     const automations = require('./server/services/automations');
@@ -404,10 +408,10 @@ async function initServices({ghostServer, config, prometheusClient}) {
         emailSuppressionList.init(),
         slackNotifications.init(),
         mediaInliner.init(),
-        donationService.init(),
+        announcementBarService.init(),
         recommendationsService.init(),
+        tinybird.init(),
         statsService.init(),
-        explorePingService.init(),
         giftService.init({
             apiUrl,
             schedulerAdapter,
@@ -422,6 +426,9 @@ async function initServices({ghostServer, config, prometheusClient}) {
             siteUuid: settingsCache.get('site_uuid')
         })
     ]);
+
+    postsService.init();
+    await explorePingService.init();
 
     if (schedulerAdapter.rescheduleOnBoot) {
         await postScheduling.rescheduleAll();

@@ -2,14 +2,15 @@ const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const models = require('../../../../core/server/models');
 const urlService = require('../../../../core/server/services/url');
-const {PostsService} = require('../../../../core/server/services/posts/posts-service-instance');
+const posts = require('../../../../core/server/services/posts');
+const PostsService = require('../../../../core/server/services/posts/posts-service');
 const searchIndexController = require('../../../../core/server/api/endpoints/search-index-public');
 
 describe('Search index public controller', function () {
     let browsePostsStub;
 
     beforeEach(function () {
-        // the controller constructs its own PostsService instance
+        posts.init();
         browsePostsStub = sinon.stub(PostsService.prototype, 'browsePosts').resolves({data: []});
         sinon.stub(models.Tag, 'findPage').resolves({data: []});
         sinon.stub(models.Author, 'findPage').resolves({data: []});

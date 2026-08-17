@@ -1,11 +1,17 @@
 const PostsService = require('./posts-service');
 const PostsExporter = require('./posts-exporter');
 const url = require('../../../server/api/endpoints/utils/serializers/output/utils/url');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-/**
- * @returns {InstanceType<PostsService>} instance of the PostsService
- */
-const getPostServiceInstance = () => {
+let instance;
+
+const service = lazySingleton('PostsService', () => instance);
+
+function init() {
+    if (instance) {
+        return;
+    }
+
     const urlUtils = require('../../../shared/url-utils').default;
     const labs = require('../../../shared/labs');
     const models = require('../../models');
@@ -32,7 +38,7 @@ const getPostServiceInstance = () => {
         settingsHelpers
     });
 
-    return new PostsService({
+    instance = new PostsService({
         urlUtils: urlUtils,
         models: models,
         isSet: flag => labs.isSet(flag), // don't use bind, that breaks test subbing of labs
@@ -40,8 +46,9 @@ const getPostServiceInstance = () => {
         emailService: emailService.service,
         postsExporter
     });
-};
+}
 
-module.exports = getPostServiceInstance;
-// exposed for testing purposes only
-module.exports.PostsService = PostsService;
+module.exports = {
+    init,
+    service
+};
