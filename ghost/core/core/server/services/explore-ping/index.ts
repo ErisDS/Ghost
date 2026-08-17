@@ -1,9 +1,12 @@
 import {ExplorePingService} from './explore-ping-service';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
-let service: ExplorePingService | undefined;
+let instance: ExplorePingService | undefined;
+
+export const service = lazySingleton('ExplorePingService', () => instance);
 
 export async function init(): Promise<void> {
-    if (service) {
+    if (instance) {
         return;
     }
 
@@ -24,7 +27,7 @@ export async function init(): Promise<void> {
     const members = require('../members');
     const statsService = require('../stats');
 
-    service = new ExplorePingService({
+    instance = new ExplorePingService({
         settingsCache,
         config,
         logging,
@@ -38,5 +41,5 @@ export async function init(): Promise<void> {
     // The final intention is to have this run on a schedule
     // For the initial version, we'll just ping when the server starts
     // Without waiting for the response
-    service.ping();
+    instance.ping();
 }

@@ -1,9 +1,12 @@
 import {IndexNowPingService} from './indexnow-ping-service';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
-let service: IndexNowPingService | undefined;
+let instance: IndexNowPingService | undefined;
+
+export const service = lazySingleton('IndexNowPingService', () => instance);
 
 export function init(): void {
-    if (service) {
+    if (instance) {
         return;
     }
 
@@ -15,7 +18,7 @@ export function init(): void {
     const logging = require('@tryghost/logging');
     const events = require('../../lib/common/events');
 
-    service = new IndexNowPingService({
+    instance = new IndexNowPingService({
         settingsCache,
         config,
         urlService,
@@ -25,5 +28,5 @@ export function init(): void {
         events
     });
 
-    service.subscribeEvents();
+    instance.subscribeEvents();
 }

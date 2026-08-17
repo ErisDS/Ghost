@@ -1,9 +1,12 @@
 import {SlackPingService} from './slack-ping-service';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
-let service: SlackPingService | undefined;
+let instance: SlackPingService | undefined;
+
+export const service = lazySingleton('SlackPingService', () => instance);
 
 export function init(): void {
-    if (service) {
+    if (instance) {
         return;
     }
 
@@ -15,7 +18,7 @@ export function init(): void {
     const urlService = require('../url');
     const urlUtils = require('../../../shared/url-utils').default;
 
-    service = new SlackPingService({
+    instance = new SlackPingService({
         blogIcon,
         events,
         logging,
@@ -25,5 +28,5 @@ export function init(): void {
         urlUtils
     });
 
-    service.subscribeEvents();
+    instance.subscribeEvents();
 }
