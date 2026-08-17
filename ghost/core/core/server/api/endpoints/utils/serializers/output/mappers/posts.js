@@ -15,7 +15,7 @@ const utils = require('../../../index');
 
 const postsMetaSchema = require('../../../../../../data/schema').tables.posts_meta;
 
-const postsService = require('../../../../../../services/posts/posts-service-instance').service;
+const postsService = require('../../../../../../services/posts').service;
 
 const commentsService = require('../../../../../../services/comments');
 const memberAttribution = require('../../../../../../services/member-attribution');

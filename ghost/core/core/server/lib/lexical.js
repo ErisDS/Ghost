@@ -31,7 +31,7 @@ function createLexicalHtmlRenderer(onError) {
 
 function buildRenderOptions(userOptions) {
     if (!postsService) {
-        postsService = require('../services/posts/posts-service-instance').service;
+        postsService = require('../services/posts').service;
     }
     if (!serializePosts) {
         serializePosts = require('../api/endpoints/utils/serializers/output/posts').all;

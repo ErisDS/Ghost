@@ -1,8 +1,12 @@
+const {lazySingleton} = require('../../../shared/lazy-singleton');
+
 let repository;
+
+const service = lazySingleton('DonationRepository', () => repository);
 
 function init() {
     if (repository) {
-        return repository;
+        return;
     }
 
     const {DonationPaymentEvent: DonationPaymentEventModel} = require('../../models');
@@ -11,22 +15,9 @@ function init() {
     repository = new DonationBookshelfRepository({
         DonationPaymentEventModel
     });
-
-    return repository;
-}
-
-function getRepository() {
-    if (!repository) {
-        const {InternalServerError} = require('@tryghost/errors');
-        throw new InternalServerError({
-            message: 'Donation repository must be initialized before use'
-        });
-    }
-
-    return repository;
 }
 
 module.exports = {
     init,
-    getRepository
+    service
 };

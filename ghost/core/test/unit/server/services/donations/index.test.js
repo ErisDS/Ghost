@@ -11,15 +11,16 @@ describe('Donations composition root', function () {
 
     it('fails loudly when the repository is used before initialization', function () {
         assert.throws(
-            () => donations.getRepository(),
-            /Donation repository must be initialized before use/
+            () => donations.service.create({}),
+            /DonationRepository must be initialized before use/
         );
     });
 
-    it('returns the same repository from repeated initialization', function () {
-        const repository = donations.init();
+    it('initializes idempotently', function () {
+        donations.init();
+        const prototype = Object.getPrototypeOf(donations.service);
 
-        assert.equal(donations.init(), repository);
-        assert.equal(donations.getRepository(), repository);
+        assert.equal(donations.init(), undefined);
+        assert.equal(Object.getPrototypeOf(donations.service), prototype);
     });
 });

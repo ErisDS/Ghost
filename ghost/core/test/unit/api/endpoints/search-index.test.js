@@ -2,8 +2,8 @@ const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const models = require('../../../../core/server/models');
 const urlService = require('../../../../core/server/services/url');
-const posts = require('../../../../core/server/services/posts/posts-service-instance');
-const {PostsService} = posts;
+const posts = require('../../../../core/server/services/posts');
+const PostsService = require('../../../../core/server/services/posts/posts-service');
 const searchIndexController = require('../../../../core/server/api/endpoints/search-index');
 
 describe('Search index controller', function () {

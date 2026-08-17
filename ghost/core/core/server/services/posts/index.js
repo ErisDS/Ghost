@@ -9,7 +9,7 @@ const service = lazySingleton('PostsService', () => instance);
 
 function init() {
     if (instance) {
-        return instance;
+        return;
     }
 
     const urlUtils = require('../../../shared/url-utils').default;
@@ -46,12 +46,9 @@ function init() {
         emailService: emailService.service,
         postsExporter
     });
-
-    return instance;
 }
 
 module.exports = {
     init,
-    service,
-    PostsService
+    service
 };

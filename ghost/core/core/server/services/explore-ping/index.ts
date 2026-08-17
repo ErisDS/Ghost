@@ -12,18 +12,11 @@ export async function init(): Promise<void> {
 
     const config = require('../../../shared/config');
 
-    // The explore ping is a background "phone home" request. It should not run
-    // in the test environment (cf. the update-check service, which gates on the
-    // same environments), where there is no explore URL configured.
-    if (!config.isProductionOrDevelopment()) {
-        return;
-    }
-
     const logging = require('@tryghost/logging');
     const ghostVersion = require('@tryghost/version');
     const request = require('@tryghost/request');
     const settingsCache = require('../../../shared/settings-cache');
-    const posts = require('../posts/posts-service-instance').service;
+    const posts = require('../posts').service;
     const members = require('../members');
     const statsService = require('../stats');
 
@@ -38,8 +31,12 @@ export async function init(): Promise<void> {
         statsService
     });
 
-    // The final intention is to have this run on a schedule
-    // For the initial version, we'll just ping when the server starts
-    // Without waiting for the response
-    instance.ping();
+    // The explore ping is a background "phone home" request. Construct the
+    // service in every environment so init() always fulfils the service
+    // contract, but only trigger the request in production or development.
+    if (config.isProductionOrDevelopment()) {
+        // The final intention is to have this run on a schedule. For the
+        // initial version, ping when the server starts without awaiting it.
+        instance.ping();
+    }
 }

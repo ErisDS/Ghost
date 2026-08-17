@@ -4,7 +4,7 @@ describe('Posts service composition root', function () {
     let posts;
 
     beforeEach(function () {
-        const modulePath = require.resolve('../../../../../core/server/services/posts/posts-service-instance');
+        const modulePath = require.resolve('../../../../../core/server/services/posts');
         delete require.cache[modulePath];
         posts = require(modulePath);
     });
@@ -16,10 +16,11 @@ describe('Posts service composition root', function () {
         );
     });
 
-    it('returns the same instance from repeated initialization', function () {
-        const instance = posts.init();
+    it('initializes idempotently', function () {
+        posts.init();
+        const prototype = Object.getPrototypeOf(posts.service);
 
-        assert.equal(posts.init(), instance);
-        assert.equal(Object.getPrototypeOf(posts.service), Object.getPrototypeOf(instance));
+        assert.equal(posts.init(), undefined);
+        assert.equal(Object.getPrototypeOf(posts.service), prototype);
     });
 });
