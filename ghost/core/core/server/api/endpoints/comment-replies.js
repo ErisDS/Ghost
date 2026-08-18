@@ -1,6 +1,6 @@
 // This is a new endpoint for the admin API to return replies to a comment with pagination
 
-const commentsService = require('../../services/comments');
+const commentsService = require('../../services/comments').service;
 const ALLOWED_INCLUDES = ['member', 'replies', 'replies.member', 'replies.count.likes', 'replies.count.dislikes', 'replies.liked', 'replies.disliked', 'count.replies', 'count.direct_replies', 'count.likes', 'count.dislikes', 'liked', 'disliked', 'post', 'parent', 'in_reply_to'];
 
 /** @type {import('@tryghost/api-framework').Controller} */

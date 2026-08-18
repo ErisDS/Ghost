@@ -12,7 +12,9 @@ const urlServiceUtils = require('../../utils/url-service-utils');
 const urlUtils = require('../../../core/shared/url-utils').default;
 const DomainEvents = require('@tryghost/domain-events');
 const {anyContentVersion, anyContentLength, anyEtag, anyObjectId, anyUuid, anyISODateTime, anyString, anyArray, anyObject, nullable} = matchers;
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const sinon = require('sinon');
 
 let membersAgent;

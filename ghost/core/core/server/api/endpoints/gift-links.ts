@@ -1,6 +1,6 @@
 import {service, type RequestContext} from '../../services/gift-links';
 
-const permissionsService = require('../../services/permissions');
+const permissionsService = require('../../services/permissions').service;
 
 interface Frame {
     options: {

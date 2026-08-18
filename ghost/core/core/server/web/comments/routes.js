@@ -7,7 +7,7 @@ const errors = require('@tryghost/errors');
 const tpl = require('@tryghost/tpl');
 
 const bodyParser = require('body-parser');
-const membersService = require('../../../server/services/members');
+const membersService = require('../../../server/services/members').service;
 
 const messages = {
     memberCommentingDisabled: 'Your commenting ability has been disabled.'

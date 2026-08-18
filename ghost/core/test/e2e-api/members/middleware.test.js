@@ -4,7 +4,9 @@ const {agentProvider, mockManager, fixtureManager, matchers, configUtils} = requ
 const {anyEtag, anyObjectId, anyUuid, anyISODateTime, stringMatching} = matchers;
 const models = require('../../../core/server/models');
 const sinon = require('sinon');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 
 let membersAgent;
 

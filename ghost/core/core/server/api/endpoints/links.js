@@ -1,4 +1,4 @@
-const linkTrackingService = require('../../services/link-tracking');
+const linkTrackingService = require('../../services/link-tracking').service;
 const INVALIDATE_ALL_REDIRECTS = '/r/*';
 
 /** @type {import('@tryghost/api-framework').Controller} */

@@ -1,6 +1,7 @@
 import logging from '@tryghost/logging';
 import {RemoteFlagsService} from './remote-flags-service';
 import * as flagOverrides from '../../../shared/labs-flag-overrides';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
 // @tryghost/request ships no types; require() avoids an implicit-any under the strict tsconfig.
 const request = require('@tryghost/request');
@@ -23,6 +24,9 @@ interface RemoteFlagsConfig {
 const MIN_POLL_INTERVAL_MS = 60 * 1000;
 
 let instance: RemoteFlagsService | null = null;
+let lifecycle: {stop(): void; getInstance(): RemoteFlagsService | null} | undefined;
+
+export const service = lazySingleton('RemoteFlagsService', () => lifecycle);
 
 /**
  * Start the poller if enabled for this instance. Config-gated and opt-in: inert
@@ -34,6 +38,10 @@ let instance: RemoteFlagsService | null = null;
  * @returns the running service, or null when inert
  */
 export function init(config: ConfigLike): RemoteFlagsService | null {
+    if (!lifecycle) {
+        lifecycle = {stop, getInstance};
+    }
+
     if (instance) {
         return instance;
     }
@@ -89,13 +97,13 @@ export function init(config: ConfigLike): RemoteFlagsService | null {
  * Stop the poller. Halts polling; intentionally leaves the last-applied overrides
  * in place rather than clearing them.
  */
-export function stop(): void {
+function stop(): void {
     if (instance) {
         instance.stop();
         instance = null;
     }
 }
 
-export function getInstance(): RemoteFlagsService | null {
+function getInstance(): RemoteFlagsService | null {
     return instance;
 }

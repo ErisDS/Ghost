@@ -4,7 +4,9 @@ const {anyEtag, anyObjectId, anyLocationFor, anyErrorId} = matchers;
 const models = require('../../../core/server/models');
 const sinon = require('sinon');
 const {mockSystemTime} = require('../../utils/clock-utils');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const crypto = require('crypto');
 
 const membersValidationKeyMock = 'abc123dontstealme';

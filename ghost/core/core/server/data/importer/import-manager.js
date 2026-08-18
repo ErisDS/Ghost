@@ -20,8 +20,8 @@ const RevueImporter = require('./importers/importer-revue');
 const DataImporter = require('./importers/data');
 const urlUtils = require('../../../shared/url-utils').default;
 const {GhostMailer} = require('../../services/mail');
-const jobManager = require('../../services/jobs');
-const adapterManager = require('../../services/adapter-manager').default;
+const jobManager = require('../../services/jobs').service;
+const adapterManager = require('../../services/adapter-manager').service;
 
 const mediaStorage = adapterManager.getAdapter('storage:media');
 const imageStorage = adapterManager.getAdapter('storage:images');

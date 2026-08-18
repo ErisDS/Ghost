@@ -1,5 +1,5 @@
 const mappers = require('./mappers');
-const tiersService = require('../../../../../services/tiers');
+const tiersService = require('../../../../../services/tiers').service;
 
 module.exports = {
     async all(model, apiConfig, frame) {

@@ -1,6 +1,7 @@
 const assert = require('node:assert/strict');
 const models = require('../../../core/server/models');
-const commentsService = require('../../../core/server/services/comments');
+const comments = require('../../../core/server/services/comments');
+const commentsService = comments.service;
 const testUtils = require('../../utils');
 const {mockSetting, restore: restoreMocks} = require('../../utils/e2e-framework-mock-manager');
 
@@ -10,7 +11,7 @@ describe('CommentsService', function () {
     afterEach(testUtils.teardownDb);
 
     beforeEach(function () {
-        commentsService.init();
+        comments.init();
         mockSetting('comments_enabled', 'all');
     });
 

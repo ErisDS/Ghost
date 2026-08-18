@@ -3,7 +3,7 @@ const {agentProvider, mockManager, fixtureManager} = require('../../utils/e2e-fr
 const models = require('../../../core/server/models');
 const assert = require('node:assert/strict');
 const {mockSystemTime} = require('../../utils/clock-utils');
-const members = require('../../../core/server/services/members');
+const members = require('../../../core/server/services/members').service;
 let membersAgent, membersService;
 
 async function assertMemberEvents({eventType, memberId, asserts}) {
@@ -22,7 +22,7 @@ describe('Members Signin', function () {
         const agents = await agentProvider.getAgentsForMembers();
         membersAgent = agents.membersAgent;
 
-        membersService = require('../../../core/server/services/members');
+        membersService = require('../../../core/server/services/members').service;
 
         await fixtureManager.init('members');
     });

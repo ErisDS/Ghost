@@ -12,7 +12,7 @@ const noRelationsUrlService = {getRequiredRelations: () => []};
 const serialize = createSerialize({urlService: noRelationsUrlService});
 
 // Mocked internals
-const tiersService = require('../../../../../core/server/services/tiers');
+const tiersService = require('../../../../../core/server/services/tiers').service;
 
 const {fixtureManager} = require('../../../../utils/e2e-framework');
 

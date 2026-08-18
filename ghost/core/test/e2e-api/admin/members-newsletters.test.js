@@ -1,6 +1,8 @@
 const {agentProvider, mockManager, fixtureManager, matchers} = require('../../utils/e2e-framework');
 const {anyContentVersion, anyContentLength, anyEtag, anyObjectId, anyUuid, anyISODateTime, anyArray, anyObject, nullable} = matchers;
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const sinon = require('sinon');
 
 const memberMatcherShallowIncludesForNewsletters = {

@@ -29,18 +29,24 @@ const redirectsUtils = require('./redirects');
 const configUtils = require('./config-utils');
 const urlServiceUtils = require('./url-service-utils');
 const mockManager = require('./e2e-framework-mock-manager');
-const mentionsJobsService = require('../../core/server/services/mentions-jobs');
-const jobsService = require('../../core/server/services/jobs');
+const mentionsJobs = require('../../core/server/services/mentions-jobs');
+const jobs = require('../../core/server/services/jobs');
+mentionsJobs.init();
+jobs.init();
+const mentionsJobsService = mentionsJobs.service;
+const jobsService = jobs.service;
 
 const boot = require('../../core/boot');
 const {AdminAPITestAgent, ContentAPITestAgent, GhostAPITestAgent, MembersAPITestAgent} = require('./agents');
 const db = require('./db-utils');
 
 // Services that need resetting
-const settingsService = require('../../core/server/services/settings/settings-service');
+const settingsService = require('../../core/server/services/settings').service;
 const supertest = require('supertest');
 const {stopGhost} = require('./e2e-utils');
-const adapterManager = require('../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 const DomainEvents = require('@tryghost/domain-events');
 
 // Require additional assertions which help us keep our tests small and clear

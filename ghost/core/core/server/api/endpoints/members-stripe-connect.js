@@ -1,4 +1,4 @@
-const membersService = require('../../services/members');
+const membersService = require('../../services/members').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

@@ -22,6 +22,17 @@ process.env.WEBHOOK_SECRET = process.env.WEBHOOK_SECRET || 'TEST_STRIPE_WEBHOOK_
 // snapshots — no per-worker session overrides needed.
 require('../../core/server/overrides');
 
+// These infrastructure facades are imported by modules that bind methods at
+// module scope. Unit tests do not run Ghost's boot sequence, so mirror the
+// corresponding initCore phase before test modules are evaluated.
+require('../../core/server/services/adapter-manager').init();
+require('../../core/server/services/url').init();
+require('../../core/server/services/settings-helpers').init();
+require('../../core/server/services/posts-public').init();
+require('../../core/server/services/tags-public').init();
+require('../../core/server/services/stats').init();
+require('../../core/server/services/member-attribution').init();
+
 // @tryghost/express-test's snapshot bridge is pulled in lazily — requiring it
 // is ~170ms per worker and only the hooks below ever read it. The mock-manager
 // just below uses the same shape.
@@ -122,8 +133,12 @@ beforeEach((context: {task: {name: string; suite?: unknown; file?: {filepath?: s
 
 afterEach(async () => {
     const domainEvents = require('@tryghost/domain-events');
-    const mentionsJobsService = require('../../core/server/services/mentions-jobs');
-    const jobsService = require('../../core/server/services/jobs');
+    const mentionsJobs = require('../../core/server/services/mentions-jobs');
+    const jobs = require('../../core/server/services/jobs');
+    mentionsJobs.init();
+    jobs.init();
+    const mentionsJobsService = mentionsJobs.service;
+    const jobsService = jobs.service;
 
     const timeout = setTimeout(() => {
         // eslint-disable-next-line no-console

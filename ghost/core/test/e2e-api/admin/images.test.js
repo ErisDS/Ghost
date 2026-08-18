@@ -14,7 +14,9 @@ const {anyErrorId} = matchers;
 const {imageSize} = require('../../../core/server/lib/image');
 const configUtils = require('../../utils/config-utils');
 const logging = require('@tryghost/logging');
-const adapterManager = require('../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 
 const images = [];
 let agent, frontendAgent, ghostServer;

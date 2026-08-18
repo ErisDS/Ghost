@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 const {assertExists} = require('../../../utils/assertions');
-const internalKeys = require('../../../../core/server/services/internal-keys').default;
+const internalKeysRoot = require('../../../../core/server/services/internal-keys');
+internalKeysRoot.init();
+const internalKeys = internalKeysRoot.service;
 
 // Stuff we are testing
 const content_api_key = require('../../../../core/frontend/helpers/content_api_key');

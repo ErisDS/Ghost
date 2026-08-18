@@ -3,8 +3,8 @@ const DomainEvents = require('@tryghost/domain-events');
 const {agentProvider, mockManager, fixtureManager, configUtils, matchers} = require('../../utils/e2e-framework');
 const {stripeMocker} = require('../../utils/e2e-framework-mock-manager');
 const models = require('../../../core/server/models');
-const membersService = require('../../../core/server/services/members');
-const tiersService = require('../../../core/server/services/tiers');
+const membersService = require('../../../core/server/services/members').service;
+const tiersService = require('../../../core/server/services/tiers').service;
 const urlUtils = require('../../../core/shared/url-utils').default;
 const {anyErrorId} = matchers;
 

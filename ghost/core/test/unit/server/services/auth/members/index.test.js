@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const sinon = require('sinon');
 const {UnauthorizedError} = require('@tryghost/errors');
 const members = require('../../../../../../core/server/services/auth/members');
-const membersService = require('../../../../../../core/server/services/members');
+const membersService = require('../../../../../../core/server/services/members/service');
 
 // A real RSA public key so the express-jwt middleware can be constructed.
 // Token verification still fails as the tests expect.

@@ -1,23 +1,26 @@
-// canThis(someUser).edit.posts([id]|[[ids]])
-// canThis(someUser).edit.post(somePost|somePostId)
-
 const models = require('../../models');
-
 const actionsMap = require('./actions-map-cache');
+const canThis = require('./can-this');
+const parseContext = require('./parse-context');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-const init = function init(options) {
-    options = options || {};
+const instance = {canThis, parseContext};
+let initPromise;
 
-    // Load all the permissions
-    return models.Permission.findAll(options)
-        .then(function (permissionsCollection) {
+async function init(options = {}) {
+    if (!initPromise) {
+        initPromise = models.Permission.findAll(options).then((permissionsCollection) => {
             return actionsMap.init(permissionsCollection);
         });
-};
+    }
 
-module.exports = {
-    init: init,
-    canThis: require('./can-this'),
-    // @TODO: Make it so that we don't need to export these
-    parseContext: require('./parse-context')
-};
+    try {
+        return await initPromise;
+    } finally {
+        initPromise = undefined;
+    }
+}
+
+const service = lazySingleton('PermissionsService', () => instance);
+
+module.exports = {init, service};

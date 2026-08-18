@@ -1,36 +1,40 @@
-const urlUtils = require('../../../shared/url-utils').default;
-const LinkRedirectRepository = require('./link-redirect-repository');
-const adapterManager = require('../adapter-manager').default;
-const config = require('../../../shared/config');
-const EventRegistry = require('../../lib/common/events');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-class LinkRedirectsServiceWrapper {
-    async init() {
-        if (this.service) {
-            // Already done
-            return;
-        }
+let instance;
 
-        // Wire up all the dependencies
-        const models = require('../../models');
+const service = lazySingleton('LinkRedirectsService', () => instance);
 
-        const LinkRedirectsService = require('./link-redirects-service');
-
-        this.linkRedirectRepository = new LinkRedirectRepository({
-            LinkRedirect: models.Redirect,
-            urlUtils,
-            cacheAdapter: config.get('hostSettings:linkRedirectsPublicCache:enabled') ? adapterManager.getAdapter('cache:linkRedirectsPublic') : null,
-            EventRegistry
-        });
-
-        // Expose the service
-        this.service = new LinkRedirectsService({
-            linkRedirectRepository: this.linkRedirectRepository,
-            config: {
-                baseURL: new URL(urlUtils.getSiteUrl())
-            }
-        });
+async function init() {
+    if (instance) {
+        return;
     }
+
+    const urlUtils = require('../../../shared/url-utils').default;
+    const LinkRedirectRepository = require('./link-redirect-repository');
+    const adapterManager = require('../adapter-manager').service;
+    const config = require('../../../shared/config');
+    const events = require('../../lib/common/events');
+    const models = require('../../models');
+    const LinkRedirectsService = require('./link-redirects-service');
+
+    const repository = new LinkRedirectRepository({
+        LinkRedirect: models.Redirect,
+        urlUtils,
+        cacheAdapter: config.get('hostSettings:linkRedirectsPublicCache:enabled')
+            ? adapterManager.getAdapter('cache:linkRedirectsPublic')
+            : null,
+        EventRegistry: events
+    });
+
+    const linkRedirectsService = new LinkRedirectsService({
+        linkRedirectRepository: repository,
+        config: {baseURL: new URL(urlUtils.getSiteUrl())}
+    });
+
+    instance = {
+        service: linkRedirectsService,
+        linkRedirectRepository: repository
+    };
 }
 
-module.exports = new LinkRedirectsServiceWrapper();
+module.exports = {init, service};

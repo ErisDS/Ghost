@@ -7,7 +7,7 @@ const testUtils = require('../../utils/index');
 const config = require('../../../core/shared/config/index');
 const localUtils = require('./utils');
 const {mockManager} = require('../../utils/e2e-framework');
-const oembed = require('../../../../core/core/server/services/oembed');
+const oembed = require('../../../../core/core/server/services/oembed').service;
 const urlUtils = require('../../../core/shared/url-utils').default;
 
 // for sinon stubs

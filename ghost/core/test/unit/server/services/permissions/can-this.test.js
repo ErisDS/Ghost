@@ -3,7 +3,8 @@ const sinon = require('sinon');
 const testUtils = require('../../../../utils');
 const _ = require('lodash');
 const models = require('../../../../../core/server/models');
-const permissions = require('../../../../../core/server/services/permissions');
+const permissionsRoot = require('../../../../../core/server/services/permissions');
+const permissions = permissionsRoot.service;
 const providers = require('../../../../../core/server/services/permissions/providers');
 
 describe('Permissions', function () {
@@ -70,7 +71,7 @@ describe('Permissions', function () {
         beforeEach(function () {
             fakePermissions = loadFakePermissions();
 
-            return permissions.init();
+            return permissionsRoot.init();
         });
 
         it('canThisResult gets build properly', function () {

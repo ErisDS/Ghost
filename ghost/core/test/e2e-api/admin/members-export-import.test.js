@@ -7,7 +7,7 @@ const Papa = require('papaparse');
 const localUtils = require('./utils');
 const config = require('../../../core/shared/config');
 const models = require('../../../core/server/models');
-const jobsService = require('../../../core/server/services/jobs');
+const jobsService = require('../../../core/server/services/jobs').service;
 const {mockManager} = require('../../utils/e2e-framework');
 
 // A member exported to CSV should re-import cleanly: the export's CSV is a valid

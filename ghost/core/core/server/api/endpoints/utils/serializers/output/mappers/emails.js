@@ -1,4 +1,4 @@
-const emailService = require('../../../../../../services/email-service');
+const emailService = require('../../../../../../services/email-service').service;
 
 module.exports = (model, frame) => {
     const jsonModel = model.toJSON ? model.toJSON(frame.options) : model;

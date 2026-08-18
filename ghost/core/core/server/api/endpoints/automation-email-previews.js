@@ -1,4 +1,4 @@
-const memberWelcomeEmailService = require('../../services/member-welcome-emails/service');
+const memberWelcomeEmailService = require('../../services/member-welcome-emails').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
-const adapterManager = require('../../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 const activeTheme = require('../../../../../core/frontend/services/theme-engine/active');
 const handleImageSizes = require('../../../../../core/frontend/web/middleware/handle-image-sizes.js');
 const {imageSize} = require('../../../../../core/server/lib/image');

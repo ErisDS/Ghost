@@ -255,7 +255,7 @@ class SettingsBREADService {
 
             if (stripeConnectData.public_key.match(/pk_live/)) {
                 // Require the Stripe service here as it breaks existing tests otherwise
-                const stripeService = require('../stripe');
+                const stripeService = require('../stripe').service;
                 // This method currently only triggers a DomainEvent
                 await stripeService.connect();
             }

@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const logging = require('@tryghost/logging');
 const MailgunClient = require('../../../../core/server/services/lib/mailgun-client');
 const DomainEvents = require('@tryghost/domain-events');
-const emailAnalytics = require('../../../../core/server/services/email-analytics');
+const emailAnalytics = require('../../../../core/server/services/email-analytics').service;
 
 async function resetFailures(models, emailId) {
     await models.EmailRecipientFailure.destroy({
@@ -47,7 +47,7 @@ processingModes.forEach(({name, batchProcessing}) => {
 
             // Only reference services after Ghost boot
             models = require('../../../../core/server/models');
-            membersService = require('../../../../core/server/services/members');
+            membersService = require('../../../../core/server/services/members').service;
 
             sinon.stub(MailgunClient.prototype, 'fetchEvents').callsFake(async function (_, batchHandler) {
                 const normalizedEvents = (events.map(this.normalizeEvent) || []).filter(e => !!e);

@@ -3,7 +3,7 @@ const {assertObjectMatches} = require('../../utils/assertions');
 const {agentProvider, fixtureManager, configUtils} = require('../../utils/e2e-framework');
 const models = require('../../../core/server/models');
 const urlServiceUtils = require('../../utils/url-service-utils');
-const memberAttributionService = require('../../../core/server/services/member-attribution');
+const memberAttributionService = require('../../../core/server/services/member-attribution').service;
 const urlUtils = require('../../../core/shared/url-utils').default;
 
 describe('Member Attribution Service', function () {

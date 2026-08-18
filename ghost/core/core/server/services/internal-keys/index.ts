@@ -1,4 +1,5 @@
 import {AutoFillingMap} from '../../lib/auto-filling-map';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
 /**
  * Slug identifying an internal integration whose API key is consumed
@@ -30,24 +31,25 @@ export type ApiKeyType = typeof SLUG_KEY_TYPE[InternalIntegrationSlug];
  */
 export type InternalKeys = AutoFillingMap<InternalIntegrationSlug, Promise<InternalApiKey>>;
 
-// models/index.js is the Bookshelf model registry — a JS module without
-// TypeScript declarations. Use a typed require so we can call the model
-// method without polluting the file with `any`. The generic constrains
-// known internal slugs to their seeded type; arbitrary slugs accept any
-// type.
-const models = require('../../models') as {
-    Integration: {
-        getApiKeyBySlug<S extends string>(slug: S, type: S extends InternalIntegrationSlug ? typeof SLUG_KEY_TYPE[S] : ApiKeyType): Promise<InternalApiKey>;
+let instance: InternalKeys | undefined;
+
+export const service = lazySingleton('InternalKeys', () => instance);
+
+export function init(): void {
+    if (instance) {
+        return;
+    }
+
+    // models/index.js is the Bookshelf model registry — a JS module without
+    // TypeScript declarations. The generic constrains known internal slugs to
+    // their seeded type; arbitrary slugs accept any type.
+    const models = require('../../models') as {
+        Integration: {
+            getApiKeyBySlug<S extends string>(slug: S, type: S extends InternalIntegrationSlug ? typeof SLUG_KEY_TYPE[S] : ApiKeyType): Promise<InternalApiKey>;
+        };
     };
-};
 
-/**
- * Process-lifetime cache of internal-integration API keys, keyed by slug.
- * Rotation orchestration calls `.clear()` to invalidate after rotating the
- * underlying api_keys row.
- */
-const internalKeys = new AutoFillingMap<InternalIntegrationSlug, Promise<InternalApiKey>>(
-    slug => models.Integration.getApiKeyBySlug(slug, SLUG_KEY_TYPE[slug])
-);
-
-export default internalKeys;
+    instance = new AutoFillingMap<InternalIntegrationSlug, Promise<InternalApiKey>>(
+        slug => models.Integration.getApiKeyBySlug(slug, SLUG_KEY_TYPE[slug])
+    );
+}

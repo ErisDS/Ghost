@@ -1,4 +1,4 @@
-const adapterManager = require('../../adapter-manager').default;
+const adapterManager = require('../../adapter-manager').service;
 const createSessionService = require('./session-service');
 const sessionFromToken = require('./session-from-token');
 const createSessionMiddleware = require('./middleware');

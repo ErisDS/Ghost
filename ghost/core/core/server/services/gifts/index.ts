@@ -5,6 +5,7 @@ import {GiftService} from './gift-service';
 import {GiftReminderScheduler} from './gift-reminder-scheduler';
 import {GiftEmailService} from './gift-email-service';
 import {GiftController} from './gift-controller';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
 export interface GiftServiceInitOptions {
     apiUrl: string;
@@ -12,23 +13,22 @@ export interface GiftServiceInitOptions {
     internalKeys: InternalKeys;
 }
 
-// Constructed by init() at boot, once the database and scheduling adapter are ready.
-// Under the dev/test loader (tsx) these compile to getter-only exports, so tests
-// can't assign to them — stub the module load instead (see
-// test/unit/server/web/gift-preview/controller.test.js).
-export let controller: GiftController | undefined;
-export let service: GiftService | undefined;
+type GiftServiceFacade = GiftService & {controller: GiftController};
+
+let instance: GiftServiceFacade | undefined;
+
+export const service = lazySingleton('GiftService', () => instance);
 
 export async function init(options: GiftServiceInitOptions): Promise<void> {
-    if (service) {
+    if (instance) {
         return;
     }
 
     const {Gift: GiftModel, MemberStripeCustomer: StripeCustomerModel} = require('../../models');
     const GiftCheckoutAdapter = require('./gift-checkout-adapter');
-    const membersService = require('../members');
-    const tiersService = require('../tiers');
-    const staffService = require('../staff');
+    const membersService = require('../members').service;
+    const tiersService = require('../tiers').service;
+    const staffService = require('../staff').service;
     const DomainEvents = require('@tryghost/domain-events');
     const logging = require('@tryghost/logging');
     const {SubscriptionActivatedEvent} = require('../../../shared/events');
@@ -40,7 +40,7 @@ export async function init(options: GiftServiceInitOptions): Promise<void> {
     const settingsCache = require('../../../shared/settings-cache');
     const labsService = require('../../../shared/labs');
     const urlUtils = require('../../../shared/url-utils').default;
-    const settingsHelpers = require('../settings-helpers');
+    const settingsHelpers = require('../settings-helpers').service;
     const EmailAddressParser = require('../email-address/email-address-parser');
     const {blogIcon} = require('../../../server/lib/image');
     const {t} = require('../i18n');
@@ -50,7 +50,7 @@ export async function init(options: GiftServiceInitOptions): Promise<void> {
     });
     const checkoutAdapter = new GiftCheckoutAdapter({
         StripeCustomerModel,
-        getStripeApi: () => require('../stripe').api
+        getStripeApi: () => require('../stripe').service.api
     });
 
     const giftEmailService = new GiftEmailService({
@@ -85,8 +85,9 @@ export async function init(options: GiftServiceInitOptions): Promise<void> {
         settingsCache
     });
 
-    service = giftService;
-    controller = new GiftController({service: giftService});
+    instance = Object.assign(giftService, {
+        controller: new GiftController({service: giftService})
+    });
 
     DomainEvents.subscribe(SubscriptionActivatedEvent, async (event: {data: {memberId: string}}) => {
         try {

@@ -1,5 +1,5 @@
 const path = require('path');
-const jobsService = require('../../jobs');
+const jobsService = require('../../jobs').service;
 
 let hasScheduled = {
     expiredComped: false,

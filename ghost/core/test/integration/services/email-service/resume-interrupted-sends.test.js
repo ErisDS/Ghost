@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const logging = require('@tryghost/logging');
 const jobManager = require('../../../../core/server/services/jobs/job-service');
 const configUtils = require('../../../utils/config-utils');
-const emailService = require('../../../../core/server/services/email-service');
+const emailService = require('../../../../core/server/services/email-service').service;
 const {sendEmail} = require('../../../utils/batch-email-utils');
 
 describe('Resume interrupted sends', function () {

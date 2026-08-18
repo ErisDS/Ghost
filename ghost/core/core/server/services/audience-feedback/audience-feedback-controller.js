@@ -1,6 +1,6 @@
 const Feedback = require('./feedback');
 const errors = require('@tryghost/errors');
-const permissions = require('../../services/permissions');
+const permissions = require('../../services/permissions').service;
 const tpl = require('@tryghost/tpl');
 
 const messages = {

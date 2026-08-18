@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
-const urlService = require('../../../../../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const urlUtil = require('../../../../../../../../core/server/api/endpoints/utils/serializers/input/utils/url');
 
 describe('Unit: endpoints/utils/serializers/input/utils/url', function () {

@@ -8,7 +8,7 @@ const testUtils = require('../../../utils');
 const MailgunClient = require('../../../../core/server/services/lib/mailgun-client');
 const {AUTOMATION_EMAIL_TAG, DEFAULT_EMAIL_DESIGN_SETTING_SLUG} = require('../../../../core/server/services/member-welcome-emails/constants');
 const {Queries} = require('../../../../core/server/services/email-analytics/lib/queries');
-const emailAnalytics = require('../../../../core/server/services/email-analytics');
+const emailAnalytics = require('../../../../core/server/services/email-analytics').service;
 const automationsApi = require('../../../../core/server/services/automations/automations-api');
 
 // Every event we hand back to the pipeline is dated here. The fetch window

@@ -1,7 +1,9 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const {Post} = require('../../../../core/server/models/post');
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const emailPostController = require('../../../../core/server/api/endpoints/email-post');
 
 describe('Email post controller', function () {

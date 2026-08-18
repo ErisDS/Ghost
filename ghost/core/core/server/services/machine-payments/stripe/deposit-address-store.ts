@@ -42,7 +42,7 @@ type DepositAddressStoreDeps = {
     settingsModel?: SettingsModel;
 };
 
-const settingsHelpers = require('../../settings-helpers') as SettingsHelpersFacade;
+const settingsHelpers = require('../../settings-helpers').service as SettingsHelpersFacade;
 const settingsCache = require('../../../../shared/settings-cache') as SettingsCacheFacade;
 
 /**

@@ -1,5 +1,6 @@
 const DomainEvents = require('@tryghost/domain-events');
 const labs = require('../../../shared/labs');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
 class StaffServiceWrapper {
     init() {
@@ -18,7 +19,7 @@ class StaffServiceWrapper {
         const settingsCache = require('../../../shared/settings-cache');
         const urlUtils = require('../../../shared/url-utils').default;
         const {blogIcon} = require('../../../server/lib/image');
-        const settingsHelpers = require('../settings-helpers');
+        const settingsHelpers = require('../settings-helpers').service;
 
         this.api = new StaffService({
             logging,
@@ -29,7 +30,7 @@ class StaffServiceWrapper {
             urlUtils,
             blogIcon,
             DomainEvents,
-            memberAttributionService: memberAttribution.service,
+            memberAttributionService: memberAttribution.service.service,
             labs
         });
 
@@ -37,4 +38,16 @@ class StaffServiceWrapper {
     }
 }
 
-module.exports = new StaffServiceWrapper();
+let instance;
+
+function init() {
+    if (!instance) {
+        const staffService = new StaffServiceWrapper();
+        staffService.init();
+        instance = staffService;
+    }
+}
+
+const service = lazySingleton('StaffService', () => instance);
+
+module.exports = {init, service};

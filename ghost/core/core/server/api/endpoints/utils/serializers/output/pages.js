@@ -1,6 +1,6 @@
 const debug = require('@tryghost/debug')('api:endpoints:utils:serializers:output:pages');
 const mappers = require('./mappers');
-const tiersService = require('../../../../../services/tiers');
+const tiersService = require('../../../../../services/tiers').service;
 
 module.exports = {
     // 204 No Content — see posts.js destroy

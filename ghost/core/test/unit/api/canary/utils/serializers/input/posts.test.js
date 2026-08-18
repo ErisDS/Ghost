@@ -1,7 +1,9 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const serializers = require('../../../../../../../core/server/api/endpoints/utils/serializers');
-const urlService = require('../../../../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const postsSchema = require('../../../../../../../core/server/data/schema').tables.posts;
 
 const lexicalLib = require('../../../../../../../core/server/lib/lexical');

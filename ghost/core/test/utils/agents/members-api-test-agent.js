@@ -24,7 +24,7 @@ class MembersAPITestAgent extends TestAgent {
     }
 
     async loginAs(email) {
-        const membersService = require('../../../core/server/services/members');
+        const membersService = require('../../../core/server/services/members').service;
         const memberRepository = membersService.api.members;
 
         const member = await memberRepository.get({email});

@@ -230,7 +230,7 @@ export class MppAdapter implements PaymentAdapter {
         }
 
         try {
-            const settingsHelpers = require('../../settings-helpers') as {
+            const settingsHelpers = require('../../settings-helpers').service as {
                 getActiveStripeKeys: () => {secretKey?: string} | null | undefined;
             };
             const keys = settingsHelpers.getActiveStripeKeys();

@@ -1,9 +1,9 @@
 // This file contains everything that the helpers and frontend apps require from the core of Ghost
 const settingsCache = require('../../shared/settings-cache');
 const config = require('../../shared/config');
-const settingsHelpers = require('../../server/services/settings-helpers');
+const settingsHelpers = require('../../server/services/settings-helpers').service;
 const storageUtils = require('../../server/adapters/storage/utils');
-const internalKeys = require('../../server/services/internal-keys').default;
+const internalKeys = require('../../server/services/internal-keys').service;
 const serverEventBus = require('../../server/lib/common/events');
 const errors = require('@tryghost/errors');
 const logging = require('@tryghost/logging');
@@ -88,7 +88,7 @@ module.exports = {
     // Member actions needed by the frontend's unsubscribe route. Lazy so that
     // loading the proxy does not pull the members service in ahead of boot.
     get members() {
-        return require('../../server/services/members');
+        return require('../../server/services/members').service;
     },
 
     // TODO: Expose less of the API to make this safe
@@ -110,6 +110,6 @@ module.exports = {
     // Labs utils for enabling/disabling helpers
     labs: require('../../shared/labs'),
     // URGH... Yuk (unhelpful comment :D)
-    urlService: require('../../server/services/url'),
+    urlService: require('../../server/services/url').service,
     urlUtils: require('../../shared/url-utils').default
 };

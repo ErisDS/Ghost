@@ -1,4 +1,4 @@
-const statsService = require('../../services/stats');
+const statsService = require('../../services/stats').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

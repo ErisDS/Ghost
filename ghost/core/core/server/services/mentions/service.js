@@ -11,10 +11,10 @@ const events = require('../../lib/common/events');
 const externalRequest = require('../../../server/lib/request-external.js');
 const urlUtils = require('../../../shared/url-utils').default;
 const outputSerializerUrlUtil = require('../../../server/api/endpoints/utils/serializers/output/utils/url');
-const urlService = require('../url');
+const urlService = require('../url').service;
 const settingsCache = require('../../../shared/settings-cache');
 const DomainEvents = require('@tryghost/domain-events');
-const jobsService = require('../mentions-jobs');
+const jobsService = require('../mentions-jobs').service;
 
 // Serializes a post model to the data the URL service needs, loading the
 // relations it reads for filtered collections (event-emitted models don't

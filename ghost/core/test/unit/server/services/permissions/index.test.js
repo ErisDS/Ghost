@@ -5,7 +5,9 @@ const testUtils = require('../../../../utils');
 const _ = require('lodash');
 const models = require('../../../../../core/server/models');
 const actionsMap = require('../../../../../core/server/services/permissions/actions-map-cache');
-const permissions = require('../../../../../core/server/services/permissions');
+const permissionsRoot = require('../../../../../core/server/services/permissions');
+const permissions = permissionsRoot.service;
+const canThis = require('../../../../../core/server/services/permissions/can-this');
 
 describe('Permissions', function () {
     let fakePermissions = [];
@@ -64,7 +66,7 @@ describe('Permissions', function () {
         it('throws an error without actionMap', function () {
             sinon.stub(actionsMap, 'empty').returns(true);
 
-            assert.throws(permissions.canThis, /No actions map found/);
+            assert.throws(canThis, /No actions map found/);
         });
     });
 
@@ -72,7 +74,7 @@ describe('Permissions', function () {
         it('can load an actions map from existing permissions', async function () {
             fakePermissions = loadFakePermissions();
 
-            const actions = await permissions.init();
+            const actions = await permissionsRoot.init();
 
             assertExists(actions);
 
@@ -89,7 +91,7 @@ describe('Permissions', function () {
         it('can load an actions map from existing permissions, and deduplicate', async function () {
             fakePermissions = loadFakePermissions({extra: true});
 
-            const actions = await permissions.init();
+            const actions = await permissionsRoot.init();
 
             assertExists(actions);
 

@@ -32,10 +32,22 @@ if (parentPort) {
     const updateCheck = require('./');
 
     // INIT required services
+    const adapterManager = require('../adapter-manager');
+    adapterManager.init();
+
+    const url = require('../url');
+    url.init();
+
+    const settingsHelpers = require('../settings-helpers');
+    settingsHelpers.init();
+
     const permissions = require('../permissions');
     await permissions.init();
 
-    const settings = require('../settings/settings-service');
+    const notifications = require('../notifications');
+    notifications.init();
+
+    const settings = require('../settings');
     await settings.init();
 
     const emailAddress = require('../email-address');

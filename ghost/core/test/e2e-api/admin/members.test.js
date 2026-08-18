@@ -16,15 +16,17 @@ const Papa = require('papaparse');
 
 const models = require('../../../core/server/models');
 const {knex} = require('../../../core/server/data/db');
-const membersService = require('../../../core/server/services/members');
-const memberAttributionService = require('../../../core/server/services/member-attribution');
+const membersService = require('../../../core/server/services/members').service;
+const memberAttributionService = require('../../../core/server/services/member-attribution').service;
 const urlServiceUtils = require('../../utils/url-service-utils');
 const urlUtils = require('../../../core/shared/url-utils').default;
 const settingsCache = require('../../../core/shared/settings-cache');
 const DomainEvents = require('@tryghost/domain-events');
 const logging = require('@tryghost/logging');
 const {stripeMocker} = require('../../utils/e2e-framework-mock-manager');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const {setupEmailVerificationUtils, restoreEmailVerificationUtils} = require('../../utils/email-verification-utils');
 
 async function assertMemberEvents({eventType, memberId, asserts}) {
@@ -1564,7 +1566,7 @@ describe('Members API', function () {
     // Edit a member
 
     it('Can add complimentary subscription (out of date)', async function () {
-        const stripeService = require('../../../core/server/services/stripe');
+        const stripeService = require('../../../core/server/services/stripe').service;
         const fakePrice = {
             id: 'price_1',
             product: '',
@@ -1660,7 +1662,7 @@ describe('Members API', function () {
     });
 
     it('Can create a comped member with labels via API', async function () {
-        const stripeService = require('../../../core/server/services/stripe');
+        const stripeService = require('../../../core/server/services/stripe').service;
         const fakePrice = {
             id: 'price_1',
             product: '',
@@ -2855,7 +2857,7 @@ describe('Members API', function () {
         });
 
         it('Returns 500 when suppression removal fails', async function () {
-            const emailSuppressionList = require('../../../core/server/services/email-suppression-list');
+            const emailSuppressionList = require('../../../core/server/services/email-suppression-list').service;
             const removeEmailStub = sinon.stub(emailSuppressionList, 'removeEmail').resolves(false);
 
             const suppressedMember = await models.Member.add({

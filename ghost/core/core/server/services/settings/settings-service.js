@@ -7,7 +7,7 @@ const models = require('../../models');
 const labs = require('../../../shared/labs');
 const limits = require('../limits');
 const config = require('../../../shared/config');
-const adapterManager = require('../adapter-manager').default;
+const adapterManager = require('../adapter-manager').service;
 const SettingsCache = require('../../../shared/settings-cache');
 const SettingsBREADService = require('./settings-bread-service');
 const {generatePrivateSiteAccessCode} = require('./private-site-access-code');
@@ -17,7 +17,7 @@ const SingleUseTokenProvider = require('../members/single-use-token-provider');
 const urlUtils = require('../../../shared/url-utils').default;
 
 const ObjectId = require('bson-objectid').default;
-const settingsHelpers = require('../settings-helpers');
+const settingsHelpers = require('../settings-helpers').service;
 const emailAddressService = require('../email-address');
 
 const MAGIC_LINK_TOKEN_VALIDITY = 24 * 60 * 60 * 1000;

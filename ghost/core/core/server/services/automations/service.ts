@@ -18,7 +18,7 @@ const logging = require('@tryghost/logging');
 const {getSignedAdminToken} = require('../../adapters/scheduling/utils');
 const StartAutomationsPollEvent = require('./events/start-automations-poll-event');
 const {welcomeEmailAutomationPoll} = require('./welcome-email-automation-poll');
-const memberWelcomeEmailService = require('../member-welcome-emails/service');
+const memberWelcomeEmailService = require('../member-welcome-emails').service;
 
 type AutomationsServiceOptions = {
     apiUrl: string;

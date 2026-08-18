@@ -1,7 +1,7 @@
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
 const models = require('../../models');
-const tagsPublicService = require('../../services/tags-public');
+const tagsPublicService = require('../../services/tags-public').service;
 
 const ALLOWED_INCLUDES = ['count.posts'];
 
@@ -17,7 +17,7 @@ const controller = {
         headers: {
             cacheInvalidate: false
         },
-        cache: tagsPublicService.api?.cache,
+        cache: tagsPublicService.cache,
         options: [
             'include',
             'filter',

@@ -1,6 +1,6 @@
-const stripeService = require('../stripe');
+const stripeService = require('../stripe').service;
 const settingsCache = require('../../../shared/settings-cache');
-const settingsHelpers = require('../../services/settings-helpers');
+const settingsHelpers = require('../../services/settings-helpers').service;
 const MembersApi = require('./members-api/members-api');
 const logging = require('@tryghost/logging');
 const mail = require('../mail');
@@ -12,17 +12,17 @@ const subscribeEmail = require('./emails/subscribe');
 const updateEmail = require('./emails/update-email');
 const SingleUseTokenProvider = require('./single-use-token-provider');
 const urlUtils = require('../../../shared/url-utils').default;
-const urlService = require('../url');
+const urlService = require('../url').service;
 const labsService = require('../../../shared/labs');
-const offersService = require('../offers');
-const tiersService = require('../tiers');
-const newslettersService = require('../newsletters');
+const offersService = require('../offers').service;
+const tiersService = require('../tiers').service;
+const newslettersService = require('../newsletters').service;
 const memberAttributionService = require('../member-attribution');
-const emailSuppressionList = require('../email-suppression-list');
-const commentsService = require('../comments');
+const emailSuppressionList = require('../email-suppression-list').service;
+const commentsService = require('../comments').service;
 const emailAddressService = require('../email-address');
 const giftService = require('../gifts');
-const customFieldsService = require('../members-custom-fields');
+const customFieldsService = require('../members-custom-fields').service;
 const {t} = require('../i18n');
 const sentry = require('../../../shared/sentry');
 
@@ -251,7 +251,7 @@ function createApiInstance(config) {
         offersAPI: offersService.api,
         labsService: labsService,
         newslettersService: newslettersService,
-        memberAttributionService: memberAttributionService.service,
+        memberAttributionService: memberAttributionService.service.service,
         emailSuppressionList,
         settingsCache,
         sentry,

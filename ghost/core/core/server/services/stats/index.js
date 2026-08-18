@@ -1,1 +1,32 @@
-module.exports = require('./service');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
+
+let instance;
+
+const service = lazySingleton('StatsService', () => instance);
+
+async function init() {
+    if (instance) {
+        return;
+    }
+
+    const StatsService = require('./stats-service');
+    const db = require('../../data/db');
+    const models = require('../../models');
+    const urlService = require('../url').service;
+    const adapterManager = require('../adapter-manager').service;
+    const config = require('../../../shared/config');
+
+    const api = StatsService.create({
+        knex: db.knex,
+        models,
+        urlService
+    });
+
+    const cache = config.get('hostSettings:statsCache:enabled')
+        ? adapterManager.getAdapter('cache:stats')
+        : null;
+
+    instance = {api, cache};
+}
+
+module.exports = {init, service};

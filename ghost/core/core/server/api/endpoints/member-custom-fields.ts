@@ -1,6 +1,6 @@
-import {definitions, type RequestContext} from '../../services/members-custom-fields';
+import {service, type RequestContext} from '../../services/members-custom-fields';
 
-const permissionsService = require('../../services/permissions');
+const permissionsService = require('../../services/permissions').service;
 
 interface Frame {
     // The framework rejects a missing or empty root key with a 400, so on add/edit
@@ -45,7 +45,7 @@ const controller = {
             return canThis(frame).browse.member_custom_field();
         },
         query(frame: Frame) {
-            return definitions!.browse({filter: frame.options.filter as string | undefined});
+            return service.definitions.browse({filter: frame.options.filter as string | undefined});
         }
     },
 
@@ -57,7 +57,7 @@ const controller = {
             return canThis(frame).read.member_custom_field(frame.options.key);
         },
         query(frame: Frame) {
-            return definitions!.read(frame.options.key);
+            return service.definitions.read(frame.options.key);
         }
     },
 
@@ -71,7 +71,7 @@ const controller = {
         // all-or-nothing. A client sending a single definition (as Admin does)
         // is just the one-item case and sees no change.
         query(frame: Frame) {
-            return definitions!.add(requestContextFromFrame(frame), frame.data.members_custom_fields);
+            return service.definitions.add(requestContextFromFrame(frame), frame.data.members_custom_fields);
         }
     },
 
@@ -83,7 +83,7 @@ const controller = {
             return canThis(frame).edit.member_custom_field();
         },
         query(frame: Frame) {
-            return definitions!.reorder(requestContextFromFrame(frame), frame.data.members_custom_fields);
+            return service.definitions.reorder(requestContextFromFrame(frame), frame.data.members_custom_fields);
         }
     },
 
@@ -95,7 +95,7 @@ const controller = {
             return canThis(frame).edit.member_custom_field(frame.options.key);
         },
         query(frame: Frame) {
-            return definitions!.edit(requestContextFromFrame(frame), frame.options.key, frame.data.members_custom_fields[0]);
+            return service.definitions.edit(requestContextFromFrame(frame), frame.options.key, frame.data.members_custom_fields[0]);
         }
     },
 
@@ -108,7 +108,7 @@ const controller = {
             return canThis(frame).destroy.member_custom_field(frame.options.key);
         },
         async query(frame: Frame) {
-            await definitions!.destroy(requestContextFromFrame(frame), frame.options.key);
+            await service.definitions.destroy(requestContextFromFrame(frame), frame.options.key);
             return null;
         }
     }

@@ -1,5 +1,5 @@
-const {notifications} = require('../../services/notifications');
-const settingsService = require('../../services/settings/settings-service');
+const {service: notifications} = require('../../services/notifications');
+const settingsService = require('../../services/settings').service;
 const settingsBREADService = settingsService.getSettingsBREADServiceInstance();
 const internalContext = {context: {internal: true}};
 

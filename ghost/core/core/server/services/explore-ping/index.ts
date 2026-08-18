@@ -17,8 +17,8 @@ export async function init(): Promise<void> {
     const request = require('@tryghost/request');
     const settingsCache = require('../../../shared/settings-cache');
     const posts = require('../posts').service;
-    const members = require('../members');
-    const statsService = require('../stats');
+    const members = require('../members').service;
+    const statsService = require('../stats').service;
 
     instance = new ExplorePingService({
         settingsCache,

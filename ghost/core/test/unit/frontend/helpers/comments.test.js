@@ -6,7 +6,9 @@ const {mockManager} = require('../../../utils/e2e-framework');
 
 const comments = require('../../../../core/frontend/helpers/comments');
 const proxy = require('../../../../core/frontend/services/proxy');
-const internalKeys = require('../../../../core/server/services/internal-keys').default;
+const internalKeysRoot = require('../../../../core/server/services/internal-keys');
+internalKeysRoot.init();
+const internalKeys = internalKeysRoot.service;
 const {settingsCache} = proxy;
 
 describe('{{comments}} helper', function () {

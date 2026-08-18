@@ -1,4 +1,4 @@
-const commentsService = require('../../services/comments');
+const commentsService = require('../../services/comments').service;
 const errors = require('@tryghost/errors');
 
 function validateCommentData(data) {

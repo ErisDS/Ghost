@@ -1,10 +1,10 @@
-const themeService = require('../../services/themes');
+const themeService = require('../../services/themes').service;
 const limitService = require('../../services/limits');
 const models = require('../../models');
 
 // Used to emit theme.uploaded which is used in core/server/analytics-events
 const events = require('../../lib/common/events');
-const {settingsCache} = require('../../services/settings-helpers');
+const {settingsCache} = require('../../services/settings-helpers').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

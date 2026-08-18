@@ -5,7 +5,9 @@ const {assertMatchSnapshot} = require('../../utils/assertions');
 const config = require('../../../core/shared/config');
 const sinon = require('sinon');
 const escapeRegExp = require('lodash/escapeRegExp');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const urlUtilsHelper = require('../../utils/url-utils');
 
 // @TODO: factor out these requires

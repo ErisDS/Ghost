@@ -14,13 +14,13 @@ const settingsCache = require('../../../shared/settings-cache');
 const config = require('../../../shared/config');
 const models = require('../../models');
 const {GhostMailer} = require('../mail');
-const jobsService = require('../jobs');
-const tiersService = require('../tiers');
+const jobsService = require('../jobs').service;
+const tiersService = require('../tiers').service;
 const giftService = require('../gifts');
 const VerificationTrigger = require('../verification-trigger');
 const {verificationWebhookService} = require('../verification/verification-webhook-service');
 const DatabaseInfo = require('@tryghost/database-info');
-const settingsHelpers = require('../settings-helpers');
+const settingsHelpers = require('../settings-helpers').service;
 const RequestIntegrityTokenProvider = require('./request-integrity-token-provider');
 
 const messages = {
@@ -49,7 +49,7 @@ let verificationTrigger;
 const buildImporterDeps = ({stripeAPIService}) => {
     // Required here, not statically: boot builds the custom fields services before this
     // one (the exporter below relies on the same).
-    const customFields = require('../members-custom-fields');
+    const customFields = require('../members-custom-fields').service;
     return {
         getTimezone: () => settingsCache.get('timezone'),
         // A getter rather than a value because the threshold is an operator
@@ -109,7 +109,7 @@ const initVerificationTrigger = () => {
 
 module.exports = {
     async init() {
-        const stripeService = require('../stripe');
+        const stripeService = require('../stripe').service;
         const createMembersApiInstance = require('./api');
         const env = config.get('env');
 
@@ -166,7 +166,7 @@ module.exports = {
 
         // Constructed here rather than required statically: the exporter needs the
         // custom fields services, which boot builds before this one.
-        const customFields = require('../members-custom-fields');
+        const customFields = require('../members-custom-fields').service;
         module.exports.export = makeExporter({
             definitions: customFields.definitions,
             values: customFields.values

@@ -284,7 +284,7 @@ class NewslettersService {
                     continue;
                 }
 
-                const validated = this.emailAddressService.service.validate(email, type);
+                const validated = this.emailAddressService.validate(email, type);
 
                 if (!validated.allowed) {
                     throw new errors.ValidationError({
@@ -308,7 +308,7 @@ class NewslettersService {
         const didChangeReplyTo = newsletter && attrs.sender_reply_to !== undefined && newsletter.get('sender_reply_to') !== attrs.sender_reply_to;
         const didChangeSenderEmail = newsletter && (attrs.sender_email !== undefined && newsletter.get('sender_email') !== attrs.sender_email);
         if (didChangeReplyTo && !didChangeSenderEmail && newsletter.get('sender_email')) {
-            const validated = this.emailAddressService.service.validate(newsletter.get('sender_email'), 'from');
+            const validated = this.emailAddressService.validate(newsletter.get('sender_email'), 'from');
             if (!validated.allowed) {
                 logging.info(`Resetting sender_email for newsletter ${newsletter.id} because it became invalid`);
                 cleanedAttrs.sender_email = null;
@@ -338,7 +338,7 @@ class NewslettersService {
      * @private
      */
     async sendEmailVerificationMagicLink({id, email, property = 'sender_from'}) {
-        const fromEmail = this.emailAddressService.service.defaultFromAddress;
+        const fromEmail = this.emailAddressService.defaultFromAddress;
         const {ghostMailer} = this;
 
         this.magicLinkService.transporter = {

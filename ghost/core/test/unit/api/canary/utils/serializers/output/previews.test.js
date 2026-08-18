@@ -3,7 +3,7 @@ const sinon = require('sinon');
 const testUtils = require('../../../../../../utils');
 const mappers = require('../../../../../../../core/server/api/endpoints/utils/serializers/output/mappers');
 const serializers = require('../../../../../../../core/server/api/endpoints/utils/serializers');
-const tiersService = require('../../../../../../../core/server/services/tiers');
+const tiersService = require('../../../../../../../core/server/services/tiers').service;
 
 describe('Unit: endpoints/utils/serializers/output/previews', function () {
     let pageModel;

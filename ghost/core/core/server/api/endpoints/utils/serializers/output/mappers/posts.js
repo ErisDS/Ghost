@@ -17,7 +17,7 @@ const postsMetaSchema = require('../../../../../../data/schema').tables.posts_me
 
 const postsService = require('../../../../../../services/posts').service;
 
-const commentsService = require('../../../../../../services/comments');
+const commentsService = require('../../../../../../services/comments').service;
 const memberAttribution = require('../../../../../../services/member-attribution');
 
 module.exports = async (model, frame, options = {}) => {
@@ -115,7 +115,7 @@ module.exports = async (model, frame, options = {}) => {
 
         // Add outbound link tagging if we have the HTML
         if (jsonModel.html) {
-            jsonModel.html = await memberAttribution.outboundLinkTagger.addToHtml(jsonModel.html);
+            jsonModel.html = await memberAttribution.service.outboundLinkTagger.addToHtml(jsonModel.html);
         }
     }
 

@@ -1,40 +1,44 @@
-const urlUtils = require('../../../shared/url-utils').default;
-const urlService = require('../../services/url');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-const AudienceFeedbackService = require('./audience-feedback-service');
-const AudienceFeedbackController = require('./audience-feedback-controller');
-const Feedback = require('./feedback');
-const FeedbackRepository = require('./feedback-repository');
+let instance;
 
-class AudienceFeedbackServiceWrapper {
-    async init() {
-        if (this.service) {
-            // Already done
-            return;
-        }
+const service = lazySingleton('AudienceFeedbackService', () => instance);
 
-        // Wire up all the dependencies
-        const models = require('../../models');
-
-        this.repository = new FeedbackRepository({
-            Member: models.Member,
-            MemberFeedback: models.MemberFeedback,
-            Feedback,
-            Post: models.Post
-        });
-
-        // Expose the service
-        this.service = new AudienceFeedbackService({
-            urlService,
-            config: {
-                baseURL: new URL(urlUtils.urlFor('home', true))
-            }
-        });
-        this.controller = new AudienceFeedbackController({
-            repository: this.repository,
-            audienceFeedbackService: this.service
-        });
+async function init() {
+    if (instance) {
+        return;
     }
+
+    const urlUtils = require('../../../shared/url-utils').default;
+    const urlService = require('../url').service;
+    const AudienceFeedbackService = require('./audience-feedback-service');
+    const AudienceFeedbackController = require('./audience-feedback-controller');
+    const Feedback = require('./feedback');
+    const FeedbackRepository = require('./feedback-repository');
+    const models = require('../../models');
+
+    const repository = new FeedbackRepository({
+        Member: models.Member,
+        MemberFeedback: models.MemberFeedback,
+        Feedback,
+        Post: models.Post
+    });
+
+    const audienceFeedbackService = new AudienceFeedbackService({
+        urlService,
+        config: {baseURL: new URL(urlUtils.urlFor('home', true))}
+    });
+
+    const controller = new AudienceFeedbackController({
+        repository,
+        audienceFeedbackService
+    });
+
+    instance = {
+        service: audienceFeedbackService,
+        controller,
+        repository
+    };
 }
 
-module.exports = new AudienceFeedbackServiceWrapper();
+module.exports = {init, service};

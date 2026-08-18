@@ -1,13 +1,23 @@
 import PostScheduling from './post-scheduling';
-import internalKeys from '../internal-keys';
-import adapterManager from '../adapter-manager';
-import {withErrorCapture} from '../../adapters/scheduling/error-capture';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
-// CJS modules without TS declarations — typed loosely at the boundary.
-const urlUtils = require('../../../shared/url-utils').default;
+let instance: PostScheduling | undefined;
 
-export default new PostScheduling({
-    apiUrl: urlUtils.urlFor('api', {type: 'admin'}, true),
-    adapter: withErrorCapture(adapterManager.getAdapter('scheduling')),
-    internalKeys
-});
+export const service = lazySingleton('PostScheduling', () => instance);
+
+export function init(): void {
+    if (instance) {
+        return;
+    }
+
+    const {service: internalKeys} = require('../internal-keys');
+    const {service: adapterManager} = require('../adapter-manager');
+    const {withErrorCapture} = require('../../adapters/scheduling/error-capture');
+    const urlUtils = require('../../../shared/url-utils').default;
+
+    instance = new PostScheduling({
+        apiUrl: urlUtils.urlFor('api', {type: 'admin'}, true),
+        adapter: withErrorCapture(adapterManager.getAdapter('scheduling')),
+        internalKeys
+    });
+}

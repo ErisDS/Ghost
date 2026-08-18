@@ -201,7 +201,7 @@ describe('Create Stripe Checkout Session for Donations', function () {
 
         const email = 'test-member-create-donation-session@email.com';
 
-        const membersService = require('../../../core/server/services/members');
+        const membersService = require('../../../core/server/services/members').service;
         const member = await membersService.api.members.create({email, name: 'Member Test'});
         const token = await membersService.api.getMemberIdentityToken(member.get('transient_id'));
 

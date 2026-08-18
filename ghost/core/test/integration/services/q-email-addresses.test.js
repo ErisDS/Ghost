@@ -1,6 +1,6 @@
 const DomainEvents = require('@tryghost/domain-events');
 const Mention = require('../../../core/server/services/mentions/mention');
-const mentionsService = require('../../../core/server/services/mentions');
+const mentionsService = require('../../../core/server/services/mentions').service;
 const assert = require('node:assert/strict');
 const {agentProvider, fixtureManager, mockManager} = require('../../utils/e2e-framework');
 const configUtils = require('../../utils/config-utils');
@@ -44,7 +44,7 @@ async function sendRecommendationNotification() {
 
 async function sendFreeMemberSignupNotification() {
     const email = ObjectId().toHexString() + '@email.com';
-    const membersService = require('../../../core/server/services/members');
+    const membersService = require('../../../core/server/services/members').service;
     await membersService.api.members.create({email, name: 'Member Test'});
     await DomainEvents.allSettled();
 }

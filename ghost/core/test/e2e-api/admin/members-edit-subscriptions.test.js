@@ -5,7 +5,9 @@ const assert = require('node:assert/strict');
 const models = require('../../../core/server/models');
 const {stripeMocker} = require('../../utils/e2e-framework-mock-manager');
 const DomainEvents = require('@tryghost/domain-events/lib/DomainEvents');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const sinon = require('sinon');
 
 const subscriptionSnapshot = {

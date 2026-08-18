@@ -50,9 +50,9 @@ class StripeMocker {
         this.checkoutSessions = [];
 
         // Fix for now, because of importing order breaking some things when they are not initialized
-        members = require('../../core/server/services/members');
-        stripeService = require('../../core/server/services/stripe');
-        tiers = require('../../core/server/services/tiers');
+        members = require('../../core/server/services/members').service;
+        stripeService = require('../../core/server/services/stripe').service;
+        tiers = require('../../core/server/services/tiers').service;
         models = require('../../core/server/models');
     }
 

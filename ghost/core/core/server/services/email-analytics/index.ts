@@ -25,14 +25,24 @@ import {StartAutomationEmailAnalyticsJobEvent} from './events/start-automation-e
 import {AUTOMATION_EMAIL_TAG} from '../member-welcome-emails/constants';
 import type * as AutomationsApi from '../automations/automations-api';
 import {AutomationEmailAnalyticsBatchProcessor} from './automation-email-analytics-batch-processor';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
-export const newsletters = new EmailAnalyticsServiceWrapper({
+const newsletters = new EmailAnalyticsServiceWrapper({
     logName: 'newsletters'
 });
 
-export const automations = new EmailAnalyticsServiceWrapper({
+const automations = new EmailAnalyticsServiceWrapper({
     logName: 'automations',
 });
+
+interface EmailAnalyticsServices {
+    newsletters: EmailAnalyticsServiceWrapper;
+    automations: EmailAnalyticsServiceWrapper;
+}
+
+const instance: EmailAnalyticsServices = {newsletters, automations};
+
+export const service = lazySingleton('EmailAnalyticsService', () => instance);
 
 export const init = ({
     automationsApi,
@@ -55,7 +65,7 @@ export const init = ({
     db: {knex: Knex},
     domainEvents: Pick<DomainEvents, 'subscribe'>;
     emailSuppressionList: Pick<typeof EmailSuppressionList, 'removeComplaint' | 'removeUnsubscribe'>;
-    membersRepository: Pick<typeof membersService.api.members, 'get' | 'update'>;
+    membersRepository: Pick<typeof membersService.service.api.members, 'get' | 'update'>;
     models: {
         Email: Email;
         EmailRecipientFailure: EmailRecipientFailure;

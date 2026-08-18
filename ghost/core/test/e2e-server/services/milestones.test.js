@@ -6,7 +6,8 @@ const models = require('../../../core/server/models');
 const moment = require('moment');
 const logging = require('@tryghost/logging');
 
-const milestonesService = require('../../../core/server/services/milestones');
+const milestonesServiceRoot = require('../../../core/server/services/milestones');
+const milestonesService = milestonesServiceRoot.service;
 
 let agent;
 let counter = 0;
@@ -178,7 +179,7 @@ describe('Milestones Service', function () {
     });
 
     it('Inits milestone service', async function () {
-        await milestonesService.init();
+        await milestonesServiceRoot.init();
 
         assert.ok(milestonesService.api);
     });

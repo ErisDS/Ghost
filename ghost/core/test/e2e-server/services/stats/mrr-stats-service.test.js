@@ -1,5 +1,5 @@
 const assert = require('node:assert/strict');
-const statsService = require('../../../../core/server/services/stats');
+const statsService = require('../../../../core/server/services/stats').service;
 const {agentProvider, fixtureManager, mockManager} = require('../../../utils/e2e-framework');
 const {stripeMocker} = require('../../../utils/e2e-framework-mock-manager');
 const moment = require('moment');

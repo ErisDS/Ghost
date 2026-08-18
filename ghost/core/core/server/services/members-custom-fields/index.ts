@@ -2,6 +2,7 @@ import {CustomFieldDefinitionsService} from './definitions-service';
 import {CustomFieldValuesService} from './values-service';
 import {recordCustomFieldAction, type RecordCustomFieldAction} from './actions';
 import {resolveMaxDefinitions} from './config';
+import {lazySingleton} from '../../../shared/lazy-singleton';
 
 export type {CustomField} from './models';
 export type {RequestContext} from './actions';
@@ -13,14 +14,17 @@ export type {RequestContext} from './actions';
 // reference data it needs — a value referencing its definition, not a boundary
 // crossing.
 //
-// Constructed by init() at boot, not at import: knex is only available once the DB has connected.
-export let definitions: CustomFieldDefinitionsService | undefined;
-export let values: CustomFieldValuesService | undefined;
+interface MembersCustomFieldsService {
+    definitions: CustomFieldDefinitionsService;
+    values: CustomFieldValuesService;
+}
+
+let instance: MembersCustomFieldsService | undefined;
+
+export const service = lazySingleton('MembersCustomFieldsService', () => instance);
 
 export function init(): void {
-    // The two are constructed together below, so checking both keeps the "both or
-    // neither" invariant explicit rather than trusting one to stand in for the pair.
-    if (definitions && values) {
+    if (instance) {
         return;
     }
 
@@ -36,15 +40,16 @@ export function init(): void {
     // container holds no state across them.
     const config = require('../../../shared/config');
 
-    definitions = new CustomFieldDefinitionsService({
+    const definitions = new CustomFieldDefinitionsService({
         knex,
         recordAction,
         getMaxDefinitions: () => resolveMaxDefinitions(config.get('members:customFields:maxDefinitions'))
     });
     // The values service reads the field definitions straight from the table, so
     // it needs knex and the same ceiling — no handle on the definitions service.
-    values = new CustomFieldValuesService({
+    const values = new CustomFieldValuesService({
         knex,
         getMaxDefinitions: () => resolveMaxDefinitions(config.get('members:customFields:maxDefinitions'))
     });
+    instance = {definitions, values};
 }

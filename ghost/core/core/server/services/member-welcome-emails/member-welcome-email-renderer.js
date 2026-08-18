@@ -8,7 +8,7 @@ const errors = require('@tryghost/errors');
 const {MESSAGES} = require('./constants');
 const {wrapReplacementStrings} = require('@tryghost/kg-default-nodes').utils.replacementStrings;
 const linkReplacer = require('../lib/link-replacer');
-const linkTracking = require('../link-tracking');
+const linkTracking = require('../link-tracking').service;
 const emailDesign = require('../email-rendering/email-design');
 const {registerHelpers} = require('../email-service/helpers/register-helpers');
 
@@ -18,9 +18,11 @@ const UNMATCHED_TOKEN_REGEX = /%%\{.*?\}%%/g;
 class MemberWelcomeEmailRenderer {
     #wrapperTemplate;
     #dir;
+    #linkTracking;
 
-    constructor({t, dir}) {
+    constructor({t, dir, linkTrackingService = linkTracking}) {
         this.#dir = dir;
+        this.#linkTracking = linkTrackingService;
         this.Handlebars = require('handlebars').create();
         registerHelpers(this.Handlebars, labs, t);
         const baseStylesSource = fs.readFileSync(
@@ -173,8 +175,7 @@ class MemberWelcomeEmailRenderer {
             }
             const isTrackable = ['http:', 'https:'].includes(url.protocol);
             if (trackClicks && automationActionRevisionId && automationRunStepId && member.uuid && isTrackable) {
-                await linkTracking.init();
-                return await linkTracking.service.addAutomationTrackingToUrl(url, automationActionRevisionId, automationRunStepId, member.uuid);
+                return await this.#linkTracking.service.addAutomationTrackingToUrl(url, automationActionRevisionId, automationRunStepId, member.uuid);
             }
             return url;
         }, {base: siteSettings.url});

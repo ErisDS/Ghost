@@ -6,16 +6,16 @@ const {MemberPageViewEvent} = require('../../shared/events');
 
 // App requires
 const config = require('../../shared/config');
-const adapterManager = require('../../server/services/adapter-manager').default;
+const adapterManager = require('../../server/services/adapter-manager').service;
 const urlUtils = require('../../shared/url-utils').default;
 const sitemapHandler = require('../services/sitemap/handler');
 const serveFavicon = require('./routers/serve-favicon');
 const servePublicFiles = require('./routers/serve-public-file');
 const themeEngine = require('../services/theme-engine');
 const themeMiddleware = themeEngine.middleware;
-const membersService = require('../../server/services/members');
-const offersService = require('../../server/services/offers');
-const customRedirects = require('../../server/services/custom-redirects');
+const membersService = require('../../server/services/members').service;
+const offersService = require('../../server/services/offers').service;
+const customRedirects = require('../../server/services/custom-redirects').service;
 const linkRedirectsHandler = require('./routers/link-redirects');
 const siteRoutes = require('./routes');
 const shared = require('../../server/web/shared');
@@ -74,7 +74,7 @@ module.exports = function setupSiteApp(routerConfig) {
     const {createLlmsService} = require('../services/llms/service');
     const {createLlmsHandler} = require('../services/llms/handler');
     const {createLlmsDiscovery} = require('./middleware/llms-discovery');
-    const machinePaymentsService = require('../../server/services/machine-payments');
+    const machinePaymentsService = require('../../server/services/machine-payments').service;
 
     const llmsService = createLlmsService({
         settingsCache,

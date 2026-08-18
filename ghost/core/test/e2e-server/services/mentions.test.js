@@ -3,8 +3,10 @@ const nock = require('nock');
 const sinon = require('sinon');
 const assert = require('node:assert/strict');
 const markdownToLexical = require('../../utils/fixtures/data-generator').markdownToLexical;
-const jobsService = require('../../../core/server/services/mentions-jobs');
-const urlService = require('../../../core/server/services/url');
+const jobsService = require('../../../core/server/services/mentions-jobs').service;
+const urlServiceRoot = require('../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 
 let agent;
 let mentionUrl = new URL('https://www.otherghostsite.com/');
