@@ -21,31 +21,16 @@ const instance = {
     }
 };
 let initPromise;
-let initKey;
-let initializedKey;
 
 async function init() {
-    const themeName = settingsCache.get('active_theme');
-    const key = `${config.getContentPath('themes')}:${themeName}`;
-
-    if (initializedKey === key) {
-        return;
-    }
-
-    if (initPromise && initKey !== key) {
-        await initPromise;
-        return init();
-    }
-
     if (!initPromise) {
-        initKey = key;
         initPromise = (async () => {
             validate.init();
 
             const skipChecks = config.get('optimization:themes:skipBootChecks') || false;
+            const themeName = settingsCache.get('active_theme');
 
             await activate.loadAndActivate(themeName, {skipChecks});
-            initializedKey = key;
         })();
     }
 
@@ -53,7 +38,6 @@ async function init() {
         await initPromise;
     } finally {
         initPromise = undefined;
-        initKey = undefined;
     }
 }
 

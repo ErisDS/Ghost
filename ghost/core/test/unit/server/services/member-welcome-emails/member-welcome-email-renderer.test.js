@@ -5,7 +5,6 @@ const errors = require('@tryghost/errors');
 const lexicalLib = require('../../../../../core/server/lib/lexical');
 const config = require('../../../../../core/shared/config');
 const emailDesign = require('../../../../../core/server/services/email-rendering/email-design');
-const linkTracking = require('../../../../../core/server/services/link-tracking');
 const MemberWelcomeEmailRenderer = require('../../../../../core/server/services/member-welcome-emails/member-welcome-email-renderer');
 
 describe('MemberWelcomeEmailRenderer', function () {
@@ -572,7 +571,6 @@ describe('MemberWelcomeEmailRenderer', function () {
             let addAutomationTrackingToUrl;
 
             beforeEach(function () {
-                sinon.stub(linkTracking, 'init').resolves();
                 addAutomationTrackingToUrl = sinon.stub().callsFake(async (url, revisionId, runStepId, uuid) => {
                     assert.equal(revisionId, 'revision-id');
                     const tracked = new URL('https://example.com/r/abc123');
@@ -580,12 +578,11 @@ describe('MemberWelcomeEmailRenderer', function () {
                     tracked.searchParams.set('step', runStepId);
                     return tracked;
                 });
-                sinon.replace(linkTracking, 'service', {addAutomationTrackingToUrl});
             });
 
             const renderTracked = async (html, options = {}) => {
                 lexicalRenderStub.resolves(html);
-                return await createRenderer().render({
+                return await createRenderer({linkTrackingService: {service: {addAutomationTrackingToUrl}}}).render({
                     lexical: '{}',
                     subject: 'Welcome!',
                     member: {name: 'John', email: 'john@example.com', uuid: memberUuid},
