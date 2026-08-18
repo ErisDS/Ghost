@@ -411,9 +411,9 @@ async function initServices({ghostServer, config, prometheusClient}) {
     schedulerAdapter.run();
     postScheduling.init();
     await stripe.init();
+    memberAttribution.init();
     await members.init();
     await mentionsService.init();
-    memberAttribution.init();
     staffService.init();
     memberWelcomeEmailService.init();
     invites.init();
