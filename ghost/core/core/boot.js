@@ -74,6 +74,13 @@ function notifyServerReady(error) {
   * @param {object} options.config
   */
 async function initDatabase({config}) {
+    // Migrations create fixtures through models which can use configured adapters.
+    // Initialize this dependency explicitly before the migration runner starts.
+    debug('Begin: adapters');
+    const adapterManager = require('./server/services/adapter-manager');
+    adapterManager.init();
+    debug('End: adapters');
+
     const DatabaseStateManager = require('./server/data/db/database-state-manager');
     const dbStateManager = new DatabaseStateManager({knexMigratorFilePath: config.get('paths:appRoot')});
     await dbStateManager.makeReady();
@@ -91,13 +98,6 @@ async function initDatabase({config}) {
  */
 async function initCore({ghostServer, config}) {
     debug('Begin: initCore');
-
-    // Validate configured adapters up-front so misconfiguration fails at boot
-    // rather than on first lazy use (e.g. first image upload or scheduled job)
-    debug('Begin: adapters');
-    const adapterManager = require('./server/services/adapter-manager');
-    adapterManager.init();
-    debug('End: adapters');
 
     debug('Begin: URL Service');
     const urlService = require('./server/services/url');

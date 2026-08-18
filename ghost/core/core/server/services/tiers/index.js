@@ -1,16 +1,11 @@
 const {lazySingleton} = require('../../../shared/lazy-singleton');
 
 const instance = {};
-let initialized = false;
 let initPromise;
 
 const service = lazySingleton('TiersService', () => instance);
 
 async function init() {
-    if (initialized) {
-        return;
-    }
-
     if (!initPromise) {
         initPromise = (async () => {
             const TiersAPI = require('./tiers-api');
@@ -33,15 +28,13 @@ async function init() {
 
             instance.repository = repository;
             instance.api = new TiersAPI({repository, slugService});
-            initialized = true;
         })();
     }
 
     try {
         await initPromise;
-    } catch (error) {
+    } finally {
         initPromise = undefined;
-        throw error;
     }
 }
 

@@ -2,25 +2,17 @@ const stripeService = require('./service');
 const {lazySingleton} = require('../../../shared/lazy-singleton');
 
 const instance = stripeService;
-let initialized = false;
 let initPromise;
 
 async function init() {
-    if (initialized) {
-        return;
-    }
-
     if (!initPromise) {
-        initPromise = stripeService.init().then(() => {
-            initialized = true;
-        });
+        initPromise = stripeService.init();
     }
 
     try {
         await initPromise;
-    } catch (error) {
+    } finally {
         initPromise = undefined;
-        throw error;
     }
 }
 

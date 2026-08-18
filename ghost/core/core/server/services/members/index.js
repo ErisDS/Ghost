@@ -4,28 +4,19 @@ const {lazySingleton} = require('../../../shared/lazy-singleton');
 // (content gating and API test seams). Keep that legacy object stable while
 // init() remains the only place that performs runtime initialization.
 const instance = require('./service');
-let initialized = false;
 let initPromise;
 
 const service = lazySingleton('MembersService', () => instance);
 
 async function init() {
-    if (initialized) {
-        return;
-    }
-
     if (!initPromise) {
-        initPromise = (async () => {
-            await instance.init();
-            initialized = true;
-        })();
+        initPromise = instance.init();
     }
 
     try {
         await initPromise;
-    } catch (error) {
+    } finally {
         initPromise = undefined;
-        throw error;
     }
 }
 

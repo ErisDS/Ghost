@@ -1,15 +1,10 @@
 const {lazySingleton} = require('../../../shared/lazy-singleton');
 
 const instance = {};
-let initialized = false;
 
 const service = lazySingleton('CommentsService', () => instance);
 
 function init() {
-    if (initialized) {
-        return;
-    }
-
     const CommentsService = require('./comments-service');
     const CommentsController = require('./comments-controller');
     const CommentsStats = require('./comments-stats-service');
@@ -39,7 +34,6 @@ function init() {
     const stats = new CommentsStats({db});
     instance.api = api;
     instance.controller = new CommentsController(api, stats);
-    initialized = true;
 }
 
 module.exports = {init, service};
