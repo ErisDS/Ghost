@@ -6,10 +6,6 @@ let initPromise;
 const service = lazySingleton('CustomRedirectsService', () => instance);
 
 async function init() {
-    if (instance) {
-        return;
-    }
-
     if (!initPromise) {
         initPromise = (async () => {
             const config = require('../../../shared/config');
@@ -43,9 +39,8 @@ async function init() {
 
     try {
         await initPromise;
-    } catch (error) {
+    } finally {
         initPromise = undefined;
-        throw error;
     }
 }
 
