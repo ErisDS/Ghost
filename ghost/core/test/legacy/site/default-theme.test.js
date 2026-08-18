@@ -20,7 +20,7 @@ describe('Default theme', function () {
         // Set active theme name
         mockSetting('active_theme', 'source');
         await themeService.init();
-        const theme = await themeService.api.getThemeErrors('source');
+        const theme = await themeService.service.api.getThemeErrors('source');
         assert.deepEqual(theme.errors, [], 'Default theme should have no errors');
     });
 });

@@ -5,7 +5,9 @@ describe('Newsletters Service', function () {
 
     describe('Newsletter Service', function () {
         it('Provides expected public API', async function () {
-            newslettersService = require('../../../../../core/server/services/newsletters');
+            const newsletters = require('../../../../../core/server/services/newsletters');
+            newsletters.init();
+            newslettersService = newsletters.service;
 
             assert.ok(newslettersService.browse);
             assert.ok(newslettersService.edit);

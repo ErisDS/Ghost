@@ -1,6 +1,7 @@
 const sinon = require('sinon');
 const staffService = require('../../../../../core/server/services/staff');
 const emailAddressService = require('../../../../../core/server/services/email-address');
+const memberAttribution = require('../../../../../core/server/services/member-attribution');
 
 const DomainEvents = require('@tryghost/domain-events');
 const {mockManager} = require('../../../../utils/e2e-framework');
@@ -19,6 +20,7 @@ describe('Staff Service:', function () {
 
         // GhostMailer's getFromAddress reads this singleton, normally set during boot.
         emailAddressService.init();
+        memberAttribution.init();
 
         sinon.stub(models.User, 'getEmailAlertUsers').resolves([{
             email: 'owner@ghost.org',

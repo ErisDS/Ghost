@@ -2,7 +2,9 @@ const assert = require('node:assert/strict');
 const {assertExists} = require('../../../../utils/assertions');
 const fs = require('fs-extra');
 const configUtils = require('../../../../utils/config-utils');
-const adapterManager = require('../../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 
 const schedulingPath = configUtils.config.getContentPath('adapters') + 'scheduling/';
 describe('Scheduling: utils', function () {

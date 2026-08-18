@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const _ = require('lodash');
 const logging = require('@tryghost/logging');
 const membersService = require('./service');
-const emailSuppressionList = require('../email-suppression-list');
+const emailSuppressionList = require('../email-suppression-list').service;
 const models = require('../../models');
 const urlUtils = require('../../../shared/url-utils').default;
 const spamPrevention = require('../../web/shared/middleware/api/spam-prevention');
@@ -13,9 +13,9 @@ const {
 const errors = require('@tryghost/errors');
 const tpl = require('@tryghost/tpl');
 const onHeaders = require('on-headers');
-const tiersService = require('../tiers/service');
+const tiersService = require('../tiers').service;
 const config = require('../../../shared/config');
-const settingsHelpers = require('../settings-helpers');
+const settingsHelpers = require('../settings-helpers').service;
 
 const messages = {
     missingUuid: 'Missing uuid.',

@@ -31,7 +31,7 @@ describe('remote-flags service index (gating)', function () {
     });
 
     afterEach(async function () {
-        remoteFlags.stop();
+        remoteFlags.service.stop();
         flagOverrides.clear();
         sinon.restore();
         await configUtils.restore();
@@ -44,7 +44,7 @@ describe('remote-flags service index (gating)', function () {
 
         assert.equal(instance, null);
         assert.equal(startStub.called, false);
-        assert.equal(remoteFlags.getInstance(), null);
+        assert.equal(remoteFlags.service.getInstance(), null);
     });
 
     it('is inert when enabled but no manifest url is configured', function () {
@@ -143,10 +143,10 @@ describe('remote-flags service index (gating)', function () {
 
         const stopStub = sinon.stub(RemoteFlagsService.prototype, 'stop');
         const first = remoteFlags.init(config);
-        remoteFlags.stop();
+        remoteFlags.service.stop();
 
         assert.equal(stopStub.calledOnce, true);
-        assert.equal(remoteFlags.getInstance(), null);
+        assert.equal(remoteFlags.service.getInstance(), null);
 
         const second = remoteFlags.init(config);
         assert.notEqual(second, first);

@@ -9,14 +9,18 @@ const testUtils = require('../../../utils');
 const configUtils = require('../../../utils/config-utils');
 const imageLib = require('../../../../core/server/lib/image');
 const routing = require('../../../../core/frontend/services/routing');
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const {cardAssets} = require('../../../../core/frontend/services/assets-minification');
 const logging = require('@tryghost/logging');
 
 const ghost_head = require('../../../../core/frontend/helpers/ghost_head');
 const proxy = require('../../../../core/frontend/services/proxy');
 const assetHash = require('../../../../core/frontend/services/asset-hash');
-const internalKeys = require('../../../../core/server/services/internal-keys').default;
+const internalKeysRoot = require('../../../../core/server/services/internal-keys');
+internalKeysRoot.init();
+const internalKeys = internalKeysRoot.service;
 const {settingsCache, settingsHelpers} = proxy;
 
 /**

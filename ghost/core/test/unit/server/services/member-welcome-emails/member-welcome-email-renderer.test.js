@@ -580,7 +580,7 @@ describe('MemberWelcomeEmailRenderer', function () {
                     tracked.searchParams.set('step', runStepId);
                     return tracked;
                 });
-                sinon.define(linkTracking, 'service', {addAutomationTrackingToUrl});
+                sinon.replace(linkTracking, 'service', {addAutomationTrackingToUrl});
             });
 
             const renderTracked = async (html, options = {}) => {

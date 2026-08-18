@@ -6,7 +6,9 @@ const supertest = require('supertest');
 const sinon = require('sinon');
 const localUtils = require('./utils');
 const config = require('../../../core/shared/config');
-const adapterManager = require('../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 
 describe('Files API', function () {
     const files = [];

@@ -9,8 +9,10 @@ const crypto = require('crypto');
 // Ghost Internals
 const boot = require('../../core/boot');
 const models = require('../../core/server/models');
-const settingsService = require('../../core/server/services/settings/settings-service');
-const adapterManager = require('../../core/server/services/adapter-manager').default;
+const settingsService = require('../../core/server/services/settings').service;
+const adapterManagerRoot = require('../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 
 // Other Test Utilities
 const configUtils = require('./config-utils');

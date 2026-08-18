@@ -9,7 +9,7 @@ const SubscriptionEventService = require('./services/webhook/subscription-event-
 const InvoiceEventService = require('./services/webhook/invoice-event-service');
 const CheckoutSessionEventService = require('./services/webhook/checkout-session-event-service');
 const ChargeRefundedEventService = require('./services/webhook/charge-refunded-event-service');
-const memberWelcomeEmailService = require('../member-welcome-emails/service');
+const memberWelcomeEmailService = require('../member-welcome-emails').service;
 
 /**
  * @typedef {object} IStripeServiceConfig

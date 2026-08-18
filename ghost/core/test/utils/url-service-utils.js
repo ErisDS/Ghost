@@ -1,4 +1,6 @@
-const urlService = require('../../core/server/services/url');
+const urlServiceRoot = require('../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 
 // Bounded on purpose: readiness is router registration, so a regression there
 // would otherwise hang the whole run instead of failing one suite with a

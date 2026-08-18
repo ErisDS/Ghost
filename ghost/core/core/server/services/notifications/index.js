@@ -1,8 +1,20 @@
-const settingsCache = require('../../../shared/settings-cache');
 const Notifications = require('./notifications');
-const models = require('../../models');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-module.exports.notifications = new Notifications({
-    settingsCache,
-    SettingsModel: models.Settings
-});
+let instance;
+
+function init() {
+    if (!instance) {
+        const settingsCache = require('../../../shared/settings-cache');
+        const models = require('../../models');
+
+        instance = new Notifications({
+            settingsCache,
+            SettingsModel: models.Settings
+        });
+    }
+}
+
+const service = lazySingleton('NotificationsService', () => instance);
+
+module.exports = {init, service};

@@ -30,7 +30,7 @@ export type RecordablePayment = {
     stripePaymentIntentId?: string | null;
 };
 
-const settingsHelpers = require('../../settings-helpers') as SettingsHelpersFacade;
+const settingsHelpers = require('../../settings-helpers').service as SettingsHelpersFacade;
 
 /**
  * Records settled machine payments as Stripe PaymentIntents for Dashboard visibility.

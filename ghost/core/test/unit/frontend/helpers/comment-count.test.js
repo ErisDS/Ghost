@@ -3,7 +3,9 @@ const configUtils = require('../../../utils/config-utils');
 const {mockManager} = require('../../../utils/e2e-framework');
 
 const proxy = require('../../../../core/frontend/services/proxy');
-const internalKeys = require('../../../../core/server/services/internal-keys').default;
+const internalKeysRoot = require('../../../../core/server/services/internal-keys');
+internalKeysRoot.init();
+const internalKeys = internalKeysRoot.service;
 const {html} = require('common-tags');
 const {settingsCache} = proxy;
 

@@ -29,7 +29,7 @@ class RevueSubscriberImporter extends BaseImporter {
         }
 
         // required here rather than top-level to avoid pulling in before it's initialized during boot
-        const membersService = require('../../../../services/members');
+        const membersService = require('../../../../services/members').service;
 
         const importLabel = importOptions.importTag ? importOptions.importTag.replace(/^#/, '') : null;
 

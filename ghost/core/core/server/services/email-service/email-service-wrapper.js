@@ -30,14 +30,14 @@ class EmailServiceWrapper {
         const {DomainWarmingService} = require('./domain-warming-service');
 
         const {Post, Newsletter, Email, EmailBatch, EmailRecipient, Member} = require('../../models');
-        const urlService = require('../url');
+        const urlService = require('../url').service;
         const getRequiredUrlRelations = () => urlService.getRequiredRelations();
         const MailgunClient = require('../lib/mailgun-client');
         const configService = require('../../../shared/config');
         const settingsCache = require('../../../shared/settings-cache');
-        const settingsHelpers = require('../settings-helpers');
-        const jobsService = require('../jobs');
-        const membersService = require('../members');
+        const settingsHelpers = require('../settings-helpers').service;
+        const jobsService = require('../jobs').service;
+        const membersService = require('../members').service;
         const db = require('../../data/db');
         const sentry = require('../../../shared/sentry');
         const membersRepository = membersService.api.members;
@@ -49,7 +49,7 @@ class EmailServiceWrapper {
         const urlUtils = require('../../../shared/url-utils').default;
         const memberAttribution = require('../member-attribution');
         const linkReplacer = require('../lib/link-replacer');
-        const linkTracking = require('../link-tracking');
+        const linkTracking = require('../link-tracking').service;
         const audienceFeedback = require('../audience-feedback');
         const storageUtils = require('../../adapters/storage/utils');
         const emailAnalyticsJobs = require('../email-analytics/jobs');
@@ -92,9 +92,9 @@ class EmailServiceWrapper {
             getRequiredUrlRelations,
             linkReplacer,
             linkTracking,
-            memberAttributionService: memberAttribution.service,
-            audienceFeedbackService: audienceFeedback.service,
-            outboundLinkTagger: memberAttribution.outboundLinkTagger,
+            memberAttributionService: memberAttribution.service.service,
+            audienceFeedbackService: audienceFeedback.service.service,
+            outboundLinkTagger: memberAttribution.service.outboundLinkTagger,
             emailAddressService: emailAddressService.service,
             labs,
             models: {Post},

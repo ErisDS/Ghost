@@ -2,7 +2,9 @@ const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const {Post} = require('../../../../core/server/models/post');
 const {Product} = require('../../../../core/server/models/product');
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const previewsController = require('../../../../core/server/api/endpoints/previews');
 
 describe('Previews controller', function () {

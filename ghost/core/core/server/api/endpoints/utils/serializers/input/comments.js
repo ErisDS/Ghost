@@ -1,4 +1,4 @@
-const urlService = require('../../../../../services/url');
+const urlService = require('../../../../../services/url').service;
 
 module.exports = {
     all(_apiConfig, frame) {

@@ -28,5 +28,5 @@ interface MembersService {
     createPaidMemberShim(tierSlug?: string): Promise<{status: 'paid'; products: Array<{slug: string}>}>;
 }
 
-declare const membersService: MembersService;
-export = membersService;
+export const service: MembersService;
+export function init(): Promise<void>;

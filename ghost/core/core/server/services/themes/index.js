@@ -6,26 +6,10 @@ const installer = require('./installer');
 const validate = require('./validate');
 const settingsCache = require('../../../shared/settings-cache');
 const config = require('../../../shared/config');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-module.exports = {
-    /*
-     * Load the currently active theme
-     */
-    init: async () => {
-        validate.init();
-
-        const skipChecks = config.get('optimization:themes:skipBootChecks') || false;
-
-        const themeName = settingsCache.get('active_theme');
-        return activate.loadAndActivate(themeName, {skipChecks});
-    },
-    /**
-     * Load all inactive themes
-     */
+const instance = {
     loadInactiveThemes: themeLoader.loadAllThemes,
-    /**
-     * Methods used in the API
-     */
     api: {
         getJSON,
         activate: activate.activate,
@@ -36,3 +20,43 @@ module.exports = {
         destroy: storage.destroy
     }
 };
+let initPromise;
+let initKey;
+let initializedKey;
+
+async function init() {
+    const themeName = settingsCache.get('active_theme');
+    const key = `${config.getContentPath('themes')}:${themeName}`;
+
+    if (initializedKey === key) {
+        return;
+    }
+
+    if (initPromise && initKey !== key) {
+        await initPromise;
+        return init();
+    }
+
+    if (!initPromise) {
+        initKey = key;
+        initPromise = (async () => {
+            validate.init();
+
+            const skipChecks = config.get('optimization:themes:skipBootChecks') || false;
+
+            await activate.loadAndActivate(themeName, {skipChecks});
+            initializedKey = key;
+        })();
+    }
+
+    try {
+        await initPromise;
+    } finally {
+        initPromise = undefined;
+        initKey = undefined;
+    }
+}
+
+const service = lazySingleton('ThemesService', () => instance);
+
+module.exports = {init, service};

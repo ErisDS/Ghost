@@ -52,7 +52,7 @@ class RecommendationServiceWrapper {
         const urlUtils = require('../../../shared/url-utils').default;
         const models = require('../../models');
         const sentry = require('../../../shared/sentry');
-        const settings = require('../settings');
+        const settings = require('../settings').service;
         const RecommendationEnablerService = require('./recommendation-enabler-service');
 
         const {
@@ -67,7 +67,7 @@ class RecommendationServiceWrapper {
             RecommendationMetadataService
         } = require('./service');
 
-        const mentions = require('../mentions');
+        const mentions = require('../mentions').service;
 
         if (!mentions.sendingService || !mentions.api) {
             // eslint-disable-next-line ghost/ghost-custom/no-native-error
@@ -93,7 +93,7 @@ class RecommendationServiceWrapper {
             sentry
         });
 
-        const oembedService = require('../oembed');
+        const oembedService = require('../oembed').service;
         const externalRequest = require('../../../server/lib/request-external.js');
 
         const recommendationMetadataService = new RecommendationMetadataService({
@@ -138,7 +138,7 @@ class RecommendationServiceWrapper {
                 });
             },
             emailRenderer: new IncomingRecommendationEmailRenderer({
-                staffService: require('../staff')
+                staffService: require('../staff').service
             })
         });
 

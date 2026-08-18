@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 
-const customRedirects = require('../../services/custom-redirects');
+const customRedirects = require('../../services/custom-redirects').service;
 const {
     parseJson,
     parseYaml,

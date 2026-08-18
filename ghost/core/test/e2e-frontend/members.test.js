@@ -8,14 +8,16 @@ const testUtils = require('../utils');
 const configUtils = require('../utils/config-utils');
 const config = require('../../core/shared/config');
 const settingsCache = require('../../core/shared/settings-cache');
-const settingsHelpers = require('../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const DomainEvents = require('@tryghost/domain-events');
 const {MemberPageViewEvent} = require('../../core/shared/events');
 const models = require('../../core/server/models');
 const {fixtureManager} = require('../utils/e2e-framework');
 const DataGenerator = require('../utils/fixtures/data-generator');
-const members = require('../../core/server/services/members');
-const membersEventsService = require('../../core/server/services/members-events');
+const members = require('../../core/server/services/members').service;
+const membersEventsService = require('../../core/server/services/members-events').service;
 const crypto = require('crypto');
 
 function assertContentIsPresent(res) {
@@ -47,7 +49,7 @@ describe('Front-end members behavior', function () {
 
         // membersService needs to be required after Ghost start so that settings
         // are pre-populated with defaults
-        const membersService = require('../../core/server/services/members');
+        const membersService = require('../../core/server/services/members').service;
 
         const signinLink = await membersService.api.getMagicLink(email, 'signin');
         const signinURL = new URL(signinLink);
@@ -178,7 +180,7 @@ describe('Front-end members behavior', function () {
         });
 
         it('should error for invalid subscription id on members create update session endpoint', async function () {
-            const membersService = require('../../core/server/services/members');
+            const membersService = require('../../core/server/services/members').service;
             const email = 'test-member-create-update-session@email.com';
             const member = await membersService.api.members.create({email});
             const token = await membersService.api.getMemberIdentityToken(member.get('transient_id'));
@@ -903,7 +905,7 @@ describe('Front-end members behavior', function () {
 
                 // membersService needs to be required after Ghost start so that settings
                 // are pre-populated with defaults
-                const membersService = require('../../core/server/services/members');
+                const membersService = require('../../core/server/services/members').service;
 
                 const signinLink = await membersService.api.getMagicLink(email, 'signin');
                 const signinURL = new URL(signinLink);

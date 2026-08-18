@@ -1,7 +1,7 @@
 const sinon = require('sinon');
 const assert = require('node:assert/strict');
 const membersController = require('../../../../core/server/api/endpoints/members');
-const membersService = require('../../../../core/server/services/members');
+const membersService = require('../../../../core/server/services/members').service;
 
 describe('Members controller', function () {
     let importCSVStub;

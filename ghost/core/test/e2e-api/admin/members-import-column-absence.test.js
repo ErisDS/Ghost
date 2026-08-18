@@ -5,7 +5,7 @@ const testUtils = require('../../utils');
 const localUtils = require('./utils');
 const configUtils = require('../../utils/config-utils');
 const config = require('../../../core/shared/config');
-const jobsService = require('../../../core/server/services/jobs');
+const jobsService = require('../../../core/server/services/jobs').service;
 const {mockManager} = require('../../utils/e2e-framework');
 
 // When the uploaded CSV has no subscription/comp columns at all, the import must not

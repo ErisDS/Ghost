@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'fs-extra';
 import type LocalStorageBaseClass from '../../../../../core/server/adapters/storage/LocalStorageBase';
-import type adapterManagerInstance from '../../../../../core/server/services/adapter-manager';
+import type {AdapterManager} from '../../../../../core/server/services/adapter-manager/adapter-manager';
 
 // Vitest resolves `import` through Vite's SSR module runner and `require`
 // through Node's CJS cache, so the same first-party module loaded both ways
@@ -9,7 +9,9 @@ import type adapterManagerInstance from '../../../../../core/server/services/ada
 // the base classes it compares them against have to come from that same graph —
 // an imported StorageBase/LocalStorageBase would fail every `instanceof` check.
 const {StorageBase} = require('ghost-storage-base');
-const adapterManager: typeof adapterManagerInstance = require('../../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager: AdapterManager = adapterManagerRoot.service;
 const LocalStorageBase: typeof LocalStorageBaseClass = require('../../../../../core/server/adapters/storage/LocalStorageBase').default;
 const configUtils = require('../../../../utils/config-utils');
 const {assertExists} = require('../../../../utils/assertions');

@@ -2,7 +2,7 @@
 const api = require('../../api').endpoints;
 const config = require('../../../shared/config');
 const urlUtils = require('../../../shared/url-utils').default;
-const jobsService = require('../jobs');
+const jobsService = require('../jobs').service;
 
 const request = require('@tryghost/request');
 const ghostVersion = require('@tryghost/version');

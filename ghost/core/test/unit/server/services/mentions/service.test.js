@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
-const urlService = require('../../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const outputSerializerUrlUtil = require('../../../../../core/server/api/endpoints/utils/serializers/output/utils/url');
 const {getPostData, getPostUrl} = require('../../../../../core/server/services/mentions/service');
 

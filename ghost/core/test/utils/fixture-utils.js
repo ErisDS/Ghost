@@ -12,7 +12,7 @@ const knexMigrator = new KnexMigrator({knexMigratorFilePath: path.join(__dirname
 const models = require('../../core/server/models');
 const {fixtureManager} = require('../../core/server/data/schema/fixtures');
 const permissions = require('../../core/server/services/permissions');
-const settingsService = require('../../core/server/services/settings/settings-service');
+const settingsService = require('../../core/server/services/settings');
 const labsService = require('../../core/shared/labs');
 const {Queries: EmailAnalyticsQueries} = require('../../core/server/services/email-analytics/lib/queries');
 
@@ -1002,7 +1002,7 @@ const getFixtureOps = (toDos) => {
     });
 
     fixtureOps.push(() => {
-        return require('../../core/server/services/tiers').repository?.init();
+        return require('../../core/server/services/tiers').service.repository?.init();
     });
 
     return fixtureOps;

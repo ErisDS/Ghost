@@ -3,7 +3,7 @@
 const moment = require('moment-timezone');
 const errors = require('@tryghost/errors');
 const logging = require('@tryghost/logging');
-const membersService = require('../../services/members');
+const membersService = require('../../services/members').service;
 
 const tpl = require('@tryghost/tpl');
 const _ = require('lodash');
@@ -533,7 +533,7 @@ const controller = {
             method: 'edit'
         },
         async query(frame) {
-            const emailSuppressionList = require('../../services/email-suppression-list');
+            const emailSuppressionList = require('../../services/email-suppression-list').service;
 
             // Get the member first to retrieve their email
             const member = await membersService.api.memberBREADService.read({id: frame.options.id}, {});

@@ -95,9 +95,24 @@ async function initCore({ghostServer, config}) {
     // Validate configured adapters up-front so misconfiguration fails at boot
     // rather than on first lazy use (e.g. first image upload or scheduled job)
     debug('Begin: adapters');
-    const adapterManager = require('./server/services/adapter-manager').default;
+    const adapterManager = require('./server/services/adapter-manager');
     adapterManager.init();
     debug('End: adapters');
+
+    debug('Begin: URL Service');
+    const urlService = require('./server/services/url');
+    urlService.init();
+    debug('End: URL Service');
+
+    debug('Begin: Internal Keys');
+    const internalKeys = require('./server/services/internal-keys');
+    internalKeys.init();
+    debug('End: Internal Keys');
+
+    debug('Begin: OEmbed Service');
+    const oembed = require('./server/services/oembed');
+    oembed.init();
+    debug('End: OEmbed Service');
 
     // URL Utils is a bit slow, put it here so the timing is visible separate from models
     debug('Begin: Load urlUtils');
@@ -110,11 +125,16 @@ async function initCore({ghostServer, config}) {
     await limits.init();
     debug('End: limits');
 
+    debug('Begin: Settings Helpers');
+    const settingsHelpers = require('./server/services/settings-helpers');
+    settingsHelpers.init();
+    debug('End: Settings Helpers');
+
     // Settings are a core concept we use settings to store key-value pairs used in critical pathways as well as public data like the site title
     debug('Begin: settings');
-    const settings = require('./server/services/settings/settings-service');
+    const settings = require('./server/services/settings');
     await settings.init();
-    await settings.syncEmailSettings(config.get('hostSettings:emailVerification:verified'));
+    await settings.service.syncEmailSettings(config.get('hostSettings:emailVerification:verified'));
     debug('End: settings');
 
     debug('Begin: i18n');
@@ -134,10 +154,24 @@ async function initCore({ghostServer, config}) {
     memberCustomFieldsService.init();
     debug('End: Member Custom Fields Service');
 
+    // Endpoint definitions read these cache handles while Express is assembled,
+    // before the main service-init phase runs.
+    debug('Begin: API Cache Services');
+    const postsPublic = require('./server/services/posts-public');
+    const tagsPublic = require('./server/services/tags-public');
+    const stats = require('./server/services/stats');
+    await Promise.all([postsPublic.init(), tagsPublic.init(), stats.init()]);
+    debug('End: API Cache Services');
+
+    const jobServiceRoot = require('./server/services/jobs');
+    const mentionsJobServiceRoot = require('./server/services/mentions-jobs');
+    jobServiceRoot.init();
+    mentionsJobServiceRoot.init();
+
     if (ghostServer) {
         // Job Service allows parts of Ghost to run in the background
         debug('Begin: Job Service');
-        const jobService = require('./server/services/jobs');
+        const jobService = jobServiceRoot.service;
 
         if (config.get('server:testmode')) {
             jobService.initTestMode();
@@ -150,7 +184,7 @@ async function initCore({ghostServer, config}) {
 
         // Mentions Job Service allows mentions to be processed in the background
         debug('Begin: Mentions Job Service');
-        const mentionsJobService = require('./server/services/mentions-jobs');
+        const mentionsJobService = mentionsJobServiceRoot.service;
 
         if (config.get('server:testmode')) {
             mentionsJobService.initTestMode();
@@ -244,7 +278,7 @@ async function initExpressApps({frontend, backend, config}) {
 
     if (frontend) {
         // SITE + MEMBERS
-        const urlService = require('./server/services/url');
+        const urlService = require('./server/services/url').service;
         const frontendApp = require('./server/web/parent/frontend')({urlService});
         parentApp.use(vhost(config.getFrontendMountPath(), frontendApp));
     }
@@ -281,7 +315,7 @@ async function initDynamicRouting({frontend}) {
     debug('Begin: Dynamic Routing');
     const routing = require('./frontend/services/routing');
     const routeSettingsModule = require('./server/services/route-settings');
-    const urlService = require('./server/services/url');
+    const urlService = require('./server/services/url').service;
     const bridge = require('./bridge');
     bridge.init();
 
@@ -331,7 +365,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const indexnow = require('./server/services/indexnow-ping');
     const slack = require('./server/services/slack-ping');
     const webhooks = require('./server/services/webhooks');
-    const postScheduling = require('./server/services/post-scheduling').default;
+    const postScheduling = require('./server/services/post-scheduling');
     const comments = require('./server/services/comments');
     const staffService = require('./server/services/staff');
     const memberAttribution = require('./server/services/member-attribution');
@@ -342,8 +376,6 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const emailService = require('./server/services/email-service');
     const emailAnalytics = require('./server/services/email-analytics');
     const mentionsService = require('./server/services/mentions');
-    const tagsPublic = require('./server/services/tags-public');
-    const postsPublic = require('./server/services/posts-public');
     const postsService = require('./server/services/posts');
     const slackNotifications = require('./server/services/slack-notifications');
     const mediaInliner = require('./server/services/media-inliner');
@@ -351,14 +383,16 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const giftService = require('./server/services/gifts');
     const machinePaymentsService = require('./server/services/machine-payments');
     const recommendationsService = require('./server/services/recommendations');
+    const notifications = require('./server/services/notifications');
+    const memberWelcomeEmailService = require('./server/services/member-welcome-emails');
+    const invites = require('./server/services/invites');
     const emailAddressService = require('./server/services/email-address');
-    const statsService = require('./server/services/stats');
     const tinybird = require('./server/services/tinybird');
     const explorePingService = require('./server/services/explore-ping');
     const domainEvents = require('@tryghost/domain-events');
     const automations = require('./server/services/automations');
     const automationsApi = require('./server/services/automations/automations-api');
-    const adapterManager = require('./server/services/adapter-manager').default;
+    const {service: adapterManager} = require('./server/services/adapter-manager');
     const {withErrorCapture} = require('./server/adapters/scheduling/error-capture');
 
     const metrics = require('@tryghost/metrics');
@@ -366,24 +400,27 @@ async function initServices({ghostServer, config, prometheusClient}) {
     const models = require('./server/models');
     const urlUtils = require('./shared/url-utils').default;
     const settingsCache = require('./shared/settings-cache');
-    const internalKeys = require('./server/services/internal-keys').default;
+    const {service: internalKeys} = require('./server/services/internal-keys');
 
     // Initialize things that other services depend on first.
     emailAddressService.init();
+    const newsletters = require('./server/services/newsletters');
+    newsletters.init();
     const apiUrl = urlUtils.urlFor('api', {type: 'admin'}, true);
     const schedulerAdapter = withErrorCapture(adapterManager.getAdapter('scheduling'));
     schedulerAdapter.run();
+    postScheduling.init();
     await stripe.init();
+    await members.init();
+    await mentionsService.init();
+    memberAttribution.init();
+    staffService.init();
+    memberWelcomeEmailService.init();
+    invites.init();
 
     await Promise.all([
         identityTokens.init(),
-        memberAttribution.init(),
-        mentionsService.init(),
-        staffService.init(),
-        members.init(),
         tiers.init(),
-        tagsPublic.init(),
-        postsPublic.init(),
         membersEvents.init(),
         permissions.init(),
         indexnow.init(),
@@ -395,14 +432,14 @@ async function initServices({ghostServer, config, prometheusClient}) {
             config,
             db,
             domainEvents,
-            emailSuppressionList,
-            membersRepository: members.api.members,
+            emailSuppressionList: emailSuppressionList.service,
+            membersRepository: members.service.api.members,
             models,
             metrics,
             prometheusClient,
             settingsCache
         }),
-        webhooks.listen(),
+        webhooks.init(),
         comments.init(),
         linkTracking.init(),
         emailSuppressionList.init(),
@@ -410,8 +447,8 @@ async function initServices({ghostServer, config, prometheusClient}) {
         mediaInliner.init(),
         announcementBarService.init(),
         recommendationsService.init(),
+        notifications.init(),
         tinybird.init(),
-        statsService.init(),
         giftService.init({
             apiUrl,
             schedulerAdapter,
@@ -431,7 +468,7 @@ async function initServices({ghostServer, config, prometheusClient}) {
     await explorePingService.init();
 
     if (schedulerAdapter.rescheduleOnBoot) {
-        await postScheduling.rescheduleAll();
+        await postScheduling.service.rescheduleAll();
     }
 
     debug('End: Services');
@@ -452,7 +489,7 @@ async function initBackgroundServices({config}) {
 
     // Load all inactive themes
     const themeService = require('./server/services/themes');
-    themeService.loadInactiveThemes();
+    themeService.service.loadInactiveThemes();
 
     // we don't want to kick off background services that will interfere with tests
     if (process.env.NODE_ENV.startsWith('test')) {
@@ -463,7 +500,7 @@ async function initBackgroundServices({config}) {
     // Runs before activitypub.init so an activitypub failure can't disable recovery.
     try {
         const emailService = require('./server/services/email-service');
-        await emailService.service.resumeInterruptedSends();
+        await emailService.service.service.resumeInterruptedSends();
     } catch (err) {
         const logging = require('@tryghost/logging');
         logging.error(err);
@@ -491,7 +528,8 @@ async function initBackgroundServices({config}) {
     remoteFlags.init(config);
 
     const milestonesService = require('./server/services/milestones');
-    milestonesService.initAndRun();
+    await milestonesService.init();
+    milestonesService.service.scheduleRun();
 
     debug('End: initBackgroundServices');
 }

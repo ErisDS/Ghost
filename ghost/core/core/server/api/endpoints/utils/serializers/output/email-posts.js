@@ -1,6 +1,6 @@
 const mappers = require('./mappers');
 const gating = require('./utils/post-gating');
-const tiersService = require('../../../../../services/tiers');
+const tiersService = require('../../../../../services/tiers').service;
 
 module.exports = {
     async read(model, apiConfig, frame) {

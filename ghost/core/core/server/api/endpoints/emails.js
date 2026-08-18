@@ -1,8 +1,8 @@
 const models = require('../../models');
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
-const emailService = require('../../services/email-service');
-const emailAnalytics = require('../../services/email-analytics');
+const emailService = require('../../services/email-service').service;
+const emailAnalytics = require('../../services/email-analytics').service;
 
 const messages = {
     emailNotFound: 'Email not found.',

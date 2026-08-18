@@ -1,57 +1,58 @@
-const urlService = require('../url');
-const urlUtils = require('../../../shared/url-utils').default;
-const settingsCache = require('../../../shared/settings-cache');
-const config = require('../../../shared/config');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
-class MemberAttributionServiceWrapper {
-    init() {
-        if (this.service) {
-            // Already done
-            return;
-        }
+let instance;
 
-        // Wire up all the dependencies
-        const MemberAttributionService = require('./member-attribution-service');
-        const UrlTranslator = require('./url-translator');
-        const ReferrerTranslator = require('./referrer-translator');
-        const AttributionBuilder = require('./attribution-builder');
-        const OutboundLinkTagger = require('./outbound-link-tagger');
-        const models = require('../../models');
+const service = lazySingleton('MemberAttributionService', () => instance);
 
-        const urlTranslator = new UrlTranslator({
-            urlService,
-            urlUtils,
-            models: {
-                Post: models.Post,
-                User: models.User,
-                Tag: models.Tag
-            }
-        });
-
-        const referrerTranslator = new ReferrerTranslator({
-            siteUrl: urlUtils.urlFor('home', true),
-            adminUrl: urlUtils.urlFor('admin', true)
-        });
-
-        this.attributionBuilder = new AttributionBuilder({urlTranslator, referrerTranslator});
-
-        this.outboundLinkTagger = new OutboundLinkTagger({
-            isEnabled: () => !!settingsCache.get('outbound_link_tagging'),
-            getSiteUrl: () => config.getSiteUrl(),
-            urlUtils
-        });
-
-        // Expose the service
-        this.service = new MemberAttributionService({
-            models: {
-                MemberCreatedEvent: models.MemberCreatedEvent,
-                SubscriptionCreatedEvent: models.SubscriptionCreatedEvent,
-                Integration: models.Integration
-            },
-            attributionBuilder: this.attributionBuilder,
-            getTrackingEnabled: () => !!settingsCache.get('members_track_sources')
-        });
+function init() {
+    if (instance) {
+        return;
     }
+
+    const urlService = require('../url').service;
+    const urlUtils = require('../../../shared/url-utils').default;
+    const settingsCache = require('../../../shared/settings-cache');
+    const config = require('../../../shared/config');
+    const MemberAttributionService = require('./member-attribution-service');
+    const UrlTranslator = require('./url-translator');
+    const ReferrerTranslator = require('./referrer-translator');
+    const AttributionBuilder = require('./attribution-builder');
+    const OutboundLinkTagger = require('./outbound-link-tagger');
+    const models = require('../../models');
+
+    const urlTranslator = new UrlTranslator({
+        urlService,
+        urlUtils,
+        models: {Post: models.Post, User: models.User, Tag: models.Tag}
+    });
+
+    const referrerTranslator = new ReferrerTranslator({
+        siteUrl: urlUtils.urlFor('home', true),
+        adminUrl: urlUtils.urlFor('admin', true)
+    });
+
+    const attributionBuilder = new AttributionBuilder({urlTranslator, referrerTranslator});
+    const outboundLinkTagger = new OutboundLinkTagger({
+        isEnabled: () => !!settingsCache.get('outbound_link_tagging'),
+        getSiteUrl: () => config.getSiteUrl(),
+        urlUtils
+    });
+
+    const memberAttributionService = new MemberAttributionService({
+        models: {
+            MemberCreatedEvent: models.MemberCreatedEvent,
+            SubscriptionCreatedEvent: models.SubscriptionCreatedEvent,
+            Integration: models.Integration
+        },
+        attributionBuilder,
+        getTrackingEnabled: () => !!settingsCache.get('members_track_sources')
+    });
+
+    instance = {
+        service: memberAttributionService,
+        attributionBuilder,
+        outboundLinkTagger
+    };
 }
 
-module.exports = new MemberAttributionServiceWrapper();
+module.exports = {init, service};

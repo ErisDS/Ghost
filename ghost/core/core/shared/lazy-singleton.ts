@@ -25,7 +25,13 @@ export function lazySingleton<T extends object>(name: string, getInstance: () =>
             const instance = resolve();
             const value = Reflect.get(instance, property, instance);
 
-            return typeof value === 'function' ? value.bind(instance) : value;
+            // Own functions are collaborators stored on a composite facade and
+            // do not need a receiver (preserving their identity also keeps
+            // normal stubbing semantics). Prototype methods belong to class
+            // instances and must retain their receiver, including private fields.
+            return typeof value === 'function' && !Object.prototype.hasOwnProperty.call(instance, property)
+                ? value.bind(instance)
+                : value;
         },
         set(_target, property, value) {
             return Reflect.set(resolve(), property, value);
@@ -38,6 +44,11 @@ export function lazySingleton<T extends object>(name: string, getInstance: () =>
         },
         deleteProperty(_target, property) {
             return Reflect.deleteProperty(resolve(), property);
+        },
+        getOwnPropertyDescriptor(_target, property) {
+            const descriptor = Reflect.getOwnPropertyDescriptor(resolve(), property);
+
+            return descriptor ? {...descriptor, configurable: true} : undefined;
         },
         getPrototypeOf() {
             return Reflect.getPrototypeOf(resolve());

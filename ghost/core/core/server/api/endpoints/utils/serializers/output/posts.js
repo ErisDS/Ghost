@@ -1,6 +1,6 @@
 const debug = require('@tryghost/debug')('api:endpoints:utils:serializers:output:posts');
 const mappers = require('./mappers');
-const tiersService = require('../../../../../services/tiers');
+const tiersService = require('../../../../../services/tiers').service;
 const {createCSVTransform} = require('./posts-csv-transform');
 const {createCSVStreamResponse} = require('./stream-csv-response');
 

@@ -2,7 +2,7 @@ const sinon = require('sinon');
 const supertest = require('supertest');
 const testUtils = require('../utils');
 const configUtils = require('../utils/config-utils');
-const membersService = require('../../core/server/services/members');
+const membersService = require('../../core/server/services/members').service;
 
 describe('Middleware Execution', function () {
     let loadMemberSessionMiddlewareSpy;

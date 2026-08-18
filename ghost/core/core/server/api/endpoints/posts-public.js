@@ -1,7 +1,7 @@
 const models = require('../../models');
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
-const postsPublicService = require('../../services/posts-public');
+const postsPublicService = require('../../services/posts-public').service;
 const postsService = require('../../services/posts').service;
 const {rejectContentApiRestrictedFieldsTransformer} = require('./utils/api-filter-utils');
 const {generateGiftKeyData, applyGiftAccess} = require('./utils/gift-link-access');
@@ -21,7 +21,7 @@ const controller = {
         headers: {
             cacheInvalidate: false
         },
-        cache: postsPublicService.api?.cache,
+        cache: postsPublicService.cache,
         generateCacheKeyData(frame) {
             return {
                 options: generateOptionsData(frame, [
@@ -77,7 +77,7 @@ const controller = {
         headers: {
             cacheInvalidate: false
         },
-        cache: postsPublicService.api?.cache,
+        cache: postsPublicService.cache,
         async generateCacheKeyData(frame) {
             return {
                 options: generateOptionsData(frame, [

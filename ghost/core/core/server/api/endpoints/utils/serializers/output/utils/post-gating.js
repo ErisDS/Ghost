@@ -1,4 +1,4 @@
-const membersService = require('../../../../../../services/members');
+const membersService = require('../../../../../../services/members').service;
 const htmlToPlaintext = require('@tryghost/html-to-plaintext');
 
 const {PERMIT_ACCESS} = membersService.contentGating;

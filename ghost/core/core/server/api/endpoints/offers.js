@@ -1,6 +1,6 @@
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
-const offersService = require('../../services/offers');
+const offersService = require('../../services/offers').service;
 
 const messages = {
     offerNotFound: 'Offer not found.'

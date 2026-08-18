@@ -40,6 +40,9 @@ export default async function setup() {
 
     // Load Ghost's runtime overrides (nconf wiring) and the template builder.
     require('../../core/server/overrides');
+    require('../../core/server/services/adapter-manager').init();
+    require('../../core/server/services/url').init();
+    require('../../core/server/services/settings-helpers').init();
     const {buildTemplate, dropTemplate} = require('./db-template');
 
     await buildTemplate(base);

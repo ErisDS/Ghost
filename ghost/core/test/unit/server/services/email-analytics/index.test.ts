@@ -1,7 +1,8 @@
 import sinon from 'sinon';
 import createKnex from 'knex';
 
-import {automations, init, newsletters} from '../../../../../core/server/services/email-analytics';
+import {init} from '../../../../../core/server/services/email-analytics';
+import {EmailAnalyticsServiceWrapper} from '../../../../../core/server/services/email-analytics/email-analytics-service-wrapper';
 import {AUTOMATION_EMAIL_TAG} from '../../../../../core/server/services/member-welcome-emails/constants';
 
 describe('email analytics service', function () {
@@ -15,14 +16,12 @@ describe('email analytics service', function () {
     const metrics = {metric: sinon.stub()};
     const settingsCache = {get: sinon.stub()};
 
-    let newslettersInit: sinon.SinonStub;
-    let automationsInit: sinon.SinonStub;
+    let serviceInit: sinon.SinonStub;
 
     let dependencies: Parameters<typeof init>[0];
 
     beforeEach(function () {
-        newslettersInit = sinon.stub(newsletters, 'init');
-        automationsInit = sinon.stub(automations, 'init');
+        serviceInit = sinon.stub(EmailAnalyticsServiceWrapper.prototype, 'init');
 
         dependencies = {
             automationsApi,
@@ -63,7 +62,7 @@ describe('email analytics service', function () {
     it('initializes newsletter and automation analytics', function () {
         init(dependencies);
 
-        sinon.assert.calledOnceWithExactly(newslettersInit, sinon.match({
+        sinon.assert.calledWith(serviceInit, sinon.match({
             config,
             domainEvents,
             event: {
@@ -89,7 +88,7 @@ describe('email analytics service', function () {
             createEventProcessor: sinon.match.func
         }));
 
-        sinon.assert.calledOnceWithExactly(automationsInit, sinon.match({
+        sinon.assert.calledWith(serviceInit, sinon.match({
             config,
             domainEvents,
             event: {

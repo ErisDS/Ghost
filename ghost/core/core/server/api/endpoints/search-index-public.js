@@ -1,5 +1,5 @@
 const models = require('../../models');
-const urlService = require('../../services/url');
+const urlService = require('../../services/url').service;
 const {requiredUrlColumns} = require('./utils/serializers/input/utils/url');
 const postsService = require('../../services/posts').service;
 

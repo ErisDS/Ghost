@@ -9,7 +9,7 @@ const controller = {
         },
         permissions: true,
         async query(frame) {
-            const IdentityTokenService = require('../../services/identity-tokens');
+            const {service: identityTokenService} = require('../../services/identity-tokens');
 
             let role = null;
             try {
@@ -19,7 +19,7 @@ const controller = {
                 logging.warn('Could not load role for identity');
             }
 
-            const token = await IdentityTokenService.instance.getTokenForUser(frame.user.get('email'), role);
+            const token = await identityTokenService.getTokenForUser(frame.user.get('email'), role);
 
             return {token};
         }

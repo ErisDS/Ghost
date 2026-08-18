@@ -2,7 +2,9 @@ const assert = require('node:assert/strict');
 const {assertExists} = require('../../../utils/assertions');
 const sinon = require('sinon');
 const testUtils = require('../../../utils');
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const tagsHelper = require('../../../../core/frontend/helpers/tags');
 
 describe('{{tags}} helper', function () {

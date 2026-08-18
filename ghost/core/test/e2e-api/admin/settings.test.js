@@ -7,7 +7,7 @@ const config = require('../../../core/shared/config');
 const {agentProvider, fixtureManager, mockManager, matchers, configUtils} = require('../../utils/e2e-framework');
 const {stringMatching, anyEtag, anyUuid, anyContentLength, anyContentVersion} = matchers;
 const models = require('../../../core/server/models');
-const membersService = require('../../../core/server/services/members');
+const membersService = require('../../../core/server/services/members').service;
 const limits = require('../../../core/server/services/limits');
 const {anyErrorId} = matchers;
 

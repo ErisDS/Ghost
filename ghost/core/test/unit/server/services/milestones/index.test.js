@@ -4,7 +4,9 @@ describe('Milestones Service', function () {
     let milestonesService;
 
     it('Provides expected public API', async function () {
-        milestonesService = require('../../../../../core/server/services/milestones');
+        const milestones = require('../../../../../core/server/services/milestones');
+        await milestones.init();
+        milestonesService = milestones.service;
 
         assert.ok(milestonesService.initAndRun);
     });

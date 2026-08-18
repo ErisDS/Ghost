@@ -5,7 +5,7 @@ const testUtils = require('../../utils');
 const localUtils = require('./utils');
 const configUtils = require('../../utils/config-utils');
 const config = require('../../../core/shared/config');
-const jobsService = require('../../../core/server/services/jobs');
+const jobsService = require('../../../core/server/services/jobs').service;
 const {mockManager} = require('../../utils/e2e-framework');
 
 // The error report a failed import emails back to the manager: one importable row (so

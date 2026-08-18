@@ -1,11 +1,11 @@
 const _ = require('lodash');
 const fs = require('fs-extra');
 const models = require('../../models');
-const routeSettings = require('../../services/route-settings');
+const routeSettings = require('../../services/route-settings').service;
 const {BadRequestError} = require('@tryghost/errors');
-const settingsService = require('../../services/settings/settings-service');
-const membersService = require('../../services/members');
-const stripeService = require('../../services/stripe');
+const settingsService = require('../../services/settings').service;
+const membersService = require('../../services/members').service;
+const stripeService = require('../../services/stripe').service;
 const settingsBREADService = settingsService.getSettingsBREADServiceInstance();
 
 async function getStripeConnectData(frame) {
@@ -173,7 +173,7 @@ const controller = {
         },
         async query(frame) {
             const content = await fs.readFile(frame.file.path, 'utf8');
-            await routeSettings.api.upload(content);
+            await routeSettings.upload(content);
         }
     },
 
@@ -192,7 +192,7 @@ const controller = {
             method: 'browse'
         },
         query() {
-            return routeSettings.api.download();
+            return routeSettings.download();
         }
     }
 };

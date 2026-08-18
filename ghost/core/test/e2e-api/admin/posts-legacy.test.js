@@ -631,7 +631,7 @@ describe('Posts API', function () {
     });
 
     it('Does not change post status when email sending fails', async function () {
-        const emailService = require('../../../core/server/services/email-service');
+        const emailService = require('../../../core/server/services/email-service').service;
         const newsletterSlug = testUtils.DataGenerator.Content.newsletters[1].slug;
 
         // Create a draft post

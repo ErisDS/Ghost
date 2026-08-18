@@ -15,7 +15,7 @@ describe('Job: Clean tokens', function () {
         await agent.loginAsOwner();
 
         // Only reference services after Ghost boot
-        jobsService = require('../../../../core/server/services/jobs');
+        jobsService = require('../../../../core/server/services/jobs').service;
     });
 
     afterAll(function () {

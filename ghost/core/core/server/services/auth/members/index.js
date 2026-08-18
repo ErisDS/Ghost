@@ -1,6 +1,6 @@
 const {expressjwt: jwt} = require('express-jwt');
 const {UnauthorizedError} = require('@tryghost/errors');
-const membersService = require('../../members');
+const membersService = require('../../members').service;
 const config = require('../../../../shared/config');
 
 let UNO_MEMBERINO;

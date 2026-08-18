@@ -80,7 +80,7 @@ class DynamicRoutingService {
     async upload(yamlContent) {
         const parseYaml = require('./yaml-parser');
         const {parseRouteSettings} = require('./route-settings-parser');
-        const urlService = require('../url');
+        const urlService = require('../url').service;
         // Deferred: bridge reaches back here via api/endpoints/settings.js,
         // so hoisting this would resolve to a half-initialised export.
         const bridge = require('../../../bridge');

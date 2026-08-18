@@ -1,4 +1,4 @@
-const mentions = require('../../services/mentions');
+const mentions = require('../../services/mentions').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

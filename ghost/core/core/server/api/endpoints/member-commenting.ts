@@ -1,4 +1,4 @@
-import membersService from '../../services/members';
+import {service as membersService} from '../../services/members';
 
 const INVALIDATE_MEMBERS_CACHE = {value: '/members/'};
 

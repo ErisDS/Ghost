@@ -1,4 +1,4 @@
-const oembed = require('../../services/oembed');
+const oembed = require('../../services/oembed').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

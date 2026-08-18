@@ -15,7 +15,7 @@ export function init(): void {
     const logging = require('@tryghost/logging');
     const request = require('../../lib/request-external');
     const settingsCache = require('../../../shared/settings-cache');
-    const urlService = require('../url');
+    const urlService = require('../url').service;
     const urlUtils = require('../../../shared/url-utils').default;
 
     instance = new SlackPingService({

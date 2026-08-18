@@ -1,6 +1,6 @@
 import type {Knex} from 'knex';
 import type {InternalApiKey, InternalKeys} from '../internal-keys';
-import internalKeysDefault from '../internal-keys';
+import {service as internalKeysDefault} from '../internal-keys';
 const modelsDefault = require('../../models');
 const {deleteAllSessions: deleteAllSessionsDefault} = require('./session');
 

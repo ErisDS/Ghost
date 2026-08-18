@@ -14,7 +14,7 @@ describe('Last Seen At Updater', function () {
 
     describe('updateLastSeenAtWithoutKnownLastSeen', function () {
         it('works', async function () {
-            const membersEvents = require('../../../core/server/services/members-events');
+            const membersEvents = require('../../../core/server/services/members-events').service;
 
             // Fire lots of EmailOpenedEvent for the same
             const memberId = fixtureManager.get('members', 0).id;
@@ -49,7 +49,7 @@ describe('Last Seen At Updater', function () {
 
     describe('cachedUpdateLastSeenAt', function () {
         it('works', async function () {
-            const membersEvents = require('../../../core/server/services/members-events');
+            const membersEvents = require('../../../core/server/services/members-events').service;
 
             // Fire lots of MemberClickEvents for the same member
             const memberId = fixtureManager.get('members', 0).id;
@@ -93,7 +93,7 @@ describe('Last Seen At Updater', function () {
         });
 
         it('does not call updateLastSeenAt multiple times for the same member on the same day', async function () {
-            const membersEvents = require('../../../core/server/services/members-events');
+            const membersEvents = require('../../../core/server/services/members-events').service;
 
             // Clear the cache to ensure it's empty
             membersEvents.lastSeenAtUpdater._lastSeenAtCache.clear();

@@ -1,4 +1,4 @@
-const oembedService = require('../oembed');
+const oembedService = require('../oembed').service;
 
 function isTransientError(err) {
     const statusCode = err.statusCode || err.response?.statusCode;

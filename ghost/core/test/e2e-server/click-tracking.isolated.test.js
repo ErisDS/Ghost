@@ -3,7 +3,7 @@ const {agentProvider, mockManager, fixtureManager, matchers} = require('../utils
 const urlUtils = require('../../core/shared/url-utils').default;
 const jobService = require('../../core/server/services/jobs/job-service');
 const {anyGhostAgent, anyContentVersion, anyContentLength, anyISODateTime, anyObjectId} = matchers;
-const membersEventsService = require('../../core/server/services/members-events');
+const membersEventsService = require('../../core/server/services/members-events').service;
 
 describe('Click Tracking', function () {
     let agent;

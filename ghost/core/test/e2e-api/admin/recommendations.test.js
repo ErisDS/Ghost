@@ -1,7 +1,7 @@
 const {agentProvider, fixtureManager, mockManager, matchers} = require('../../utils/e2e-framework');
 const {anyObjectId, anyErrorId, anyISODateTime, anyContentVersion, anyLocationFor, anyEtag} = matchers;
 const assert = require('node:assert/strict');
-const recommendationsService = require('../../../core/server/services/recommendations');
+const recommendationsService = require('../../../core/server/services/recommendations').service;
 const {Recommendation, ClickEvent, SubscribeEvent} = require('../../../core/server/services/recommendations/service');
 const nock = require('nock');
 

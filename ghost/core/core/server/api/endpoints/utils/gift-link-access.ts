@@ -6,7 +6,7 @@
 import errors from '@tryghost/errors';
 import tpl from '@tryghost/tpl';
 import {service as giftLinksService} from '../../../services/gift-links';
-import membersService from '../../../services/members';
+import {service as membersService} from '../../../services/members';
 
 const messages = {
     invalidGiftToken: 'Invalid gift link token.',

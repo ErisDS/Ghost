@@ -8,7 +8,7 @@ const errors = require('@tryghost/errors');
 const {MESSAGES} = require('./constants');
 const {wrapReplacementStrings} = require('@tryghost/kg-default-nodes').utils.replacementStrings;
 const linkReplacer = require('../lib/link-replacer');
-const linkTracking = require('../link-tracking');
+const linkTracking = require('../link-tracking').service;
 const emailDesign = require('../email-rendering/email-design');
 const {registerHelpers} = require('../email-service/helpers/register-helpers');
 

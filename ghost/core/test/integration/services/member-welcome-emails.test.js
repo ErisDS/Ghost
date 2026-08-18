@@ -7,7 +7,9 @@ const models = require('../../../core/server/models');
 const db = require('../../../core/server/data/db');
 const MailgunClient = require('../../../core/server/services/lib/mailgun-client');
 const mailService = require('../../../core/server/services/mail');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const {MEMBER_WELCOME_EMAIL_SLUGS, MESSAGES} = require('../../../core/server/services/member-welcome-emails/constants');
 const memberWelcomeEmailService = require('../../../core/server/services/member-welcome-emails/service');
 
@@ -30,8 +32,15 @@ describe('Member Welcome Emails Integration', function () {
 
     beforeAll(async function () {
         await testUtils.setup('default')();
-        membersService = require('../../../core/server/services/members');
-        membersService.init();
+        const offers = require('../../../core/server/services/offers');
+        const membersCustomFields = require('../../../core/server/services/members-custom-fields');
+        const newsletters = require('../../../core/server/services/newsletters');
+        const members = require('../../../core/server/services/members');
+        await offers.init();
+        await membersCustomFields.init();
+        await newsletters.init();
+        await members.init();
+        membersService = members.service;
         defaultEmailDesignSettingId = await db.knex('email_design_settings')
             .where('slug', 'default-automated-email')
             .first('id')

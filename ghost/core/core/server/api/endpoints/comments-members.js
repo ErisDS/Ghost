@@ -1,4 +1,4 @@
-const commentsService = require('../../services/comments');
+const commentsService = require('../../services/comments').service;
 const ALLOWED_INCLUDES = ['member', 'replies', 'replies.member', 'replies.count.likes', 'replies.liked', 'replies.disliked', 'count.replies', 'count.direct_replies', 'count.likes', 'liked', 'disliked', 'post', 'parent'];
 
 /** @type {import('@tryghost/api-framework').Controller} */

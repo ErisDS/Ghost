@@ -62,7 +62,7 @@ describe('Machine payments markdown routing', function () {
             })
         ]);
 
-        machinePayments = require('../../core/server/services/machine-payments');
+        machinePayments = require('../../core/server/services/machine-payments').service;
         request = supertest.agent(configUtils.config.get('url'));
     });
 

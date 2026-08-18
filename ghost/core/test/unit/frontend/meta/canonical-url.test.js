@@ -1,7 +1,9 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const urlUtils = require('../../../../core/shared/url-utils').default;
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const testUtils = require('../../../utils');
 
 const getCanonicalUrl = require('../../../../core/frontend/meta/canonical-url');

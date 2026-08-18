@@ -1,7 +1,7 @@
 const path = require('path');
 const logging = require('@tryghost/logging');
 const express = require('../../../../shared/express');
-const jobsService = require('../../../services/jobs');
+const jobsService = require('../../../services/jobs').service;
 
 /** A bunch of helper routes for testing purposes */
 module.exports = function testRoutes() {

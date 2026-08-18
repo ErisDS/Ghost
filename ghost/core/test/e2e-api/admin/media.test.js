@@ -7,7 +7,9 @@ const sinon = require('sinon');
 const localUtils = require('./utils');
 const config = require('../../../core/shared/config');
 const logging = require('@tryghost/logging');
-const adapterManager = require('../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 
 describe('Media API', function () {
     // NOTE: holds paths to media that need to be cleaned up after the tests are run

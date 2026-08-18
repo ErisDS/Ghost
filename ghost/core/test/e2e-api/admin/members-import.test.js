@@ -8,7 +8,7 @@ const localUtils = require('./utils');
 const config = require('../../../core/shared/config');
 const configUtils = require('../../utils/config-utils');
 const models = require('../../../core/server/models');
-const jobsService = require('../../../core/server/services/jobs');
+const jobsService = require('../../../core/server/services/jobs').service;
 const {assertExists} = require('../../utils/assertions');
 const {mockManager} = require('../../utils/e2e-framework');
 

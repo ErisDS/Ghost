@@ -6,23 +6,24 @@ const DomainEvents = require('@tryghost/domain-events');
 
 const models = require('../../../../../core/server/models');
 const linkRedirection = require('../../../../../core/server/services/link-redirection');
-const linkTracking = require('../../../../../core/server/services/link-tracking');
+const LinkTrackingServiceWrapper = require('../../../../../core/server/services/link-tracking/link-tracking-service-wrapper');
 const LinkClickTrackingService = require('../../../../../core/server/services/link-tracking/link-click-tracking-service');
 const RedirectEvent = require('../../../../../core/server/services/link-redirection/redirect-event');
 
 describe('LinkTrackingServiceWrapper', function () {
-    const originalLinkRedirectionService = linkRedirection.service;
-    const originalLinkRedirectRepository = linkRedirection.linkRedirectRepository;
+    linkRedirection.init();
+    const originalLinkRedirectionService = linkRedirection.service.service;
+    const originalLinkRedirectRepository = linkRedirection.service.linkRedirectRepository;
 
     afterEach(function () {
         sinon.restore();
-        linkRedirection.service = originalLinkRedirectionService;
-        linkRedirection.linkRedirectRepository = originalLinkRedirectRepository;
+        linkRedirection.service.service = originalLinkRedirectionService;
+        linkRedirection.service.linkRedirectRepository = originalLinkRedirectRepository;
     });
 
     it('waits for the same initialization when called concurrently', async function () {
-        linkRedirection.service = {};
-        linkRedirection.linkRedirectRepository = {};
+        linkRedirection.service.service = {};
+        linkRedirection.service.linkRedirectRepository = {};
 
         let finishInitialization!: () => void;
         const initialization = new Promise<void>((resolve) => {
@@ -34,7 +35,7 @@ describe('LinkTrackingServiceWrapper', function () {
             originalInit.apply(this, args);
             return initialization;
         });
-        const wrapper = new linkTracking.LinkTrackingServiceWrapper();
+        const wrapper = new LinkTrackingServiceWrapper();
 
         const firstInit = wrapper.init();
         const secondInit = wrapper.init();
@@ -56,13 +57,13 @@ describe('LinkTrackingServiceWrapper', function () {
     });
 
     it('allows initialization to be retried after a failure', async function () {
-        linkRedirection.service = {};
-        linkRedirection.linkRedirectRepository = {};
+        linkRedirection.service.service = {};
+        linkRedirection.service.linkRedirectRepository = {};
 
         const init = sinon.stub(LinkClickTrackingService.prototype, 'init');
         init.onFirstCall().rejects(new Error('Initialization failed'));
         init.onSecondCall().resolves();
-        const wrapper = new linkTracking.LinkTrackingServiceWrapper();
+        const wrapper = new LinkTrackingServiceWrapper();
 
         await assert.rejects(wrapper.init(), /Initialization failed/);
         await wrapper.init();
@@ -72,8 +73,8 @@ describe('LinkTrackingServiceWrapper', function () {
     });
 
     it('wires automation click persistence and analytics to the same transaction', async function () {
-        linkRedirection.service = {};
-        linkRedirection.linkRedirectRepository = {};
+        linkRedirection.service.service = {};
+        linkRedirection.service.linkRedirectRepository = {};
 
         const subscribe = sinon.stub(DomainEvents, 'subscribe');
         const member = {
@@ -91,7 +92,7 @@ describe('LinkTrackingServiceWrapper', function () {
             return await callback(transacting);
         });
 
-        const wrapper = new linkTracking.LinkTrackingServiceWrapper({
+        const wrapper = new LinkTrackingServiceWrapper({
             automationsApi: {trackEmailClicked}
         });
         await wrapper.init();

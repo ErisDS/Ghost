@@ -1,6 +1,8 @@
 const assert = require('node:assert/strict');
 
-const adapterManager = require('../../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 const MemoryCache = require('../../../../../core/server/adapters/cache/MemoryCache');
 
 describe('Cache Adapter', function () {
