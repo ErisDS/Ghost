@@ -284,7 +284,9 @@ const controller = {
         statusCode: 201,
         headers: {
             location: {
-                resolve: postsService.generateCopiedPostLocationFromUrl
+                resolve(...args) {
+                    return postsService.generateCopiedPostLocationFromUrl(...args);
+                }
             },
             cacheInvalidate: false
         },
