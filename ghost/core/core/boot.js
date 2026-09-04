@@ -483,8 +483,9 @@ async function initServices({ghostServer, config, prometheusClient}) {
 
  * @param {object} options
  * @param {object} options.config
+ * @param {object} options.ghostServer
  */
-async function initBackgroundServices({config}) {
+async function initBackgroundServices({config, ghostServer}) {
     debug('Begin: initBackgroundServices');
 
     // Load all inactive themes
@@ -525,7 +526,10 @@ async function initBackgroundServices({config}) {
 
     // Remote feature-flag overrides (config-gated; inert unless explicitly configured).
     const remoteFlags = require('./server/services/remote-flags');
-    remoteFlags.init(config);
+    await remoteFlags.init(config);
+    ghostServer.registerCleanupTask(async () => {
+        await remoteFlags.shutdown();
+    }, 'Remote feature flags');
 
     const milestonesService = require('./server/services/milestones');
     await milestonesService.init();
@@ -669,7 +673,7 @@ async function bootGhost({backend = true, frontend = true, server = true} = {}) 
         notifyServerReady();
 
         // Step 7 - Init our background services, we don't wait for this to finish
-        initBackgroundServices({config});
+        initBackgroundServices({config, ghostServer});
 
         // If we pass the env var, kill Ghost
         if (process.env.GHOST_CI_SHUTDOWN_AFTER_BOOT) {

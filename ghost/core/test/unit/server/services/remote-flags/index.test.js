@@ -31,63 +31,63 @@ describe('remote-flags service index (gating)', function () {
     });
 
     afterEach(async function () {
-        remoteFlags.service.stop();
+        await remoteFlags.shutdown();
         flagOverrides.clear();
         sinon.restore();
         await configUtils.restore();
     });
 
-    it('is inert when disabled, even with a url', function () {
+    it('is inert when disabled, even with a url', async function () {
         configUtils.set('remoteFlags', {enabled: false, url: URL_STRING});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.equal(instance, null);
         assert.equal(startStub.called, false);
         assert.equal(remoteFlags.service.getInstance(), null);
     });
 
-    it('is inert when enabled but no manifest url is configured', function () {
+    it('is inert when enabled but no manifest url is configured', async function () {
         configUtils.set('remoteFlags', {enabled: true});
 
-        assert.equal(remoteFlags.init(config), null);
+        assert.equal(await remoteFlags.init(config), null);
         assert.equal(startStub.called, false);
     });
 
-    it('starts on any configured instance (config-gated, not Pro-gated)', function () {
+    it('starts on any configured instance (config-gated, not Pro-gated)', async function () {
         // No hostSettings here: a self-hosted instance that opts in still starts.
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.ok(instance instanceof RemoteFlagsService);
         assert.equal(startStub.calledOnce, true);
     });
 
-    it('starts without a site_uuid but skips ramps (full overrides still apply)', function () {
+    it('starts without a site_uuid but skips ramps (full overrides still apply)', async function () {
         settingsCache.get.withArgs('site_uuid').returns(undefined);
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.ok(instance instanceof RemoteFlagsService);
         assert.equal(instance.siteUuid, undefined);
         assert.equal(startStub.calledOnce, true);
     });
 
-    it('is inert and warns when the configured url is not a valid URL', function () {
+    it('is inert and warns when the configured url is not a valid URL', async function () {
         const warnStub = sinon.stub(logging, 'warn');
         configUtils.set('remoteFlags', {enabled: true, url: 'not-a-url'});
 
-        assert.equal(remoteFlags.init(config), null);
+        assert.equal(await remoteFlags.init(config), null);
         assert.equal(startStub.called, false);
         assert.ok(warnStub.getCalls().some(c => c.args[0]?.system?.event === 'remote_flags.invalid_url'));
     });
 
-    it('constructs and starts the service when enabled with a url, bucketing on the site UUID', function () {
+    it('constructs and starts the service when enabled with a url, bucketing on the site UUID', async function () {
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.ok(instance instanceof RemoteFlagsService);
         // The service is handed a ready URL object, not a raw string.
@@ -99,64 +99,76 @@ describe('remote-flags service index (gating)', function () {
         assert.equal(instance.pollInterval, 5 * 60 * 1000);
     });
 
-    it('uses a configured poll interval at or above the floor', function () {
+    it('does not publish a poller when startup fails', async function () {
+        const failure = new Error('initial fetch failed');
+        const stopStub = sinon.stub(RemoteFlagsService.prototype, 'stop');
+        startStub.rejects(failure);
+        configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
+
+        await assert.rejects(remoteFlags.init(config), failure);
+
+        assert.equal(stopStub.calledOnce, true);
+        assert.throws(() => remoteFlags.service.getInstance(), /RemoteFlagsService must be initialized before use/);
+    });
+
+    it('uses a configured poll interval at or above the floor', async function () {
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING, pollInterval: 120000});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.equal(instance.pollInterval, 120000);
     });
 
-    it('ignores an invalid poll interval, warns, and falls back to the default', function () {
+    it('ignores an invalid poll interval, warns, and falls back to the default', async function () {
         const warnStub = sinon.stub(logging, 'warn');
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING, pollInterval: -5});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.equal(instance.pollInterval, 5 * 60 * 1000);
         assert.ok(warnStub.getCalls().some(c => c.args[0]?.system?.event === 'remote_flags.invalid_poll_interval'));
     });
 
-    it('rejects a sub-floor poll interval (manifest-host-hammering guard) and uses the default', function () {
+    it('rejects a sub-floor poll interval (manifest-host-hammering guard) and uses the default', async function () {
         const warnStub = sinon.stub(logging, 'warn');
         // 1ms across many instances would be a self-inflicted DoS; must not be honored.
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING, pollInterval: 1});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
 
         assert.equal(instance.pollInterval, 5 * 60 * 1000);
         assert.ok(warnStub.getCalls().some(c => c.args[0]?.system?.event === 'remote_flags.invalid_poll_interval'));
     });
 
-    it('is idempotent: a second init returns the same instance and starts once', function () {
+    it('is idempotent: a second init returns the same instance and starts once', async function () {
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
 
-        const first = remoteFlags.init(config);
-        const second = remoteFlags.init(config);
+        const first = await remoteFlags.init(config);
+        const second = await remoteFlags.init(config);
 
         assert.equal(first, second);
         assert.equal(startStub.calledOnce, true);
     });
 
-    it('stop() stops the running service and allows a fresh init afterwards', function () {
+    it('shutdown() stops the running service and allows a fresh init afterwards', async function () {
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
 
         const stopStub = sinon.stub(RemoteFlagsService.prototype, 'stop');
-        const first = remoteFlags.init(config);
-        remoteFlags.service.stop();
+        const first = await remoteFlags.init(config);
+        await remoteFlags.shutdown();
 
         assert.equal(stopStub.calledOnce, true);
-        assert.equal(remoteFlags.service.getInstance(), null);
+        assert.throws(() => remoteFlags.service.getInstance(), /RemoteFlagsService must be initialized before use/);
 
-        const second = remoteFlags.init(config);
+        const second = await remoteFlags.init(config);
         assert.notEqual(second, first);
         assert.equal(startStub.calledTwice, true);
     });
 
-    it('applyOverrides writes through to the shared override store', function () {
+    it('applyOverrides writes through to the shared override store', async function () {
         configUtils.set('remoteFlags', {enabled: true, url: URL_STRING});
 
-        const instance = remoteFlags.init(config);
+        const instance = await remoteFlags.init(config);
         instance.applyOverrides({flagA: true});
 
         assert.deepEqual(flagOverrides.getAll(), {flagA: true});
