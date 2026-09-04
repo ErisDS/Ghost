@@ -56,6 +56,17 @@ describe('defineService', function () {
         expect(start).toHaveBeenCalledOnce();
     });
 
+    it('passes initialization arguments to the factory', async function () {
+        const lifecycle = defineService<ExampleService, [number]>({
+            name: 'ExampleService',
+            create: value => new ExampleService(value)
+        });
+
+        await lifecycle.init(42);
+
+        expect(lifecycle.service.value).toBe(42);
+    });
+
     it('cleans up a failed start without publishing the candidate', async function () {
         const candidate = new ExampleService(1);
         const failure = new Error('start failed');
