@@ -11,7 +11,7 @@ export interface ServiceLifecycleOptions<T extends object, Args extends unknown[
 
 export interface ServiceLifecycle<T extends object, Args extends unknown[]> {
     service: T;
-    init(...args: Args): Promise<void>;
+    init(...args: Args): Awaitable<void>;
     shutdown(): Promise<void>;
 }
 
@@ -46,32 +46,69 @@ export function defineService<T extends object, Args extends unknown[] = []>({
 
     const service = lazySingleton(name, () => instance);
 
-    const startService = async (args: Args): Promise<void> => {
-        let candidate: T | undefined;
+    const isPromiseLike = <Value>(value: Awaitable<Value>): value is PromiseLike<Value> => {
+        return typeof (value as PromiseLike<Value>)?.then === 'function';
+    };
+
+    const cleanUpFailedStart = (candidate: T, startError: unknown): Awaitable<never> => {
+        if (!stop) {
+            throw startError;
+        }
 
         try {
-            candidate = await create(...args);
-            await start?.(candidate);
-            instance = candidate;
-        } catch (startError) {
-            if (candidate && stop) {
-                try {
-                    await stop(candidate);
-                } catch (stopError) {
-                    throw new ServiceLifecycleFailure(`${name} failed to start and clean up`, [
+            const cleanup = stop(candidate);
+
+            if (isPromiseLike(cleanup)) {
+                return Promise.resolve(cleanup).then(
+                    () => Promise.reject(startError),
+                    stopError => Promise.reject(new ServiceLifecycleFailure(`${name} failed to start and clean up`, [
                         startError,
                         stopError
-                    ]);
-                }
+                    ]))
+                );
+            }
+        } catch (stopError) {
+            throw new ServiceLifecycleFailure(`${name} failed to start and clean up`, [
+                startError,
+                stopError
+            ]);
+        }
+
+        throw startError;
+    };
+
+    const startCandidate = (candidate: T): Awaitable<void> => {
+        try {
+            const startup = start?.(candidate);
+
+            if (startup && isPromiseLike(startup)) {
+                return Promise.resolve(startup).then(
+                    () => {
+                        instance = candidate;
+                    },
+                    startError => cleanUpFailedStart(candidate, startError)
+                );
             }
 
-            throw startError;
+            instance = candidate;
+        } catch (startError) {
+            return cleanUpFailedStart(candidate, startError);
         }
     };
 
-    const init = (...args: Args): Promise<void> => {
+    const trackInit = (operation: PromiseLike<void>): Promise<void> => {
+        const tracked = Promise.resolve(operation).finally(() => {
+            if (initPromise === tracked) {
+                initPromise = undefined;
+            }
+        });
+        initPromise = tracked;
+        return tracked;
+    };
+
+    const init = (...args: Args): Awaitable<void> => {
         if (instance) {
-            return Promise.resolve();
+            return;
         }
 
         if (initPromise) {
@@ -82,11 +119,24 @@ export function defineService<T extends object, Args extends unknown[] = []>({
             return shutdownPromise.then(() => init(...args));
         }
 
-        initPromise = startService(args).finally(() => {
-            initPromise = undefined;
-        });
+        let candidate: Awaitable<T>;
 
-        return initPromise;
+        try {
+            candidate = create(...args);
+        } catch (error) {
+            throw error;
+        }
+
+        if (isPromiseLike(candidate)) {
+            return trackInit(Promise.resolve(candidate).then(startCandidate));
+        }
+
+        const startup = startCandidate(candidate);
+        if (startup && isPromiseLike(startup)) {
+            return trackInit(startup);
+        }
+
+        return;
     };
 
     const shutdown = (): Promise<void> => {
