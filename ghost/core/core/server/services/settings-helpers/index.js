@@ -20,7 +20,8 @@ function create() {
 }
 const lifecycle = defineService({
     name: 'SettingsHelpers',
-    create
+    create,
+    retainInstance: true
 });
 
 
