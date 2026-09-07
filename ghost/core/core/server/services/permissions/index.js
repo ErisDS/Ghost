@@ -25,6 +25,7 @@ async function create(options = {}) {
 const lifecycle = defineService({
     name: 'PermissionsService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

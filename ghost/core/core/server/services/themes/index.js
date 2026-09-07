@@ -45,6 +45,7 @@ async function create() {
 const lifecycle = defineService({
     name: 'ThemesService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

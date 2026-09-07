@@ -168,6 +168,7 @@ const create = ({
 const lifecycle = defineService({
     name: 'EmailAnalyticsService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

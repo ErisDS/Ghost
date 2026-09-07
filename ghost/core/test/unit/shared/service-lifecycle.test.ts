@@ -81,6 +81,27 @@ describe('defineService', function () {
         expect(lifecycle.service.value).toBe(1);
     });
 
+    it('keeps an explicitly stable legacy instance available around boot', async function () {
+        const instance = new ExampleService(1);
+        const create = vi.fn(() => instance);
+        const lifecycle = defineService({
+            name: 'ExampleService',
+            create,
+            stableInstance: instance,
+            reinitialize: true
+        });
+
+        expect(lifecycle.service.value).toBe(1);
+
+        await lifecycle.init();
+        await lifecycle.shutdown();
+
+        expect(lifecycle.service.value).toBe(1);
+
+        await lifecycle.init();
+        expect(create).toHaveBeenCalledTimes(2);
+    });
+
     it('passes initialization arguments to the factory', async function () {
         const lifecycle = defineService<ExampleService, [number]>({
             name: 'ExampleService',

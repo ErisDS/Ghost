@@ -22,6 +22,7 @@ async function create() {
 const lifecycle = defineService({
     name: 'MembersService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

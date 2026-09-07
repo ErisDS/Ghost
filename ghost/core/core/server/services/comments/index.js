@@ -38,6 +38,7 @@ function create() {
 const lifecycle = defineService({
     name: 'CommentsService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

@@ -15,6 +15,7 @@ function create(options) {
 const lifecycle = defineService({
     name: 'EmailService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

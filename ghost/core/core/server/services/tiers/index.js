@@ -40,6 +40,7 @@ async function create() {
 const lifecycle = defineService({
     name: 'TiersService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 

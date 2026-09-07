@@ -20,6 +20,7 @@ async function create() {
 const lifecycle = defineService({
     name: 'StripeService',
     create,
+    stableInstance: instance,
     reinitialize: true
 });
 
