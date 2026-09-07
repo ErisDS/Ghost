@@ -19,7 +19,8 @@ function create() {
 }
 const lifecycle = defineService({
     name: 'UrlService',
-    create
+    create,
+    retainInstance: true
 });
 
 

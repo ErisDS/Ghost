@@ -6,6 +6,7 @@ export interface ServiceLifecycleOptions<T extends object, Args extends unknown[
     name: string;
     create(...args: Args): Awaitable<T>;
     stableInstance?: T;
+    retainInstance?: boolean;
     reinitialize?: boolean;
     start?(service: T): Awaitable<void>;
     stop?(service: T): Awaitable<void>;
@@ -40,6 +41,7 @@ export function defineService<T extends object, Args extends unknown[] = []>({
     name,
     create,
     stableInstance,
+    retainInstance = stableInstance !== undefined,
     reinitialize = false,
     start,
     stop
@@ -159,10 +161,16 @@ export function defineService<T extends object, Args extends unknown[] = []>({
             }
 
             const candidate = instance;
-            instance = stableInstance;
+            instance = undefined;
 
-            if (candidate) {
-                await stop?.(candidate);
+            try {
+                if (candidate) {
+                    await stop?.(candidate);
+                }
+            } finally {
+                if (retainInstance) {
+                    instance = candidate ?? stableInstance;
+                }
             }
         })().finally(() => {
             shutdownPromise = undefined;

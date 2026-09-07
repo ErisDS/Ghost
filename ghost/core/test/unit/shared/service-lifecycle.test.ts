@@ -102,6 +102,22 @@ describe('defineService', function () {
         expect(create).toHaveBeenCalledTimes(2);
     });
 
+    it('can retain a lazily created legacy facade after shutdown', async function () {
+        const instance = new ExampleService(1);
+        const lifecycle = defineService({
+            name: 'ExampleService',
+            create: () => instance,
+            retainInstance: true
+        });
+
+        expect(() => lifecycle.service.value).toThrow('ExampleService must be initialized before use');
+
+        await lifecycle.init();
+        await lifecycle.shutdown();
+
+        expect(lifecycle.service.value).toBe(1);
+    });
+
     it('passes initialization arguments to the factory', async function () {
         const lifecycle = defineService<ExampleService, [number]>({
             name: 'ExampleService',

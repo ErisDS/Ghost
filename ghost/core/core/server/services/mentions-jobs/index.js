@@ -14,6 +14,8 @@ function create() {
 const lifecycle = defineService({
     name: 'MentionsJobService',
     create,
+    retainInstance: true,
+    reinitialize: true,
     stop(jobManager) {
         return jobManager.shutdown();
     }
