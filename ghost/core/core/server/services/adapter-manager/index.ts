@@ -25,7 +25,8 @@ function create() {
 }
 const lifecycle = defineService({
     name: 'AdapterManager',
-    create
+    create,
+    retainInstance: true
 });
 
 export const service = lifecycle.service;
