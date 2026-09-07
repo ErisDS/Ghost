@@ -1,12 +1,10 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('MediaInlinerService', () => instance);
-
-async function init() {
+async function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const debug = require('@tryghost/debug')('mediaInliner');
@@ -59,6 +57,15 @@ async function init() {
             }
         }
     };
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'MediaInlinerService',
+    create
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

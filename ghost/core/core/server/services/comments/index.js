@@ -1,10 +1,8 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 const instance = {};
 
-const service = lazySingleton('CommentsService', () => instance);
-
-function init() {
+function create() {
     const CommentsService = require('./comments-service');
     const CommentsController = require('./comments-controller');
     const CommentsStats = require('./comments-stats-service');
@@ -34,6 +32,16 @@ function init() {
     const stats = new CommentsStats({db});
     instance.api = api;
     instance.controller = new CommentsController(api, stats);
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'CommentsService',
+    create,
+    reinitialize: true
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

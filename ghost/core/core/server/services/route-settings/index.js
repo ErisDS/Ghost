@@ -1,9 +1,9 @@
 const DynamicRoutingService = require('./dynamic-routing-service');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-function init() {
+function create() {
     if (!instance) {
         instance = new DynamicRoutingService();
     }
@@ -12,8 +12,15 @@ function init() {
     instance.configure({
         store: adapterManager.getAdapter('route-settings')
     });
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'RouteSettingsService',
+    create
+});
 
-const service = lazySingleton('RouteSettingsService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

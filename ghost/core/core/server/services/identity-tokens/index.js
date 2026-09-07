@@ -1,14 +1,12 @@
 const {IdentityTokenService} = require('./identity-token-service');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 let initPromise;
 
-const service = lazySingleton('IdentityTokenService', () => instance);
-
-async function init() {
+async function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     if (!initPromise) {
@@ -32,9 +30,17 @@ async function init() {
         initPromise = undefined;
         throw error;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'IdentityTokenService',
+    create
+});
+
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

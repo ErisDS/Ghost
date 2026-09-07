@@ -1,16 +1,24 @@
 const EmailServiceWrapper = require('./email-service-wrapper');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 const instance = new EmailServiceWrapper();
 let initialized = false;
 
-function init(options) {
+function create(options) {
     if (!initialized) {
         instance.init(options);
         initialized = true;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'EmailService',
+    create,
+    reinitialize: true
+});
 
-const service = lazySingleton('EmailService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

@@ -5,7 +5,7 @@ import {GiftService} from './gift-service';
 import {GiftReminderScheduler} from './gift-reminder-scheduler';
 import {GiftEmailService} from './gift-email-service';
 import {GiftController} from './gift-controller';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 export interface GiftServiceInitOptions {
     apiUrl: string;
@@ -17,11 +17,9 @@ type GiftServiceFacade = GiftService & {controller: GiftController};
 
 let instance: GiftServiceFacade | undefined;
 
-export const service = lazySingleton('GiftService', () => instance);
-
-export async function init(options: GiftServiceInitOptions): Promise<void> {
+async function create(options: GiftServiceInitOptions) {
     if (instance) {
-        return;
+        return instance;
     }
 
     const {Gift: GiftModel, MemberStripeCustomer: StripeCustomerModel} = require('../../models');
@@ -130,4 +128,14 @@ export async function init(options: GiftServiceInitOptions): Promise<void> {
 
     jobs.scheduleGiftCleanupJob();
     jobs.scheduleGiftReminderJob();
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'GiftService',
+    create
+});
+
+export const service = lifecycle.service;
+export const init = lifecycle.init;
+export const shutdown = lifecycle.shutdown;

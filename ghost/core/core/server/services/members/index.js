@@ -1,4 +1,4 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 // Members still exposes a small set of static collaborators before boot
 // (content gating and API test seams). Keep that legacy object stable while
@@ -6,9 +6,7 @@ const {lazySingleton} = require('../../../shared/lazy-singleton');
 const instance = require('./service');
 let initPromise;
 
-const service = lazySingleton('MembersService', () => instance);
-
-async function init() {
+async function create() {
     if (!initPromise) {
         initPromise = instance.init();
     }
@@ -18,6 +16,16 @@ async function init() {
     } finally {
         initPromise = undefined;
     }
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'MembersService',
+    create,
+    reinitialize: true
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

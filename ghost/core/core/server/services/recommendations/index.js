@@ -1,16 +1,23 @@
 const RecommendationServiceWrapper = require('./recommendation-service-wrapper');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-function init() {
+function create() {
     if (!instance) {
         const recommendationService = new RecommendationServiceWrapper();
         recommendationService.init();
         instance = recommendationService;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'RecommendationsService',
+    create
+});
 
-const service = lazySingleton('RecommendationsService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

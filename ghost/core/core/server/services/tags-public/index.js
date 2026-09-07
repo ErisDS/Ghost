@@ -1,12 +1,10 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('TagsPublicService', () => instance);
-
-async function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const adapterManager = require('../adapter-manager').service;
@@ -20,6 +18,15 @@ async function init() {
     }
 
     instance = {cache};
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'TagsPublicService',
+    create
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

@@ -4,14 +4,7 @@ const assert = require('node:assert/strict');
 
 const servicesPath = path.join(__dirname, '../../../../core/server/services');
 
-const managedLifecycleServiceRoots = [
-    'remote-flags'
-];
-
-// These roots acquire timers, workers, subscriptions, schedulers, listeners,
-// or external resources, but have not yet moved onto the managed lifecycle.
-// Keep the debt explicit instead of misclassifying them as composition-only.
-const legacyLifecycleServiceRoots = [
+const resourceOwningServiceRoots = [
     'activitypub',
     'automations',
     'email-analytics',
@@ -29,6 +22,7 @@ const legacyLifecycleServiceRoots = [
     'offers',
     'post-scheduling',
     'recommendations',
+    'remote-flags',
     'route-settings',
     'slack-notifications',
     'staff',
@@ -73,8 +67,7 @@ const compositionOnlyServiceRoots = [
 ];
 
 const serviceRoots = [
-    ...managedLifecycleServiceRoots,
-    ...legacyLifecycleServiceRoots,
+    ...resourceOwningServiceRoots,
     ...compositionOnlyServiceRoots
 ];
 
@@ -121,7 +114,7 @@ describe('Service roots', function () {
         }
     });
 
-    it.each(managedLifecycleServiceRoots)('%s exposes managed shutdown', function (serviceName) {
+    it.each(serviceRoots)('%s exposes managed shutdown', function (serviceName) {
         const servicePath = path.join(servicesPath, serviceName);
         const entryPath = ['index.ts', 'index.js']
             .map(fileName => path.join(servicePath, fileName))

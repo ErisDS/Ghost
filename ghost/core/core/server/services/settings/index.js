@@ -1,10 +1,10 @@
 const settingsService = require('./settings-service');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 const instance = settingsService;
 let initPromise;
 
-async function init() {
+async function create() {
     if (!initPromise) {
         initPromise = settingsService.init();
     }
@@ -14,8 +14,16 @@ async function init() {
     } finally {
         initPromise = undefined;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'SettingsService',
+    create,
+    reinitialize: true
+});
 
-const service = lazySingleton('SettingsService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

@@ -1,4 +1,4 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
@@ -6,7 +6,7 @@ let instance;
 // serialize → payload → trigger chain and registers the model-event
 // listeners. Requires are deferred until init() runs so the model layer
 // isn't loaded before boot wires it.
-function init() {
+function create() {
     if (!instance) {
         const models = require('../../models');
         const limitService = require('../../services/limits');
@@ -24,8 +24,15 @@ function init() {
         registerListeners({events, trigger});
         instance = {serialize, payload, trigger};
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'WebhooksService',
+    create
+});
 
-const service = lazySingleton('WebhooksService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

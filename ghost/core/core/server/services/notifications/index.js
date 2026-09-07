@@ -1,9 +1,9 @@
 const Notifications = require('./notifications');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-function init() {
+function create() {
     if (!instance) {
         const settingsCache = require('../../../shared/settings-cache');
         const models = require('../../models');
@@ -13,8 +13,15 @@ function init() {
             SettingsModel: models.Settings
         });
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'NotificationsService',
+    create
+});
 
-const service = lazySingleton('NotificationsService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

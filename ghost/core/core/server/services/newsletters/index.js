@@ -1,5 +1,5 @@
 const NewslettersService = require('./newsletters-service.js');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 const MAGIC_LINK_TOKEN_VALIDITY = 24 * 60 * 60 * 1000;
 const MAGIC_LINK_TOKEN_VALIDITY_AFTER_USAGE = 10 * 60 * 1000;
@@ -7,11 +7,9 @@ const MAGIC_LINK_TOKEN_MAX_USAGE_COUNT = 7;
 
 let instance;
 
-const service = lazySingleton('NewslettersService', () => instance);
-
-function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const SingleUseTokenProvider = require('../members/single-use-token-provider');
@@ -37,9 +35,17 @@ function init() {
         labs,
         emailAddressService
     });
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'NewslettersService',
+    create
+});
+
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

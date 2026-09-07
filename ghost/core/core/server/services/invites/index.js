@@ -1,9 +1,9 @@
 const Invites = require('./invites');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-function init() {
+function create() {
     if (!instance) {
         const settingsCache = require('../../../shared/settings-cache');
         const settingsHelpers = require('../settings-helpers').service;
@@ -12,8 +12,15 @@ function init() {
 
         instance = new Invites({settingsCache, settingsHelpers, mailService, urlUtils});
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'InvitesService',
+    create
+});
 
-const service = lazySingleton('InvitesService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

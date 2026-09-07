@@ -1,12 +1,12 @@
 const LinkTrackingServiceWrapper = require('./link-tracking-service-wrapper');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 let initPromise;
 
-async function init() {
+async function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     if (!initPromise) {
@@ -22,8 +22,15 @@ async function init() {
         initPromise = undefined;
         throw error;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'LinkTrackingService',
+    create
+});
 
-const service = lazySingleton('LinkTrackingService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

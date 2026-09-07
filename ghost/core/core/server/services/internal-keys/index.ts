@@ -1,5 +1,5 @@
 import {AutoFillingMap} from '../../lib/auto-filling-map';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 /**
  * Slug identifying an internal integration whose API key is consumed
@@ -33,11 +33,9 @@ export type InternalKeys = AutoFillingMap<InternalIntegrationSlug, Promise<Inter
 
 let instance: InternalKeys | undefined;
 
-export const service = lazySingleton('InternalKeys', () => instance);
-
-export function init(): void {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     // models/index.js is the Bookshelf model registry — a JS module without
@@ -52,4 +50,14 @@ export function init(): void {
     instance = new AutoFillingMap<InternalIntegrationSlug, Promise<InternalApiKey>>(
         slug => models.Integration.getApiKeyBySlug(slug, SLUG_KEY_TYPE[slug])
     );
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'InternalKeys',
+    create
+});
+
+export const service = lifecycle.service;
+export const init = lifecycle.init;
+export const shutdown = lifecycle.shutdown;
