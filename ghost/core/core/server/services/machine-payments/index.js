@@ -12,7 +12,7 @@ const {MppAdapter} = require('./adapters/mpp-adapter');
 const {MachinePaymentEventRepository} = require('./events/machine-payment-event-repository');
 const {ContentLoader} = require('./content-loader');
 const {Pricing} = require('./pricing');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 class MachinePaymentsServiceWrapper {
     /** @type {MachinePaymentsService|null} */
@@ -86,14 +86,21 @@ class MachinePaymentsServiceWrapper {
 
 let instance;
 
-function init() {
+function create() {
     if (!instance) {
         const machinePaymentsService = new MachinePaymentsServiceWrapper();
         machinePaymentsService.init();
         instance = machinePaymentsService;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'MachinePaymentsService',
+    create
+});
 
-const service = lazySingleton('MachinePaymentsService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

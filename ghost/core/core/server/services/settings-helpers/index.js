@@ -1,13 +1,11 @@
 const SettingsHelpers = require('./settings-helpers');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('SettingsHelpers', () => instance);
-
-function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const settingsCache = require('../../../shared/settings-cache');
@@ -17,9 +15,18 @@ function init() {
     const limitService = require('../limits');
 
     instance = new SettingsHelpers({settingsCache, urlUtils, config, labs, limitService});
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'SettingsHelpers',
+    create,
+    retainInstance: true
+});
+
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

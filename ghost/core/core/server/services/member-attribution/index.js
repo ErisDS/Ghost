@@ -1,12 +1,10 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('MemberAttributionService', () => instance);
-
-function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const urlService = require('../url').service;
@@ -53,6 +51,15 @@ function init() {
         attributionBuilder,
         outboundLinkTagger
     };
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'MemberAttributionService',
+    create
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

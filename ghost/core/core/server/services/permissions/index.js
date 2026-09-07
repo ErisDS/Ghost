@@ -2,12 +2,13 @@ const models = require('../../models');
 const actionsMap = require('./actions-map-cache');
 const canThis = require('./can-this');
 const parseContext = require('./parse-context');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 const instance = {canThis, parseContext};
 let initPromise;
+let actions;
 
-async function init(options = {}) {
+async function create(options = {}) {
     if (!initPromise) {
         initPromise = models.Permission.findAll(options).then((permissionsCollection) => {
             return actionsMap.init(permissionsCollection);
@@ -15,12 +16,24 @@ async function init(options = {}) {
     }
 
     try {
-        return await initPromise;
+        actions = await initPromise;
+        return instance;
     } finally {
         initPromise = undefined;
     }
 }
+const lifecycle = defineService({
+    name: 'PermissionsService',
+    create,
+    stableInstance: instance,
+    reinitialize: true
+});
 
-const service = lazySingleton('PermissionsService', () => instance);
+async function init(options) {
+    await lifecycle.init(options);
+    return actions;
+}
 
-module.exports = {init, service};
+module.exports = {init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

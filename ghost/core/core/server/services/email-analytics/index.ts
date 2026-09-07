@@ -25,7 +25,7 @@ import {StartAutomationEmailAnalyticsJobEvent} from './events/start-automation-e
 import {AUTOMATION_EMAIL_TAG} from '../member-welcome-emails/constants';
 import type * as AutomationsApi from '../automations/automations-api';
 import {AutomationEmailAnalyticsBatchProcessor} from './automation-email-analytics-batch-processor';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 const newsletters = new EmailAnalyticsServiceWrapper({
     logName: 'newsletters'
@@ -42,9 +42,7 @@ interface EmailAnalyticsServices {
 
 const instance: EmailAnalyticsServices = {newsletters, automations};
 
-export const service = lazySingleton('EmailAnalyticsService', () => instance);
-
-export const init = ({
+const create = ({
     automationsApi,
     config,
     db,
@@ -164,4 +162,16 @@ export const init = ({
             })
         )
     });
+
+    return instance;
 };
+const lifecycle = defineService({
+    name: 'EmailAnalyticsService',
+    create,
+    stableInstance: instance,
+    reinitialize: true
+});
+
+export const service = lifecycle.service;
+export const init = lifecycle.init;
+export const shutdown = lifecycle.shutdown;

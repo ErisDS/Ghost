@@ -1,14 +1,12 @@
 const LazyUrlService = require('./lazy-url-service');
 const {createFindResource} = require('./lazy-find-resource');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('UrlService', () => instance);
-
-function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const models = require('../../models');
@@ -16,9 +14,18 @@ function init() {
     // Every caller shares the router registrations made by RouterManager at
     // boot and on every routes.yaml reload.
     instance = new LazyUrlService({findResource: createFindResource(models)});
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'UrlService',
+    create,
+    retainInstance: true
+});
+
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

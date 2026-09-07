@@ -292,4 +292,9 @@ export class SlackPingService {
             .removeListener('slack.test', this.testListener)
             .on('slack.test', this.testListener);
     }
+
+    unsubscribeEvents(): void {
+        this.events.removeListener('post.published', this.postListener);
+        this.events.removeListener('slack.test', this.testListener);
+    }
 }

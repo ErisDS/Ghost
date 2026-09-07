@@ -1,6 +1,6 @@
 const DomainEvents = require('@tryghost/domain-events');
 const labs = require('../../../shared/labs');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 class StaffServiceWrapper {
     init() {
@@ -40,14 +40,21 @@ class StaffServiceWrapper {
 
 let instance;
 
-function init() {
+function create() {
     if (!instance) {
         const staffService = new StaffServiceWrapper();
         staffService.init();
         instance = staffService;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'StaffService',
+    create
+});
 
-const service = lazySingleton('StaffService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

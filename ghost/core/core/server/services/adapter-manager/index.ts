@@ -1,15 +1,13 @@
 import {AdapterManager} from './adapter-manager';
 import {adapterPaths} from './adapter-paths';
 import {baseClasses} from './base-classes';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 let instance: AdapterManager | undefined;
 
-export const service = lazySingleton('AdapterManager', () => instance);
-
-export function init(): void {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const config = require('../../../shared/config');
@@ -22,4 +20,15 @@ export function init(): void {
     });
 
     instance.init();
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'AdapterManager',
+    create,
+    retainInstance: true
+});
+
+export const service = lifecycle.service;
+export const init = lifecycle.init;
+export const shutdown = lifecycle.shutdown;

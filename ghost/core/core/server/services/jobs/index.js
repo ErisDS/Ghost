@@ -1,15 +1,27 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('JobService', () => instance);
-
-function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     instance = require('./job-service');
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'JobService',
+    create,
+    retainInstance: true,
+    reinitialize: true,
+    stop(jobManager) {
+        return jobManager.shutdown();
+    }
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

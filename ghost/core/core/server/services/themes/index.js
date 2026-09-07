@@ -6,7 +6,7 @@ const installer = require('./installer');
 const validate = require('./validate');
 const settingsCache = require('../../../shared/settings-cache');
 const config = require('../../../shared/config');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 const instance = {
     loadInactiveThemes: themeLoader.loadAllThemes,
@@ -22,7 +22,7 @@ const instance = {
 };
 let initPromise;
 
-async function init() {
+async function create() {
     if (!initPromise) {
         initPromise = (async () => {
             validate.init();
@@ -39,8 +39,17 @@ async function init() {
     } finally {
         initPromise = undefined;
     }
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'ThemesService',
+    create,
+    stableInstance: instance,
+    reinitialize: true
+});
 
-const service = lazySingleton('ThemesService', () => instance);
 
-module.exports = {init, service};
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

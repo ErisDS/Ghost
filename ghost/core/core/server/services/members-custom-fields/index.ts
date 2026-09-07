@@ -2,7 +2,7 @@ import {CustomFieldDefinitionsService} from './definitions-service';
 import {CustomFieldValuesService} from './values-service';
 import {recordCustomFieldAction, type RecordCustomFieldAction} from './actions';
 import {resolveMaxDefinitions} from './config';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 export type {CustomField} from './models';
 export type {RequestContext} from './actions';
@@ -21,11 +21,9 @@ interface MembersCustomFieldsService {
 
 let instance: MembersCustomFieldsService | undefined;
 
-export const service = lazySingleton('MembersCustomFieldsService', () => instance);
-
-export function init(): void {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const {knex} = require('../../data/db');
@@ -52,4 +50,14 @@ export function init(): void {
         getMaxDefinitions: () => resolveMaxDefinitions(config.get('members:customFields:maxDefinitions'))
     });
     instance = {definitions, values};
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'MembersCustomFieldsService',
+    create
+});
+
+export const service = lifecycle.service;
+export const init = lifecycle.init;
+export const shutdown = lifecycle.shutdown;

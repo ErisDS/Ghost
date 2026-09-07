@@ -1,11 +1,9 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 let initPromise;
 
-const service = lazySingleton('CustomRedirectsService', () => instance);
-
-async function init() {
+async function create() {
     if (!initPromise) {
         initPromise = (async () => {
             const config = require('../../../shared/config');
@@ -42,6 +40,16 @@ async function init() {
     } finally {
         initPromise = undefined;
     }
-}
 
-module.exports = {init, service};
+    return instance;
+}
+const lifecycle = defineService({
+    name: 'CustomRedirectsService',
+    create,
+    reinitialize: true
+});
+
+
+module.exports = {init: lifecycle.init, service: lifecycle.service,
+    shutdown: lifecycle.shutdown
+};

@@ -1,14 +1,12 @@
 const {ActivityPubService} = require('./activity-pub-service');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 let enabled = false;
 
-const service = lazySingleton('ActivityPubService', () => instance);
-
-async function init() {
+async function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const logging = require('@tryghost/logging');
@@ -42,9 +40,17 @@ async function init() {
     events.on('settings.is_private.edited', configureActivityPub);
 
     configureActivityPub();
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'ActivityPubService',
+    create
+});
+
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

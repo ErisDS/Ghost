@@ -1,13 +1,11 @@
 import PostScheduling from './post-scheduling';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 let instance: PostScheduling | undefined;
 
-export const service = lazySingleton('PostScheduling', () => instance);
-
-export function init(): void {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const {service: internalKeys} = require('../internal-keys');
@@ -20,4 +18,14 @@ export function init(): void {
         adapter: withErrorCapture(adapterManager.getAdapter('scheduling')),
         internalKeys
     });
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'PostScheduling',
+    create
+});
+
+export const service = lifecycle.service;
+export const init = lifecycle.init;
+export const shutdown = lifecycle.shutdown;

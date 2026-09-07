@@ -1,13 +1,11 @@
 const {EmailAddressService} = require('./email-address-service');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
 let instance;
 
-const service = lazySingleton('EmailAddressService', () => instance);
-
-function init() {
+function create() {
     if (instance) {
-        return;
+        return instance;
     }
 
     const labs = require('../../../shared/labs');
@@ -25,9 +23,17 @@ function init() {
         getMembersSupportAddress: () => settingsHelpers.getMembersSupportAddress(),
         isValidEmailAddress: emailAddress => validator.isEmail(emailAddress)
     });
+
+    return instance;
 }
+const lifecycle = defineService({
+    name: 'EmailAddressService',
+    create
+});
+
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

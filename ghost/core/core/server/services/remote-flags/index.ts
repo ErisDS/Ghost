@@ -1,14 +1,12 @@
 import logging from '@tryghost/logging';
 import {RemoteFlagsService} from './remote-flags-service';
 import * as flagOverrides from '../../../shared/labs-flag-overrides';
-import {lazySingleton} from '../../../shared/lazy-singleton';
+import {defineService} from '../../../shared/service-lifecycle';
 
 // @tryghost/request ships no types; require() avoids an implicit-any under the strict tsconfig.
 const request = require('@tryghost/request');
-// Every site seeds a site_uuid setting, so it's a universal ramp key.
 const settingsCache = require('../../../shared/settings-cache');
 
-// Config slice this module needs; injected so init() stays testable.
 interface ConfigLike {
     get(key: string): unknown;
 }
@@ -19,54 +17,31 @@ interface RemoteFlagsConfig {
     pollInterval?: unknown;
 }
 
-// Floor for the poll interval: many instances can share one manifest host, so a
-// too-small or units-confused (seconds-as-ms) value is rejected, not honored.
+interface RemoteFlagsRuntime {
+    getInstance(): RemoteFlagsService | null;
+}
+
 const MIN_POLL_INTERVAL_MS = 60 * 1000;
 
-let instance: RemoteFlagsService | null = null;
-let lifecycle: {stop(): void; getInstance(): RemoteFlagsService | null} | undefined;
-
-export const service = lazySingleton('RemoteFlagsService', () => lifecycle);
-
-/**
- * Start the poller if enabled for this instance. Config-gated and opt-in: inert
- * unless `remoteFlags` is enabled with a `url` (self-hosted/dev leave it unset).
- * The site's UUID is the ramp bucket key; it's absent only in edge cases, where
- * ramps are skipped but full overrides still apply. Polling is fire-and-forget so
- * boot is never blocked on the first fetch.
- *
- * @returns the running service, or null when inert
- */
-export function init(config: ConfigLike): RemoteFlagsService | null {
-    if (!lifecycle) {
-        lifecycle = {stop, getInstance};
-    }
-
-    if (instance) {
-        return instance;
-    }
-
+function createRuntime(config: ConfigLike): RemoteFlagsRuntime {
     const remoteFlags = (config.get('remoteFlags') as RemoteFlagsConfig) || {};
 
     if (remoteFlags.enabled !== true || !remoteFlags.url) {
-        return null;
+        return {getInstance: () => null};
     }
 
     const siteUuid = settingsCache.get('site_uuid') as string | undefined;
 
     let url: URL;
     try {
-        // Validate the url once at start (not on every poll); hand the service a ready URL.
         url = new URL(remoteFlags.url);
     } catch {
         logging.warn({
             system: {event: 'remote_flags.invalid_url'}
         }, `Remote feature flags url is not a valid URL, not starting: ${remoteFlags.url}`);
-        return null;
+        return {getInstance: () => null};
     }
 
-    // Optional poll interval (ms): honor a finite value >= the floor, else warn and
-    // use the service default.
     let pollInterval: number | undefined;
     const configuredInterval = remoteFlags.pollInterval;
     if (configuredInterval !== undefined && configuredInterval !== null) {
@@ -79,7 +54,7 @@ export function init(config: ConfigLike): RemoteFlagsService | null {
         }
     }
 
-    instance = new RemoteFlagsService({
+    const instance = new RemoteFlagsService({
         url,
         siteUuid,
         applyOverrides: overrides => flagOverrides.replace(overrides),
@@ -87,23 +62,30 @@ export function init(config: ConfigLike): RemoteFlagsService | null {
         pollInterval
     });
 
-    // Fire-and-forget: start() never rejects, so this won't block boot or throw unhandled.
-    instance.start();
-
-    return instance;
+    return {getInstance: () => instance};
 }
+
+const lifecycle = defineService<RemoteFlagsRuntime, [ConfigLike]>({
+    name: 'RemoteFlagsService',
+    create: createRuntime,
+    async start(runtime) {
+        await runtime.getInstance()?.start();
+    },
+    stop(runtime) {
+        runtime.getInstance()?.stop();
+    }
+});
+
+export const service = lifecycle.service;
+export const shutdown = lifecycle.shutdown;
 
 /**
- * Stop the poller. Halts polling; intentionally leaves the last-applied overrides
- * in place rather than clearing them.
+ * A disabled or invalid configuration is a successfully initialized, inert
+ * service rather than an uninitialized service. Boot awaits the first fetch
+ * before publishing the facade, so consumers cannot observe a partially
+ * started poller.
  */
-function stop(): void {
-    if (instance) {
-        instance.stop();
-        instance = null;
-    }
-}
-
-function getInstance(): RemoteFlagsService | null {
-    return instance;
+export async function init(config: ConfigLike): Promise<RemoteFlagsService | null> {
+    await lifecycle.init(config);
+    return service.getInstance();
 }
