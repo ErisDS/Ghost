@@ -12,6 +12,18 @@ require('./server/overrides');
 const debug = require('@tryghost/debug')('boot');
 // END OF GLOBAL REQUIRES
 
+function registerServiceCleanup(ghostServer, serviceRoots, name) {
+    if (!ghostServer) {
+        return;
+    }
+
+    ghostServer.registerCleanupTask(async () => {
+        for (const serviceRoot of serviceRoots.toReversed()) {
+            await serviceRoot.shutdown();
+        }
+    }, name);
+}
+
 /**
  * Helper class to create consistent log messages
  */
@@ -99,6 +111,8 @@ async function initDatabase({config}) {
 async function initCore({ghostServer, config}) {
     debug('Begin: initCore');
 
+    const adapterManagerRoot = require('./server/services/adapter-manager');
+
     debug('Begin: URL Service');
     const urlService = require('./server/services/url');
     urlService.init();
@@ -146,9 +160,6 @@ async function initCore({ghostServer, config}) {
     debug('Begin: Gift Links Service');
     const giftLinksService = require('./server/services/gift-links');
     giftLinksService.init();
-    if (ghostServer) {
-        ghostServer.registerCleanupTask(() => giftLinksService.shutdown());
-    }
     debug('End: Gift Links Service');
 
     // Member custom fields service: knex-backed, wired once the DB is ready.
@@ -171,6 +182,22 @@ async function initCore({ghostServer, config}) {
     jobServiceRoot.init();
     mentionsJobServiceRoot.init();
 
+    registerServiceCleanup(ghostServer, [
+        adapterManagerRoot,
+        urlService,
+        internalKeys,
+        oembed,
+        settingsHelpers,
+        settings,
+        giftLinksService,
+        memberCustomFieldsService,
+        postsPublic,
+        tagsPublic,
+        stats,
+        jobServiceRoot,
+        mentionsJobServiceRoot
+    ], 'Core service composition roots');
+
     if (ghostServer) {
         // Job Service allows parts of Ghost to run in the background
         debug('Begin: Job Service');
@@ -180,9 +207,6 @@ async function initCore({ghostServer, config}) {
             jobService.initTestMode();
         }
 
-        ghostServer.registerCleanupTask(async () => {
-            await jobService.shutdown();
-        });
         debug('End: Job Service');
 
         // Mentions Job Service allows mentions to be processed in the background
@@ -193,9 +217,6 @@ async function initCore({ghostServer, config}) {
             mentionsJobService.initTestMode();
         }
 
-        ghostServer.registerCleanupTask(async () => {
-            await mentionsJobService.shutdown();
-        });
         debug('End: Mentions Job Service');
     }
 
@@ -208,7 +229,7 @@ async function initCore({ghostServer, config}) {
  * @param {BootLogger} options.bootLogger
 
  */
-async function initServicesForFrontend({bootLogger}) {
+async function initServicesForFrontend({bootLogger, ghostServer}) {
     debug('Begin: initServicesForFrontend');
 
     debug('Begin: Routing Settings');
@@ -240,6 +261,14 @@ async function initServicesForFrontend({bootLogger}) {
     debug('Begin: Offers');
     const offers = require('./server/services/offers');
     await offers.init();
+
+    registerServiceCleanup(ghostServer, [
+        routeSettings,
+        customRedirects,
+        linkRedirects,
+        themeService,
+        offers
+    ], 'Frontend service composition roots');
     debug('End: Offers');
 
     debug('End: initServicesForFrontend');
@@ -470,17 +499,43 @@ async function initServices({ghostServer, config, prometheusClient}) {
     postsService.init();
     await explorePingService.init();
 
-    if (ghostServer) {
-        ghostServer.registerCleanupTask(() => Promise.all([
-            explorePingService.shutdown(),
-            tinybird.shutdown(),
-            announcementBarService.shutdown(),
-            slack.shutdown(),
-            indexnow.shutdown(),
-            postsService.shutdown(),
-            donationService.shutdown()
-        ]));
-    }
+    registerServiceCleanup(ghostServer, [
+        identityTokens,
+        donationService,
+        stripe,
+        members,
+        tiers,
+        permissions,
+        indexnow,
+        slack,
+        webhooks,
+        postScheduling,
+        comments,
+        staffService,
+        memberAttribution,
+        membersEvents,
+        linkTracking,
+        audienceFeedback,
+        emailSuppressionList,
+        emailService,
+        emailAnalytics,
+        mentionsService,
+        postsService,
+        slackNotifications,
+        mediaInliner,
+        announcementBarService,
+        giftService,
+        machinePaymentsService,
+        recommendationsService,
+        notifications,
+        memberWelcomeEmailService,
+        invites,
+        emailAddressService,
+        tinybird,
+        explorePingService,
+        automations,
+        newsletters
+    ], 'Application service composition roots');
 
     if (schedulerAdapter.rescheduleOnBoot) {
         await postScheduling.service.rescheduleAll();
@@ -542,13 +597,12 @@ async function initBackgroundServices({config, ghostServer}) {
     // Remote feature-flag overrides (config-gated; inert unless explicitly configured).
     const remoteFlags = require('./server/services/remote-flags');
     await remoteFlags.init(config);
-    ghostServer.registerCleanupTask(async () => {
-        await remoteFlags.shutdown();
-    }, 'Remote feature flags');
 
     const milestonesService = require('./server/services/milestones');
     await milestonesService.init();
     milestonesService.service.scheduleRun();
+
+    registerServiceCleanup(ghostServer, [activitypub, remoteFlags, milestonesService], 'Background service composition roots');
 
     debug('End: initBackgroundServices');
 }
@@ -660,7 +714,7 @@ async function bootGhost({backend = true, frontend = true, server = true} = {}) 
             prometheusClient.instrumentKnex(connection);
         }
 
-        await initServicesForFrontend({bootLogger});
+        await initServicesForFrontend({bootLogger, ghostServer});
 
         if (frontend) {
             initFrontend();
