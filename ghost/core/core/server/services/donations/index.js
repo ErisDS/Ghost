@@ -1,23 +1,19 @@
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
-let repository;
+const lifecycle = defineService({
+    name: 'DonationRepository',
+    create() {
+        const {DonationPaymentEvent: DonationPaymentEventModel} = require('../../models');
+        const {DonationBookshelfRepository} = require('./donation-bookshelf-repository');
 
-const service = lazySingleton('DonationRepository', () => repository);
-
-function init() {
-    if (repository) {
-        return;
+        return new DonationBookshelfRepository({
+            DonationPaymentEventModel
+        });
     }
-
-    const {DonationPaymentEvent: DonationPaymentEventModel} = require('../../models');
-    const {DonationBookshelfRepository} = require('./donation-bookshelf-repository');
-
-    repository = new DonationBookshelfRepository({
-        DonationPaymentEventModel
-    });
-}
+});
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };

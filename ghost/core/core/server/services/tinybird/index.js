@@ -1,34 +1,30 @@
 const TinybirdService = require('./tinybird-service');
-const {lazySingleton} = require('../../../shared/lazy-singleton');
+const {defineService} = require('../../../shared/service-lifecycle');
 
-let instance;
+const lifecycle = defineService({
+    name: 'TinybirdService',
+    create() {
+        const config = require('../../../shared/config');
+        const settingsCache = require('../../../shared/settings-cache');
+        const logging = require('@tryghost/logging');
 
-const service = lazySingleton('TinybirdService', () => instance);
+        const tinybirdConfig = config.get('tinybird');
+        const siteUuid = settingsCache.get('site_uuid');
 
-function init() {
-    if (instance) {
-        return;
+        if (!tinybirdConfig || !siteUuid) {
+            logging.warn('Tinybird service not configured');
+        }
+
+        return new TinybirdService({
+            tinybirdConfig,
+            getTinybirdConfig: () => config.get('tinybird'),
+            siteUuid
+        });
     }
-
-    const config = require('../../../shared/config');
-    const settingsCache = require('../../../shared/settings-cache');
-    const logging = require('@tryghost/logging');
-
-    const tinybirdConfig = config.get('tinybird');
-    const siteUuid = settingsCache.get('site_uuid');
-
-    if (!tinybirdConfig || !siteUuid) {
-        logging.warn('Tinybird service not configured');
-    }
-
-    instance = new TinybirdService({
-        tinybirdConfig,
-        getTinybirdConfig: () => config.get('tinybird'),
-        siteUuid
-    });
-}
+});
 
 module.exports = {
-    init,
-    service
+    init: lifecycle.init,
+    service: lifecycle.service,
+    shutdown: lifecycle.shutdown
 };
