@@ -5,6 +5,7 @@ type Awaitable<T> = T | PromiseLike<T>;
 export interface ServiceLifecycleOptions<T extends object, Args extends unknown[]> {
     name: string;
     create(...args: Args): Awaitable<T>;
+    reinitialize?: boolean;
     start?(service: T): Awaitable<void>;
     stop?(service: T): Awaitable<void>;
 }
@@ -37,6 +38,7 @@ export class ServiceLifecycleFailure extends Error {
 export function defineService<T extends object, Args extends unknown[] = []>({
     name,
     create,
+    reinitialize = false,
     start,
     stop
 }: ServiceLifecycleOptions<T, Args>): ServiceLifecycle<T, Args> {
@@ -107,7 +109,7 @@ export function defineService<T extends object, Args extends unknown[] = []>({
     };
 
     const init = (...args: Args): Awaitable<void> => {
-        if (instance) {
+        if (instance && !reinitialize) {
             return;
         }
 

@@ -66,6 +66,21 @@ describe('defineService', function () {
         expect(start).toHaveBeenCalledOnce();
     });
 
+    it('can reinitialize a stable facade on each boot', async function () {
+        const create = vi.fn(() => new ExampleService(1));
+        const lifecycle = defineService({
+            name: 'ExampleService',
+            create,
+            reinitialize: true
+        });
+
+        lifecycle.init();
+        lifecycle.init();
+
+        expect(create).toHaveBeenCalledTimes(2);
+        expect(lifecycle.service.value).toBe(1);
+    });
+
     it('passes initialization arguments to the factory', async function () {
         const lifecycle = defineService<ExampleService, [number]>({
             name: 'ExampleService',
