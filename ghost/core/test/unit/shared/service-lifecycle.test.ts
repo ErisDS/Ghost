@@ -19,6 +19,16 @@ describe('defineService', function () {
         expect(() => lifecycle.service.value).toThrow('ExampleService must be initialized before use');
     });
 
+    it('preserves synchronous initialization for synchronous services', function () {
+        const lifecycle = defineService({
+            name: 'ExampleService',
+            create: () => new ExampleService(1)
+        });
+
+        expect(lifecycle.init()).toBeUndefined();
+        expect(lifecycle.service.value).toBe(1);
+    });
+
     it('publishes a service after startup completes', async function () {
         let finishStart!: () => void;
         const startBarrier = new Promise<void>((resolve) => {
