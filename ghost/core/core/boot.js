@@ -126,6 +126,9 @@ async function initCore({ghostServer, config}) {
     debug('Begin: Gift Links Service');
     const giftLinksService = require('./server/services/gift-links');
     giftLinksService.init();
+    if (ghostServer) {
+        ghostServer.registerCleanupTask(() => giftLinksService.shutdown());
+    }
     debug('End: Gift Links Service');
 
     // Member custom fields service: knex-backed, wired once the DB is ready.
@@ -429,6 +432,18 @@ async function initServices({ghostServer, config, prometheusClient}) {
 
     postsService.init();
     await explorePingService.init();
+
+    if (ghostServer) {
+        ghostServer.registerCleanupTask(() => Promise.all([
+            explorePingService.shutdown(),
+            tinybird.shutdown(),
+            announcementBarService.shutdown(),
+            slack.shutdown(),
+            indexnow.shutdown(),
+            postsService.shutdown(),
+            donationService.shutdown()
+        ]));
+    }
 
     if (schedulerAdapter.rescheduleOnBoot) {
         await postScheduling.rescheduleAll();
