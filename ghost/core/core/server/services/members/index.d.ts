@@ -34,5 +34,5 @@ interface MembersService {
   handleImportJob: ((job: MembersImportJob) => Promise<void>) | null;
 }
 
-declare const membersService: MembersService;
-export = membersService;
+export const service: MembersService;
+export function init(): Promise<void>;

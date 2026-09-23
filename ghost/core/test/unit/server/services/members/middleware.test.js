@@ -6,8 +6,8 @@ const sinon = require('sinon');
 
 const urlUtils = require('../../../../../core/shared/url-utils').default;
 const config = require('../../../../../core/shared/config');
-const tiersService = require('../../../../../core/server/services/tiers/service');
-const membersService = require('../../../../../core/server/services/members');
+const tiersService = require('../../../../../core/server/services/tiers').service;
+const membersService = require('../../../../../core/server/services/members/service');
 const membersMiddleware = require('../../../../../core/server/services/members/middleware');
 const models = require('../../../../../core/server/models');
 

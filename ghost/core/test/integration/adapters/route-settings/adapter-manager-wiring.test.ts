@@ -20,7 +20,9 @@ import {
 
 // config-utils is untyped JS, so it can't be imported; the adapter-manager is
 // required alongside it for its `.default` export.
-const adapterManager = require('../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 const configUtils = require('../../../utils/config-utils');
 
 const STATIC_PREFIX = 'content/settings';

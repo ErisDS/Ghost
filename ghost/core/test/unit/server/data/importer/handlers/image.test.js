@@ -3,7 +3,9 @@ const sinon = require('sinon');
 const _ = require('lodash');
 
 const ImageHandler = require('../../../../../../core/server/data/importer/handlers/image');
-const adapterManager = require('../../../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 const configUtils = require('../../../../../utils/config-utils');
 
 describe('ImageHandler', function () {

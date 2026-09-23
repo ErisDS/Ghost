@@ -1,4 +1,4 @@
-const emailService = require('../../services/email-service');
+const emailService = require('../../services/email-service').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

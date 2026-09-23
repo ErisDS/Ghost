@@ -1,6 +1,6 @@
 const allowedIncludes = ['count.posts', 'count.members', 'count.active_members'];
 
-const newslettersService = require('../../services/newsletters');
+const newslettersService = require('../../services/newsletters').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

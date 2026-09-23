@@ -31,10 +31,18 @@ import { GiftEmailAnalyticsBatchProcessor } from './gift-email-analytics-batch-p
 import { StartGiftEmailAnalyticsJobEvent } from './events/start-gift-email-analytics-job-event';
 import type { GiftDeliveryService } from '../gifts/gift-delivery-service';
 import { GIFT_DELIVERY_EMAIL_TAG } from '../gifts/constants';
+import { lazySingleton } from '../../../shared/lazy-singleton';
 
 let newsletters: EmailAnalyticsServiceWrapper | undefined;
 let automations: EmailAnalyticsServiceWrapper | undefined;
 let gifts: EmailAnalyticsServiceWrapper | undefined;
+type EmailAnalyticsService = {
+  newsletters: EmailAnalyticsServiceWrapper;
+  automations: EmailAnalyticsServiceWrapper;
+  gifts: EmailAnalyticsServiceWrapper;
+};
+let instance: EmailAnalyticsService | undefined;
+export const service = lazySingleton<EmailAnalyticsService>('EmailAnalyticsService', () => instance);
 
 export function getNewsletters(): EmailAnalyticsServiceWrapper {
   assert(newsletters, 'Newsletter email analytics should be initialized');
@@ -203,6 +211,8 @@ export const init = ({
     settingsCache,
     createEventProcessor: () => new GiftEmailAnalyticsBatchProcessor({ giftDeliveryService }),
   });
+
+  instance = { newsletters, automations, gifts };
 
   domainEvents.subscribe(StartEmailAnalyticsJobEvent, () => newsletters!.startFetch());
 

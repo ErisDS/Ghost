@@ -1,13 +1,11 @@
 const DomainEvents = require('@tryghost/domain-events');
 const labs = require('../../../shared/labs');
+const { lazySingleton } = require('../../../shared/lazy-singleton');
 
-class StaffServiceWrapper {
-  init() {
-    if (this.api) {
-      // Prevent creating duplicate DomainEvents subscribers
-      return;
-    }
+let instance;
 
+function init() {
+  if (!instance) {
     const StaffService = require('./staff-service');
 
     const logging = require('@tryghost/logging');
@@ -18,9 +16,9 @@ class StaffServiceWrapper {
     const settingsCache = require('../../../shared/settings-cache');
     const urlUtils = require('../../../shared/url-utils').default;
     const { blogIcon } = require('../../../server/lib/image');
-    const settingsHelpers = require('../settings-helpers');
+    const settingsHelpers = require('../settings-helpers').service;
 
-    this.api = new StaffService({
+    instance = new StaffService({
       logging,
       models,
       mailer,
@@ -33,8 +31,10 @@ class StaffServiceWrapper {
       labs,
     });
 
-    this.api.subscribeEvents();
+    instance.subscribeEvents();
   }
 }
 
-module.exports = new StaffServiceWrapper();
+const service = lazySingleton('StaffService', () => instance);
+
+module.exports = { init, service };

@@ -1,8 +1,10 @@
 import errors from '@tryghost/errors';
 import { JobsService } from './jobs-service';
 import type { JobsShutdownOptions } from '@tryghost/adapter-base-jobs';
+import { lazySingleton } from '../../../shared/lazy-singleton';
 
 let instance: JobsService | undefined;
+export const service = lazySingleton<JobsService>('JobsService', () => instance);
 
 export function init(): JobsService {
   // The instance lives for the whole process: the didInit-guarded mentions
@@ -14,7 +16,7 @@ export function init(): JobsService {
     return instance;
   }
 
-  const adapterManager = require('../adapter-manager').default;
+  const adapterManager = require('../adapter-manager').service;
   const logging = require('@tryghost/logging');
   const sentry = require('../../../shared/sentry');
 

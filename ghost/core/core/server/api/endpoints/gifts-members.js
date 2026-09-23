@@ -1,4 +1,4 @@
-const gift = require('../../services/gifts');
+const gift = require('../../services/gifts').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 module.exports = {

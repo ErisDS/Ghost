@@ -26,7 +26,7 @@ const {
   createCSVTransform: createPostsCSVTransform,
 } = require('./utils/serializers/output/posts-csv-transform');
 const { pipeline } = require('stream');
-const { exportRequestsService } = require('../../services/export-requests/export-requests-service');
+const exportRequestsService = require('../../services/export-requests').service;
 
 const messages = {
   noComponentsSelected: 'No export components selected',

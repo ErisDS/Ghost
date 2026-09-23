@@ -22,7 +22,9 @@ const {
 const { queryStringToken } = regexes;
 const models = require('../../../core/server/models');
 const logging = require('@tryghost/logging');
-const settingsHelpers = require('../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const settingsHelpers = settingsHelpersRoot.service;
 const urlUtilsHelper = require('../../utils/url-utils');
 
 const assertMemberRelationCount = async (newsletterId, expectedCount) => {

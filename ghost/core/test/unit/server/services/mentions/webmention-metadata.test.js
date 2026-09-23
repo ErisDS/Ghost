@@ -1,7 +1,11 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
 
-const oembedService = require('../../../../../core/server/services/oembed');
+const adapterManager = require('../../../../../core/server/services/adapter-manager');
+const oembed = require('../../../../../core/server/services/oembed');
+adapterManager.init();
+oembed.init();
+const oembedService = oembed.service;
 const WebmentionMetadata = require('../../../../../core/server/services/mentions/webmention-metadata');
 
 describe('WebmentionMetadata', function () {

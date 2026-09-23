@@ -1,4 +1,4 @@
-const feedbackService = require('../../services/audience-feedback');
+const feedbackService = require('../../services/audience-feedback').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

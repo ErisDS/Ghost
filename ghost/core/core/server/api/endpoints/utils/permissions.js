@@ -1,6 +1,6 @@
 const debug = require('@tryghost/debug')('api:endpoints:utils:permissions');
 const _ = require('lodash');
-const permissions = require('../../../services/permissions');
+const permissions = require('../../../services/permissions').service;
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
 

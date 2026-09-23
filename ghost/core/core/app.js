@@ -2,7 +2,7 @@ const sentry = require('./shared/sentry');
 const express = require('./shared/express');
 const config = require('./shared/config');
 const logging = require('@tryghost/logging');
-const urlService = require('./server/services/url');
+const urlService = require('./server/services/url').service;
 const fs = require('fs');
 const path = require('path');
 /** @import {Application as ExpressApplication, Request, RequestHandler} from 'express' */

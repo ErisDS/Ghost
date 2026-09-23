@@ -16,6 +16,7 @@ import { urlForImportedPost } from './import/post-link';
 import { createImportFileStager } from './import/staged-file';
 import ContentCSVImportJob from './jobs/content-csv-import-job';
 import { getInstance as getJobsService } from '../jobs-service';
+import { lazySingleton } from '../../../shared/lazy-singleton';
 
 // The request is built from HTTP upload metadata, so it is validated at the
 // service boundary rather than trusted.
@@ -34,9 +35,9 @@ function makeImporter(): ContentCSVImporter {
   const models = require('../../models');
   const lexicalLib = require('../../lib/lexical');
   const settingsCache = require('../../../shared/settings-cache');
-  const urlService = require('../url');
+  const urlService = require('../url').service;
   const urlUtils = require('../../../shared/url-utils').default;
-  const mediaInlinerService = require('../media-inliner');
+  const mediaInlinerService = require('../media-inliner').service;
   const config = require('../../../shared/config');
   const ObjectID = require('bson-objectid').default;
   const { GhostMailer } = require('../mail');
@@ -71,7 +72,7 @@ function makeImporter(): ContentCSVImporter {
     getCleanHTML: () => require('@tryghost/mg-clean-html').cleanHTML,
     createMediaInliner: () =>
       new PostMediaInliner({
-        media: mediaInlinerService.getInstance(),
+        media: mediaInlinerService,
         isLocalMediaUrl: (sourceUrl) =>
           isLocalMediaUrl(sourceUrl, {
             siteUrl: config.getSiteUrl(),
@@ -86,7 +87,7 @@ function makeImporter(): ContentCSVImporter {
     email,
     dispatchJob: (job) => getJobsService().dispatch(job),
     fileStager: createImportFileStager(() =>
-      require('../adapter-manager').default.getAdapter('storage:imports'),
+      require('../adapter-manager').service.getAdapter('storage:imports'),
     ),
     report,
     store: new ImportRunStore(),
@@ -105,6 +106,7 @@ function makeImporter(): ContentCSVImporter {
 }
 
 let importer: ContentCSVImporter | undefined;
+export const service = lazySingleton<ContentCSVImporter>('ContentImportService', () => importer);
 
 // Idempotent because tests may boot more than once per process.
 export function init(): void {

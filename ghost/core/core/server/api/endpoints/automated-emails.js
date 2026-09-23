@@ -2,7 +2,7 @@ const _ = require('lodash');
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
 const models = require('../../models');
-const memberWelcomeEmailService = require('../../services/member-welcome-emails/service');
+const memberWelcomeEmailService = require('../../services/member-welcome-emails').service;
 const emailAddressService = require('../../services/email-address');
 const {
   DEFAULT_EMAIL_DESIGN_SETTING_SLUG,

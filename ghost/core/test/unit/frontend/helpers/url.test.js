@@ -6,7 +6,9 @@ const testUtils = require('../../../utils');
 const configUtils = require('../../../utils/config-utils');
 const markdownToLexical = require('../../../utils/fixtures/data-generator').markdownToLexical;
 const url = require('../../../../core/frontend/helpers/url');
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const logging = require('@tryghost/logging');
 const api = require('../../../../core/server/api').endpoints;
 

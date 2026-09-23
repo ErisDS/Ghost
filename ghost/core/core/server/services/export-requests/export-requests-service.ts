@@ -114,5 +114,3 @@ export class ExportRequestsService {
     }
   }
 }
-
-export const exportRequestsService = new ExportRequestsService();

@@ -6,7 +6,7 @@ const config = require('../../../shared/config');
 const settingsCache = require('../../../shared/settings-cache');
 const ImageUtils = require('./image-utils');
 
-const adapterManager = require('../../services/adapter-manager').default;
+const adapterManager = require('../../services/adapter-manager').service;
 
 const cacheStore = adapterManager.getAdapter('cache:imageSizes');
 const imageStore = adapterManager.getAdapter('storage:images');
