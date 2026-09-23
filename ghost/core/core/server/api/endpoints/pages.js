@@ -1,7 +1,7 @@
 const models = require('../../models');
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
-const getPostServiceInstance = require('../../services/posts/posts-service-instance');
+const postsService = require('../../services/posts').service;
 const { restrictAdminApiQueryOptions } = require('./utils/api-filter-utils');
 const ALLOWED_INCLUDES = [
   'tags',
@@ -18,8 +18,6 @@ const UNSAFE_ATTRS = ['status', 'authors', 'visibility'];
 const messages = {
   pageNotFound: 'Page not found.',
 };
-
-const postsService = getPostServiceInstance();
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

@@ -15,7 +15,7 @@ const labs = require('../../../shared/labs');
 const config = require('../../../shared/config');
 const settingsCache = require('../../../shared/settings-cache');
 const requestExternal = require('../../lib/request-external');
-const TinybirdServiceWrapper = require('../tinybird');
+const tinybird = require('../tinybird');
 const { create: createTinybirdClient } = require('../stats/utils/tinybird');
 const lexicalLib = require('../../lib/lexical');
 
@@ -83,7 +83,7 @@ function getTinybirdClient() {
     return null;
   }
   try {
-    const tinybirdService = TinybirdServiceWrapper.instance;
+    const tinybirdService = tinybird.service;
     if (!tinybirdService?.getToken()?.token) {
       return null;
     }

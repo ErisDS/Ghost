@@ -6,7 +6,7 @@ const logging = require('@tryghost/logging');
 const security = require('@tryghost/security');
 const exporter = require('../../data/exporter');
 const membersService = require('../../services/members');
-const getPostServiceInstance = require('../../services/posts/posts-service-instance');
+const postsService = require('../../services/posts').service;
 const routeSettings = require('../../services/route-settings');
 const customRedirects = require('../../services/custom-redirects');
 const { serializeToYaml } = require('../../services/custom-redirects/redirect-config-parser');
@@ -27,8 +27,6 @@ const {
 } = require('./utils/serializers/output/posts-csv-transform');
 const { pipeline } = require('stream');
 const { exportRequestsService } = require('../../services/export-requests/export-requests-service');
-
-const postsService = getPostServiceInstance();
 
 const messages = {
   noComponentsSelected: 'No export components selected',

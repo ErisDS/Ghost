@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import knex from 'knex';
 import sinon from 'sinon';
-const TinybirdServiceWrapper = require('../../../../../core/server/services/tinybird');
+const tinybird = require('../../../../../core/server/services/tinybird');
 // @ts-expect-error This module lacks type definitions.
 import StatsService from '../../../../../core/server/services/stats/stats-service';
 
@@ -16,7 +16,7 @@ describe('StatsService', function () {
   ])(
     'initializes Tinybird for the enabled analytics source: %j',
     function ({ webAnalytics, sync, configured, initialized }) {
-      const init = sinon.stub(TinybirdServiceWrapper, 'init');
+      const init = sinon.stub(tinybird, 'init');
       const isSet = sinon.stub();
       isSet.withArgs('automationsTinybirdSync').returns(sync);
       const getSetting = sinon.stub();

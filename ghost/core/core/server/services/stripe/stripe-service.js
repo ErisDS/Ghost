@@ -39,7 +39,7 @@ module.exports = class StripeService {
    * @param {object} deps
    * @param {*} deps.labs
    * @param {*} deps.membersService
-   * @param {*} deps.donationService
+   * @param {*} deps.donationRepository
    * @param {*} deps.giftService
    * @param {*} deps.staffService
    * @param {import('./webhook-manager').StripeWebhook} deps.StripeWebhook
@@ -56,7 +56,7 @@ module.exports = class StripeService {
   constructor({
     labs,
     membersService,
-    donationService,
+    donationRepository,
     giftService,
     staffService,
     StripeWebhook,
@@ -113,7 +113,7 @@ module.exports = class StripeService {
         return membersService.api.events;
       },
       get donationRepository() {
-        return donationService.repository;
+        return donationRepository;
       },
       get giftService() {
         return giftService.service;

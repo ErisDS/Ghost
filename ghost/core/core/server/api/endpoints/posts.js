@@ -1,7 +1,7 @@
 const urlUtils = require('../../../shared/url-utils').default;
 const models = require('../../models');
 const { getCSVExportFileName } = require('./utils/csv-export-filename');
-const getPostServiceInstance = require('../../services/posts/posts-service-instance');
+const postsService = require('../../services/posts').service;
 const contentImportService = require('../../services/content-import');
 const { restrictAdminApiQueryOptions } = require('./utils/api-filter-utils');
 const allowedIncludes = [
@@ -22,8 +22,6 @@ const allowedIncludes = [
   'post_revisions.author',
 ];
 const unsafeAttrs = ['status', 'authors', 'visibility'];
-
-const postsService = getPostServiceInstance();
 
 /**
  * @param {string} event
