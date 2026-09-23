@@ -10,12 +10,13 @@ Use [`src/tags/tags.acceptance.test.tsx`](../../src/tags/tags.acceptance.test.ts
 - **When** — `await renderAdminApp("/tags")`, then gesture through the screen helper (`tagsScreen.internalTab().click()`).
 - **Then** — three assertion idioms, plus one documented fallback:
 
-| Asserting | Idiom |
-| --- | --- |
-| Element state | `await expect.element(locator).toBeVisible() / toHaveTextContent() / toHaveAttribute()` |
-| Element counts | `await expect(locator).toHaveCount(n)` |
+| Asserting         | Idiom                                                                                                                                                                |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Element state     | `await expect.element(locator).toBeVisible() / toHaveTextContent() / toHaveAttribute()`                                                                              |
+| Element counts    | `await expect(locator).toHaveCount(n)`                                                                                                                               |
 | Captured requests | `await expect(membersApi).toHaveSentFilter("label:[VIP]")` / `toHaveSentSearch(...)` — string for an exact match against the decoded param, RegExp for a partial one |
-| Edited settings | `await expect(settingsApi).toHaveEditedSettings([{key: "title", value: "New title"}])` — exact settings in the latest `PUT /settings/` payload; order-independent |
+| Edited settings   | `await expect(settingsApi).toHaveEditedSettings([{key: "title", value: "New title"}])` — exact settings in the latest `PUT /settings/` payload; order-independent    |
+| Saved post fields | `await expect(saveApi).toHaveSavedFields({slug: "new-slug"})` — waits for the write and asserts the named fields of the latest post/page payload, deep-equal per key |
 
 The request matchers assert against the **latest** captured request; inspect `capture.requests` for history. For anything they don't cover — other captured fields (`url`, `order`, `page`, `limit`), payload bodies, the current URL — fall back to raw polling:
 
@@ -25,7 +26,11 @@ await expect.poll(currentRoute).toBe("/members");   // URL assertions
 await expect.poll(() => document.documentElement.classList.contains("dark")).toBe(true);   // DOM state no locator reaches
 ```
 
-**One render per test.** Each `renderAdminApp` gets a fresh QueryClient and the fake API resets between tests — there is no reload. State that would be persisted on a real server (user preferences, settings) is *represented* by boot overrides; a journey that genuinely needs persistence across reloads belongs in `e2e/`.
+**The URL leads the app.** `currentRoute` reads the address bar, which the browser updates before the router has re-rendered — so a route assertion says where the app is going, not what is on screen. That is fine for asserting the URL, and wrong as a cue to act: after `window.history.back()` or a dialog close, wait for the screen itself (`await expect(dialog).toHaveCount(0)`, `await expect.element(dialog).toBeVisible()`). A spec that reopens the same dialog, or dismisses a confirmation and triggers it again, will otherwise act on the instance that is on its way out — the click lands, the departing copy takes it, and nothing happens.
+
+**Unsaved-changes guards.** Typing into a dirty screen arms its navigation guard through a chain of passive effects, so a spec that navigates straight after a `fill` races the guard and an unguarded navigation just goes through. Wait for the guard itself, never for a frame count: `await expect.poll(unsavedChangesGuarded).toBe(true)` before the click or `window.history.back()`.
+
+**One render per test.** Each `renderAdminApp` gets a fresh QueryClient and the fake API resets between tests — there is no reload. State that would be persisted on a real server (user preferences, settings) is _represented_ by boot overrides; a journey that genuinely needs persistence across reloads belongs in `e2e/`.
 
 **Host page.** `renderAdminApp` mounts into a stand-in of the production host page (the `react-admin` body class + `#root` from index.html), so the shell's viewport-bounded grid applies and scroll-driven behaviors — virtualized lists, infinite paging — work like production.
 
@@ -33,7 +38,7 @@ await expect.poll(() => document.documentElement.classList.contains("dark")).toB
 
 ## The 418 loop
 
-Don't guess the app's network graph — run the test, the 418 names what's missing. Any request no fake handles is served a 418 (admin API paths *and* known external origins like ghost.org) and fails the test in `afterEach`, listing the request and the currently faked routes. Declare admin API requests with a resource fake or a `renderAdminApp` boot override, external URLs with `fakeEndpoint(method, url, response)`; `allowUnhandledRequests()` opts a single test out.
+Don't guess the app's network graph — run the test, the 418 names what's missing. Any request no fake handles is served a 418 (admin API paths _and_ known external origins like ghost.org) and fails the test in `afterEach`, listing the request and the currently faked routes. Declare admin API requests with a resource fake or a `renderAdminApp` boot override, external URLs with `fakeEndpoint(method, url, response)`; `allowUnhandledRequests()` opts a single test out.
 
 **Cross-app navigation.** When a spec asserts only the shell's behavior and a navigation mounts another app (settings, ActivityPub), don't fake that app's boot graph: `allowUnhandledRequests()` with a one-line constraint comment ("the settings app owns its request graph") is the sanctioned pattern.
 
@@ -46,8 +51,14 @@ When your area calls a new external origin, add it to `EXTERNAL_URL_BLOCKLIST` i
 The shell requests handled by default (`boot.ts`): `browseSettings`, `browseConfig`, `browseSite`, `browseMe`, `browseMembersCount`, `browseActiveTheme`, `editUserPreferences`. A **boot override** replaces the response of one named entry for one test (the entry's method/path stay fixed):
 
 ```ts
-// Labs flags (sugar for lockstep settings + config overrides):
+// Labs flags (sugar for lockstep settings + config overrides; merges into
+// any browseSettings/browseConfig boot override, named flags winning):
 await renderAdminApp("/tags", {labs: {someFlag: true}});
+
+// The editor's autosave debounce, injected as a test-only `/config/` key, so a
+// save that lands proves it was sent without waiting (`withoutAutosave()`), or
+// autosave fires at once (`withFastAutosave()`):
+await renderAdminApp("/editor/post/abc123", withoutAutosave({labs: {editorReact: true}}));
 
 // Persisted user state, e.g. what's-new preferences:
 const me = currentUserResponse();
@@ -62,7 +73,7 @@ Boot responses are STATELESS — a canned reply per request, nothing is stored �
 For a **browse endpoint** (`GET /<resource>/`), add a resource fake in `resources.ts` with `defineResource({resource, semantics})` and pick its semantics honestly:
 
 - `{kind: "passthrough"}` — serves exactly the declared entities, never interprets the query. Right for NQL-filtered lists; per-request responses are declared with a function of the parsed query.
-- `{kind: "declared-query", covers, select}` — implements *trivial declared* behaviors only (a field match, page/limit slicing); any filter component outside `covers` 418s instead of silently serving the full world.
+- `{kind: "declared-query", covers, select}` — implements _trivial declared_ behaviors only (a field match, page/limit slicing); any filter component outside `covers` 418s instead of silently serving the full world.
 
 For a **one-off endpoint** (stats subpaths, settings chrome, a mutation the spec asserts on), use `fakeAdminEndpoint(method, apiPath, response)` — it enters the route listing, returns a capture, and `response` may be a function of the captured request (`({body}) => body` is an honest echo).
 
@@ -78,7 +89,7 @@ The pipe capture exposes each request's query params (`site_uuid`, `date_from`, 
 
 Per-area locator vocabulary lives in `src/<area>/<area>.screen.ts` (e.g. `membersScreen`): locator factories + multi-step gestures, **no assertions**. Selector strings come from the shared per-area registry modules — flat named constants imported via `@tryghost/test-data/selectors/<area>` (e.g. `import {repliesMetric} from "@tryghost/test-data/selectors/comments"`, or `import * as sel from ...` when a file uses many) — the same strings the e2e page objects use, so both tiers break together when the UI changes. Testid constants are the camelCase of the testid string itself (`"replies-metric"` → `repliesMetric`); accessible-name constants carry their element kind or a `Label` suffix (`newTagLink`, `searchLabel`); bare text fragments end in `Text`. The modules are deliberately not re-exported from the package root — flat names collide across surfaces.
 
-**Row scopes.** A helper that identifies a repeated row returns a *scope*: the row locator itself, augmented with factories for the row's parts — `commentsScreen.threadRow(id).repliedToLink()`. Never write a helper that takes another helper's locator as an argument; scopes keep call sites at one nesting level, reading left-to-right, and the scope is still a locator, so all three assertion idioms work on it unchanged (`await expect.element(commentsScreen.commentRow("…")).toBeVisible()`).
+**Row scopes.** A helper that identifies a repeated row returns a _scope_: the row locator itself, augmented with factories for the row's parts — `commentsScreen.threadRow(id).repliedToLink()`. Never write a helper that takes another helper's locator as an argument; scopes keep call sites at one nesting level, reading left-to-right, and the scope is still a locator, so all three assertion idioms work on it unchanged (`await expect.element(commentsScreen.commentRow("…")).toBeVisible()`).
 
 Adding a new screen:
 
@@ -88,6 +99,14 @@ Adding a new screen:
 4. Point the e2e page object at the same registry constants (locator code stays Playwright-native).
 
 > **Follow-up:** the registry is the interim single source. The end-state is app-owned selector modules — testids only; accessible names stay product copy, asserted as users see it — consumed by the components AND both test tiers, pending an import surface and an e2e dependency-cost check. Until then, component source remains the source of truth and the registry mirrors it.
+
+## Component tier
+
+`*.component.test.tsx` specs run in the same browser config, against the same fake API and the same provider stack minus the router — they just mount one component instead of the whole app. There is no route, so `useNavigate` and `useLocation` throw and `currentRoute()` has no meaning here. `renderInApp(subject)` mounts a subject under the app's providers; `InAppProviders` is that same stack as a `renderHook` wrapper. The boot table serves the shell lookups here exactly as it does for `renderAdminApp`.
+
+Reach for it when the behaviour under test is a component's own — a modal's steps, a hook's loading boundary — and going through the app would only add route setup. A component spec **must not boot the app or depend on a route**: no `renderAdminApp`, no URL assertions, no navigation between screens. Behaviour that needs the shell, a route, or a second screen is an acceptance spec.
+
+Specs never build their own QueryClient or framework props. The stack comes from the harness, so the caching and retry behaviour under test is the app's own. Boot overrides and labs flags have no seam in this tier; a component that needs one belongs in an acceptance spec.
 
 ## Running
 

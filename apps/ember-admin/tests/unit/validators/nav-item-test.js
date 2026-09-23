@@ -7,7 +7,7 @@ import {
 import {expect} from 'chai';
 
 const testInvalidUrl = function (url) {
-    let navItem = NavItem.create({url});
+    const navItem = NavItem.create({url});
 
     validator.check(navItem, 'url');
 
@@ -20,7 +20,7 @@ const testInvalidUrl = function (url) {
 };
 
 const testValidUrl = function (url) {
-    let navItem = NavItem.create({url});
+    const navItem = NavItem.create({url});
 
     validator.check(navItem, 'url');
 
@@ -29,21 +29,31 @@ const testValidUrl = function (url) {
 };
 
 describe('Unit: Validator: nav-item', function () {
-    it('requires label presence', function () {
-        let navItem = NavItem.create();
+    it('requires label or icon presence', function () {
+        const navItem = NavItem.create();
 
         validator.check(navItem, 'label');
 
         expect(validator.get('passed')).to.be.false;
         expect(navItem.get('errors').errorsFor('label').toArray()).to.deep.equal([{
             attribute: 'label',
-            message: 'You must specify a label'
+            message: 'You must specify a label or icon'
         }]);
         expect(navItem.get('hasValidated')).to.include('label');
     });
 
+    it('allows blank label when icon is present', function () {
+        const navItem = NavItem.create({icon: 'https://example.com/icon.svg'});
+
+        validator.check(navItem, 'label');
+
+        expect(validator.get('passed')).to.be.true;
+        expect(navItem.get('errors').errorsFor('label')).to.be.empty;
+        expect(navItem.get('hasValidated')).to.include('label');
+    });
+
     it('requires url presence', function () {
-        let navItem = NavItem.create();
+        const navItem = NavItem.create();
 
         validator.check(navItem, 'url');
 
@@ -56,7 +66,7 @@ describe('Unit: Validator: nav-item', function () {
     });
 
     it('fails on invalid url values', function () {
-        let invalidUrls = [
+        const invalidUrls = [
             'test@example.com',
             '/has spaces',
             'no-leading-slash',
@@ -69,7 +79,7 @@ describe('Unit: Validator: nav-item', function () {
     });
 
     it('passes on valid url values', function () {
-        let validUrls = [
+        const validUrls = [
             'http://localhost:2368',
             'http://localhost:2368/some-path',
             'https://localhost:2368/some-path',
@@ -79,7 +89,7 @@ describe('Unit: Validator: nav-item', function () {
             'http://localhost:2368/?query=test&another=example#test',
             'tel:01234-567890',
             'mailto:test@example.com',
-            'http://some:user@example.com:1234',
+            'http://example.com:1234',
             '/relative/path'
         ];
 
@@ -89,12 +99,22 @@ describe('Unit: Validator: nav-item', function () {
     });
 
     it('validates url and label by default', function () {
-        let navItem = NavItem.create();
+        const navItem = NavItem.create();
 
         validator.check(navItem);
 
         expect(navItem.get('errors').errorsFor('label')).to.not.be.empty;
         expect(navItem.get('errors').errorsFor('url')).to.not.be.empty;
         expect(validator.get('passed')).to.be.false;
+    });
+
+    it('validates url and icon-only item by default', function () {
+        const navItem = NavItem.create({icon: 'https://example.com/icon.svg', url: '/icon-only/'});
+
+        validator.check(navItem);
+
+        expect(navItem.get('errors').errorsFor('label')).to.be.empty;
+        expect(navItem.get('errors').errorsFor('url')).to.be.empty;
+        expect(validator.get('passed')).to.be.true;
     });
 });

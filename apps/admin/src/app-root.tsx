@@ -1,25 +1,36 @@
-import { StrictMode } from "react";
-import { FrameworkProvider, RouterProvider, type TopLevelFrameworkProps } from "@tryghost/admin-x-framework";
-import { ShadeApp } from "@tryghost/shade/app";
+import { StrictMode } from 'react';
+import {
+  FrameworkProvider,
+  RouterProvider,
+  type TopLevelFrameworkProps,
+  useLocation,
+} from '@tryghost/admin-x-framework';
+import { useFeatureFlag } from '@tryghost/admin-x-framework/hooks';
+import { ShadeApp } from '@tryghost/shade/app';
+import { cn } from '@tryghost/shade/utils';
 
-import App from "./app.tsx";
-import { routes } from "./routes.tsx";
-import { useTheme } from "./hooks/use-theme";
-import { AppProvider } from "./providers/app-provider";
-import { fetchKoenigLexical } from "./utils/fetch-koenig-lexical";
+import App from './app.tsx';
+import { routes, useIsEmberOwnedRoute } from './routes.tsx';
+import { useThemeContext } from './providers/theme-context';
+import { ThemeProvider } from './providers/theme-provider';
 
 function ThemedAdminApp() {
-    const { resolvedTheme } = useTheme();
+  const { resolvedTheme } = useThemeContext();
+  const { pathname } = useLocation();
+  const isEmberOwnedRoute = useIsEmberOwnedRoute(pathname);
+  const isAdmin7 =
+    useFeatureFlag('admin7Pill') && !/^\/editor(?:\/|$)/.test(pathname) && !isEmberOwnedRoute;
 
-    return (
-        <ShadeApp
-            className="shade-admin"
-            darkMode={resolvedTheme === "dark"}
-            fetchKoenigLexical={fetchKoenigLexical}
-        >
-            <App />
-        </ShadeApp>
-    );
+  return (
+    <ShadeApp
+      className={cn('shade-admin', isAdmin7 && 'admin7-pill')}
+      darkMode={resolvedTheme === 'dark'}
+      isAdmin7={isAdmin7}
+      data-react-admin-mounted
+    >
+      <App />
+    </ShadeApp>
+  );
 }
 
 /**
@@ -30,15 +41,15 @@ function ThemedAdminApp() {
  * query client) differ between the two.
  */
 export function AdminAppRoot({ framework }: { framework: TopLevelFrameworkProps }) {
-    return (
-        <StrictMode>
-            <FrameworkProvider {...framework}>
-                <RouterProvider prefix={"/"} routes={routes}>
-                    <AppProvider>
-                        <ThemedAdminApp />
-                    </AppProvider>
-                </RouterProvider>
-            </FrameworkProvider>
-        </StrictMode>
-    );
+  return (
+    <StrictMode>
+      <FrameworkProvider {...framework}>
+        <RouterProvider prefix={'/'} routes={routes}>
+          <ThemeProvider>
+            <ThemedAdminApp />
+          </ThemeProvider>
+        </RouterProvider>
+      </FrameworkProvider>
+    </StrictMode>
+  );
 }

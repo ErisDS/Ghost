@@ -58,7 +58,7 @@ root:
 
 ```bash
 corepack enable pnpm
-pnpm setup
+pnpm bootstrap
 ```
 
 After setup, run the package commands below from `apps/shade` or with
@@ -68,11 +68,12 @@ Local docs with Storybook:
 
 - `pnpm storybook` — run Storybook and view docs under `src/docs/`
 - `pnpm build-storybook` — build a static export
+- `pnpm build` — build the package and its type declarations
 
 ## Test
 
 - `pnpm test` — type-checks and runs Vitest with coverage
-- `pnpm test:unit` — type-checks and runs Vitest
+- `pnpm test:unit` — runs Vitest
 - `pnpm test:types` — TypeScript only
 - `pnpm lint` — ESLint for `src/` and `test/`
 

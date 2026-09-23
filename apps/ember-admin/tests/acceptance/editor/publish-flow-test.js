@@ -1,6 +1,6 @@
 import loginAsRole from '../../helpers/login-as-role';
 import moment from 'moment-timezone';
-import {blur, click, fillIn, find, findAll, triggerEvent, waitFor} from '@ember/test-helpers';
+import {blur, click, currentURL, fillIn, find, findAll, triggerEvent, waitFor, waitUntil} from '@ember/test-helpers';
 import {clickTrigger, removeMultipleOption, selectChoose} from 'ember-power-select/test-support/helpers';
 import {disableMailgun, enableMailgun} from '../../helpers/mailgun';
 import {disableMembers, enableMembers} from '../../helpers/members';
@@ -33,7 +33,7 @@ function lexicalWithPublicPreview({before = 'Public preview content', after = 'F
 }
 
 describe('Acceptance: Publish flow', function () {
-    let hooks = setupApplicationTest();
+    const hooks = setupApplicationTest();
     setupMirage(hooks);
 
     beforeEach(function () {
@@ -686,6 +686,50 @@ describe('Acceptance: Publish flow', function () {
                 .to.have.trimmed.text('Your plan supports up to 1,000 members. Please upgrade to reenable publishing.');
         });
 
+        // the email limit registering must not mask an account-review hold: the
+        // server applies both, and this used to short-circuit on the limit passing
+        it('shows the verification hold while under a configured email limit', async function () {
+            const config = this.server.db.configs.find(1);
+            config.hostSettings = {
+                subscription: {start: '2026-01-01T00:00:00.000Z'},
+                limits: {
+                    emails: {
+                        maxPeriodic: 1000,
+                        error: 'Your plan supports up to {{max}} emails. Please upgrade to keep sending.'
+                    }
+                }
+            };
+            this.server.db.configs.update(1, config);
+
+            this.server.db.settings.update({key: 'email_verification_required'}, {value: true});
+
+            // the periodic limit counts sent emails through this endpoint
+            const emailRequests = [];
+            this.server.get('/emails/', function (schema, request) {
+                emailRequests.push(request.queryParams);
+                return {emails: [], meta: {pagination: {total: 0}}};
+            });
+
+            await loginAsRole('Administrator', this.server);
+            const post = this.server.create('post', {status: 'draft'});
+
+            await visit(`/editor/post/${post.id}`);
+            await click('[data-test-button="publish-flow"]');
+            await click('[data-test-setting="publish-type"] [data-test-setting-title]');
+
+            // without this the verification hold alone would satisfy the assertion
+            // below, even with the limit never registered
+            // the adapter turns limit: 'all' into paged requests, so this asserts what
+            // reaches the endpoint rather than what getEmailsCount asked for
+            const emailCountQuery = emailRequests.find(query => query.fields === 'id,email_count');
+            expect(emailCountQuery, 'email count query').to.exist;
+            expect(emailCountQuery.filter).to.match(/^created_at:>='/);
+
+            expect(find('[data-test-publish-type-error="email-disabled"]'), 'email disabled error').to.exist;
+            expect(find('[data-test-publish-type-error="email-disabled"]'), 'email disabled error')
+                .to.have.trimmed.text('Email sending is temporarily disabled because your account is currently in review. You should have an email about this from us already, but you can also reach us any time at support@ghost.org.');
+        });
+
         it('(as editor) handles over-member limits', async function () {
             // set members limit
             const config = this.server.db.configs.find(1);
@@ -740,7 +784,61 @@ describe('Acceptance: Publish flow', function () {
         });
 
         it('handles server error when confirming');
-        it('handles email sending error');
+
+        it('uses the analytics sending flow when improved sending UI is enabled', async function () {
+            enableLabsFlag(this.server, 'improveSendingUI');
+
+            await loginAsRole('Administrator', this.server);
+            const post = this.server.create('post', {status: 'draft'});
+            const email = this.server.create('email', {status: 'pending'});
+
+            this.server.put('/posts/:id/', function ({posts}, {params}) {
+                return posts.find(params.id).update({
+                    status: 'published',
+                    email
+                });
+            });
+            await visit(`/editor/post/${post.id}`);
+            await click('[data-test-button="publish-flow"]');
+            await click('[data-test-button="continue"]');
+            await click('[data-test-button="confirm-publish"]');
+
+            await waitUntil(() => currentURL() === `/posts/analytics/${post.id}`);
+            expect(find('[data-test-modal="publish-flow"]'), 'publish flow closed after save').not.to.exist;
+            expect(email.status, 'legacy poll did not reload the failed email').to.equal('pending');
+        });
+
+        it('preserves the legacy email failure flow when improved sending UI is disabled', async function () {
+            await loginAsRole('Administrator', this.server);
+            const post = this.server.create('post', {status: 'draft'});
+            const email = this.server.create('email', {status: 'pending'});
+
+            this.server.put('/posts/:id/', function ({posts}, {params}) {
+                return posts.find(params.id).update({
+                    status: 'published',
+                    email
+                });
+            });
+            this.server.get('/posts/:id/', function ({posts}, {params}) {
+                const savedPost = posts.find(params.id);
+                if (savedPost.status === 'published') {
+                    email.update({
+                        status: 'failed',
+                        error: 'Mailgun rejected the batch.'
+                    });
+                }
+                return savedPost;
+            });
+
+            await visit(`/editor/post/${post.id}`);
+            await click('[data-test-button="publish-flow"]');
+            await click('[data-test-button="continue"]');
+            await click('[data-test-button="confirm-publish"]');
+
+            await waitFor('.gh-publish-title .red');
+            expect(find('.gh-publish-confirmation'), 'email error')
+                .to.contain.trimmed.text('Mailgun rejected the batch.');
+        });
 
         it('defaults to publish-only when default recipients is "Usually nobody"', async function () {
             // Set default recipients to "Usually nobody" (filter with null filter)

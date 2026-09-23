@@ -1,6 +1,6 @@
-import { EmberFallback, useEmberFeatureFlag } from "./ember-bridge";
-import { Suspense, type ComponentType, type LazyExoticComponent } from "react";
-import { useBrowseConfig } from "@tryghost/admin-x-framework/api/config";
+import { EmberFallback } from './ember-bridge';
+import { useFlagGatedRouteOwner } from './use-flag-gated-route-owner';
+import { Suspense, type ComponentType, type LazyExoticComponent, type ReactNode } from 'react';
 
 /**
  * Chooses which implementation serves a route while a screen migrates from
@@ -23,39 +23,32 @@ import { useBrowseConfig } from "@tryghost/admin-x-framework/api/config";
  * Errors are deliberately not reported here: `useBrowseConfig` already routes
  * them through the framework's default error handler, and the shell calls the
  * same query, so anything logged here would be a duplicate.
+ *
+ * `fallback` overrides what the Ember side renders, for routes that need more
+ * than a bare EmberFallback while the flag is off — the posts and pages lists
+ * also mount the React gift-link modal host, which the Ember context menu
+ * opens over the state bridge.
  */
-export function FlagGatedRoute({ flag, component: Component }: {
-    flag: string;
-    component: LazyExoticComponent<ComponentType>;
+export function FlagGatedRoute({
+  flag,
+  component: Component,
+  fallback = <EmberFallback />,
+}: {
+  flag: string;
+  component: LazyExoticComponent<ComponentType>;
+  fallback?: ReactNode;
 }) {
-    const { data: config, isError, isLoading } = useBrowseConfig();
-    const emberFlag = useEmberFeatureFlag(flag);
+  const owner = useFlagGatedRouteOwner(flag);
 
-    const renderReact = () => (
-        <Suspense fallback={null}>
-            <Component />
-        </Suspense>
-    );
-
-    if (typeof emberFlag === 'boolean') {
-        return emberFlag ? renderReact() : <EmberFallback />;
-    }
-
-    if (emberFlag === null) {
-        return null;
-    }
-
-    if (isLoading) {
-        return null;
-    }
-
-    if (isError || !config) {
-        return <EmberFallback />;
-    }
-
-    if (config.config.labs?.[flag] !== true) {
-        return <EmberFallback />;
-    }
-
-    return renderReact();
+  if (owner === 'pending') {
+    return null;
+  }
+  if (owner === 'ember') {
+    return fallback;
+  }
+  return (
+    <Suspense fallback={null}>
+      <Component />
+    </Suspense>
+  );
 }
