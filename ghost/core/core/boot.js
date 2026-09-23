@@ -350,6 +350,8 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const slackNotifications = require('./server/services/slack-notifications');
   const mediaInliner = require('./server/services/media-inliner');
   const contentImport = require('./server/services/content-import');
+  const exportRequests = require('./server/services/export-requests');
+  const tinybirdSync = require('./server/services/tinybird-sync');
   const announcementBarService = require('./server/services/announcement-bar-service');
   const giftService = require('./server/services/gifts');
   const machinePaymentsService = require('./server/services/machine-payments');
@@ -359,7 +361,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const tinybird = require('./server/services/tinybird');
   const explorePingService = require('./server/services/explore-ping');
   const domainEvents = require('@tryghost/domain-events');
-  const { automationsService } = require('./server/services/automations');
+  const automationsService = require('./server/services/automations');
   const automationsApi = require('./server/services/automations/automations-api');
   const adapterManager = require('./server/services/adapter-manager').default;
   const { withErrorCapture } = require('./server/adapters/scheduling/error-capture');
@@ -426,6 +428,8 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
     slackNotifications.init(),
     mediaInliner.init(),
     contentImport.init(),
+    exportRequests.init(),
+    tinybirdSync.init(),
     announcementBarService.init(),
     recommendationsService.init(),
     tinybird.init(),
@@ -487,7 +491,7 @@ async function initBackgroundServices({ config }) {
   const giftService = require('./server/services/gifts');
   giftService.recoverPendingDeliveries();
 
-  const jobsService = require('./server/services/jobs-service').getInstance();
+  const jobsService = require('./server/services/jobs-service').service;
 
   // Runs before activitypub.init for the same reason as the send recovery
   // above: gifts would otherwise go uncleaned for the life of the process
@@ -543,7 +547,7 @@ async function initBackgroundServices({ config }) {
     ]);
   }
 
-  const tinybirdSync = require('./server/services/tinybird-sync');
+  const tinybirdSync = require('./server/services/tinybird-sync').service;
   tinybirdSync.start();
 
   try {

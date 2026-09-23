@@ -2,7 +2,7 @@ const logging = require('@tryghost/logging');
 const config = require('../../../shared/config');
 const settingsCache = require('../../../shared/settings-cache');
 const labs = require('../../../shared/labs');
-const settingsHelpers = require('../settings-helpers');
+const settingsHelpers = require('../settings-helpers').service;
 const models = require('../../models');
 
 const { MachinePaymentsService, getDefaultTiersCurrency } = require('./service');
@@ -13,6 +13,7 @@ const { X402Adapter } = require('./adapters/x402-adapter');
 const { MachinePaymentEventRepository } = require('./events/machine-payment-event-repository');
 const { ContentLoader } = require('./content-loader');
 const { Pricing } = require('./pricing');
+const {lazySingleton} = require('../../../shared/lazy-singleton');
 
 class MachinePaymentsServiceWrapper {
   /** @type {MachinePaymentsService|null} */
@@ -41,7 +42,7 @@ class MachinePaymentsServiceWrapper {
       MachinePaymentEventModel: models.MachinePaymentEvent,
     });
 
-    const urlService = require('../url');
+        const urlService = require('../url').service;
     const contentLoader = new ContentLoader({
       urlServiceFacade: urlService,
     });
@@ -115,5 +116,16 @@ class MachinePaymentsServiceWrapper {
   }
 }
 
-module.exports = new MachinePaymentsServiceWrapper();
-module.exports.MachinePaymentsServiceWrapper = MachinePaymentsServiceWrapper;
+let instance;
+
+function init() {
+    if (!instance) {
+        const machinePaymentsService = new MachinePaymentsServiceWrapper();
+        machinePaymentsService.init();
+        instance = machinePaymentsService;
+    }
+}
+
+const service = lazySingleton('MachinePaymentsService', () => instance);
+
+module.exports = {init, service};

@@ -1,6 +1,6 @@
 const path = require('path');
 const config = require('../../shared/config');
-const adapterManager = require('../services/adapter-manager').default;
+const adapterManager = require('../services/adapter-manager').service;
 
 let cardFactory;
 let cards;

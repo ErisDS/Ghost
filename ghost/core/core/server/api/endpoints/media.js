@@ -1,6 +1,6 @@
 const path = require('path');
 
-const adapterManager = require('../../services/adapter-manager').default;
+const adapterManager = require('../../services/adapter-manager').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

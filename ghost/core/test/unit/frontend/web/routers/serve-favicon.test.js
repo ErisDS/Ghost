@@ -3,7 +3,9 @@ const request = require('supertest');
 const express = require('../../../../../core/shared/express');
 const serveFavicon = require('../../../../../core/frontend/web/routers/serve-favicon');
 const settingsCache = require('../../../../../core/shared/settings-cache');
-const adapterManager = require('../../../../../core/server/services/adapter-manager').default;
+const adapterManagerRoot = require('../../../../../core/server/services/adapter-manager');
+adapterManagerRoot.init();
+const adapterManager = adapterManagerRoot.service;
 const configUtils = require('../../../../utils/config-utils');
 const path = require('path');
 

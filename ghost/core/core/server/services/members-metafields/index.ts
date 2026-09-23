@@ -3,6 +3,7 @@ import { MetafieldValuesService } from './values-service';
 import { MetafieldBindingsService } from './bindings-service';
 import { recordMetafieldAction, type RecordMetafieldAction } from './actions';
 import { resolveMaxDefinitions } from './config';
+import { lazySingleton } from '../../../shared/lazy-singleton';
 
 export type { Metafield } from './models';
 export type { RequestContext } from './actions';
@@ -34,6 +35,13 @@ export {
 export let definitions: MetafieldDefinitionsService | undefined;
 export let values: MetafieldValuesService | undefined;
 export let bindings: MetafieldBindingsService | undefined;
+type MembersMetafieldsService = {
+  definitions: MetafieldDefinitionsService;
+  values: MetafieldValuesService;
+  bindings: MetafieldBindingsService;
+};
+let instance: MembersMetafieldsService | undefined;
+export const service = lazySingleton<MembersMetafieldsService>('MembersMetafieldsService', () => instance);
 
 export function init(): void {
   // The three are constructed together below, so checking all of them keeps the "all or
@@ -70,4 +78,5 @@ export function init(): void {
   // definitions: making a field is not part of binding to one, so a caller that needs both
   // asks for both.
   bindings = new MetafieldBindingsService({ knex, values });
+  instance = { definitions, values, bindings };
 }

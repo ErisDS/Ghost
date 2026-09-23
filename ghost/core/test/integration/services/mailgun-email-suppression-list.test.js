@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const DomainEvents = require('@tryghost/domain-events');
 
 const MailgunClient = require('../../../core/server/services/lib/mailgun-client');
-const emailAnalytics = require('../../../core/server/services/email-analytics');
+const emailAnalytics = require('../../../core/server/services/email-analytics').service;
 const models = require('../../../core/server/models');
 
 describe('MailgunEmailSuppressionList', function () {

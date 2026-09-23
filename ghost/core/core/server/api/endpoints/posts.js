@@ -2,7 +2,7 @@ const urlUtils = require('../../../shared/url-utils').default;
 const models = require('../../models');
 const { getCSVExportFileName } = require('./utils/csv-export-filename');
 const postsService = require('../../services/posts').service;
-const contentImportService = require('../../services/content-import');
+const contentImportService = require('../../services/content-import').service;
 const { restrictAdminApiQueryOptions } = require('./utils/api-filter-utils');
 const allowedIncludes = [
   'tags',

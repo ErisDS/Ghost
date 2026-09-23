@@ -3,7 +3,7 @@ const path = require('path');
 const errors = require('@tryghost/errors');
 const imageTransform = require('@tryghost/image-transform');
 
-const adapterManager = require('../../services/adapter-manager').default;
+const adapterManager = require('../../services/adapter-manager').service;
 const config = require('../../../shared/config');
 
 /** @type {import('@tryghost/api-framework').Controller} */

@@ -42,7 +42,7 @@ describe('sendMagicLink', function () {
     const agents = await agentProvider.getAgentsForMembers();
     membersAgent = agents.membersAgent;
 
-    membersService = require('../../../core/server/services/members');
+        membersService = require('../../../core/server/services/members').service;
 
     await fixtureManager.init('members');
   });

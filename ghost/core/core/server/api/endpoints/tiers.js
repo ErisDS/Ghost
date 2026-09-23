@@ -1,4 +1,4 @@
-const tiersService = require('../../services/tiers');
+const tiersService = require('../../services/tiers').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

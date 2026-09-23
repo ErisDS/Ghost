@@ -1,6 +1,6 @@
 const tpl = require('@tryghost/tpl');
 const errors = require('@tryghost/errors');
-const invites = require('../../services/invites');
+const invites = require('../../services/invites').service;
 const models = require('../../models');
 const api = require('./index');
 const { restrictAdminApiQueryOptions } = require('./utils/api-filter-utils');

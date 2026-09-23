@@ -1,5 +1,5 @@
 const urlUtils = require('../../../../../../../shared/url-utils').default;
-const urlService = require('../../../../../../services/url');
+const urlService = require('../../../../../../services/url').service;
 const localUtils = require('../../../index');
 
 const handleImageUrl = (imageUrl) => {

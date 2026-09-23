@@ -1,9 +1,11 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const url = require('../../../../../core/server/api/endpoints/utils/serializers/output/utils/url');
-const EmailServiceWrapper = require('../../../../../core/server/services/email-service/email-service-wrapper');
+const {
+  getPostUrl,
+} = require('../../../../../core/server/services/email-service/email-service-factory');
 
-describe('EmailServiceWrapper getPostUrl', function () {
+describe('Email service getPostUrl', function () {
   afterEach(function () {
     sinon.restore();
   });
@@ -20,7 +22,7 @@ describe('EmailServiceWrapper getPostUrl', function () {
     // matches no post collection and 404s.
     const forPost = sinon.stub(url, 'forPost');
 
-    new EmailServiceWrapper().getPostUrl(fakePost('page'));
+    getPostUrl(fakePost('page'));
 
     assert.equal(forPost.getCall(0).args[3], 'pages');
   });
@@ -28,7 +30,7 @@ describe('EmailServiceWrapper getPostUrl', function () {
   it('routes a post as a post', function () {
     const forPost = sinon.stub(url, 'forPost');
 
-    new EmailServiceWrapper().getPostUrl(fakePost('post'));
+    getPostUrl(fakePost('post'));
 
     assert.equal(forPost.getCall(0).args[3], 'posts');
   });

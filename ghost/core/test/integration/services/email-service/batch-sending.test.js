@@ -6,9 +6,11 @@ const logging = require('@tryghost/logging');
 const assert = require('node:assert/strict');
 const _ = require('lodash');
 const configUtils = require('../../../utils/config-utils');
-const { settingsCache } = require('../../../../core/server/services/settings-helpers');
+const settingsHelpersRoot = require('../../../../core/server/services/settings-helpers');
+settingsHelpersRoot.init();
+const {settingsCache} = settingsHelpersRoot.service;
 const DomainEvents = require('@tryghost/domain-events');
-const emailService = require('../../../../core/server/services/email-service');
+const emailService = require('../../../../core/server/services/email-service').service;
 const { mockSetting, stripeMocker } = require('../../../utils/e2e-framework-mock-manager');
 const {
   sendEmail,
@@ -169,10 +171,10 @@ describe('Batch sending tests', function () {
     await fixtureManager.init('newsletters', 'members:newsletters');
     await agent.loginAsOwner();
 
-    linkRedirectService = require('../../../../core/server/services/link-redirection');
+        linkRedirectService = require('../../../../core/server/services/link-redirection').service;
     linkRedirectRepository = linkRedirectService.linkRedirectRepository;
 
-    linkTrackingService = require('../../../../core/server/services/link-tracking');
+        linkTrackingService = require('../../../../core/server/services/link-tracking').service;
     linkClickRepository = linkTrackingService.linkClickRepository;
   });
 
@@ -680,7 +682,7 @@ describe('Batch sending tests', function () {
 
     // We stub a lot of imported members to mimic a large import that is in progress but is not yet finished
     // the current verification required value is off. But when creating an email, we need to update that check to avoid this issue.
-    const members = require('../../../../core/server/services/members');
+        const members = require('../../../../core/server/services/members').service;
     const events = members.api.events;
     const getSignupEvents = sinon.stub(events, 'getSignupEvents').resolves({
       meta: {

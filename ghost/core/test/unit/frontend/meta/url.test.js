@@ -2,7 +2,9 @@ const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const logging = require('@tryghost/logging');
 const urlUtils = require('../../../../core/shared/url-utils').default;
-const urlService = require('../../../../core/server/services/url');
+const urlServiceRoot = require('../../../../core/server/services/url');
+urlServiceRoot.init();
+const urlService = urlServiceRoot.service;
 const getUrl = require('../../../../core/frontend/meta/url');
 const testUtils = require('../../../utils');
 

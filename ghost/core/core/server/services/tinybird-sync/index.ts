@@ -8,20 +8,24 @@ import labs from '../../../shared/labs';
 import settingsCache from '../../../shared/settings-cache';
 import { knex } from '../../data/db';
 import { createTinybirdSyncService } from './tinybird-sync-service';
+import { lazySingleton } from '../../../shared/lazy-singleton';
 
-const service = createTinybirdSyncService({
-  config,
-  settingsCache,
-  labs,
-  knex,
-  logging,
-  sleep: async (ms) => {
-    await setTimeoutPromise(ms, undefined, { ref: false });
-  },
-  random: Math.random,
-  now: () => new Date(),
-  fetch: globalThis.fetch,
-  createId: () => ObjectId().toHexString(),
-});
+let instance: ReturnType<typeof createTinybirdSyncService> | undefined;
+export const service = lazySingleton('TinybirdSyncService', () => instance);
 
-export const start = service.start;
+export function init(): void {
+  instance ??= createTinybirdSyncService({
+    config,
+    settingsCache,
+    labs,
+    knex,
+    logging,
+    sleep: async (ms) => {
+      await setTimeoutPromise(ms, undefined, { ref: false });
+    },
+    random: Math.random,
+    now: () => new Date(),
+    fetch: globalThis.fetch,
+    createId: () => ObjectId().toHexString(),
+  });
+}

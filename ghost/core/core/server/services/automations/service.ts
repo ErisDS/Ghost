@@ -17,9 +17,9 @@ import { StartAutomationsPollEvent } from './events/start-automations-poll-event
 
 const logging = require('@tryghost/logging');
 const { welcomeEmailAutomationPoll } = require('./welcome-email-automation-poll');
-const memberWelcomeEmailService = require('../member-welcome-emails/service');
+const memberWelcomeEmailService = require('../member-welcome-emails').service;
 
-type AutomationsServiceOptions = {
+export type AutomationsServiceOptions = {
   apiUrl: string;
   domainEvents: Pick<DomainEvents, 'dispatch' | 'subscribe'>;
   internalKeys: InternalKeys;

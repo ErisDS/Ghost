@@ -1,6 +1,6 @@
 // Endpoint for the admin API to return likers for a comment
 
-const commentsService = require('../../services/comments');
+const commentsService = require('../../services/comments').service;
 
 /** @type {import('@tryghost/api-framework').Controller} */
 const controller = {

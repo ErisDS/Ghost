@@ -7,7 +7,7 @@ const {
   configUtils,
 } = require('../../utils/e2e-framework');
 const { anyEtag } = matchers;
-const recommendationsService = require('../../../core/server/services/recommendations');
+const recommendationsService = require('../../../core/server/services/recommendations').service;
 const { Recommendation } = require('../../../core/server/services/recommendations/service');
 
 async function testClicked({ recommendationId, memberId }, test) {
@@ -71,7 +71,7 @@ describe('Recommendation Event Tracking', function () {
     await membersAgent2.loginAs('authenticationtest@email.com');
     await fixtureManager.init('posts', 'members');
 
-    const membersService = require('../../../core/server/services/members');
+        const membersService = require('../../../core/server/services/members').service;
     const memberRepository = membersService.api.members;
 
     const member = await memberRepository.get({ email: 'authenticationtest@email.com' });

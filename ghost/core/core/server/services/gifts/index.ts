@@ -8,6 +8,7 @@ import { SignedFlushScheduler } from '../../adapters/scheduling/signed-flush-sch
 import { GiftEmailService } from './gift-email-service';
 import { GiftController } from './gift-controller';
 import { SendGiftDeliveryEvent } from './events/send-gift-delivery-event';
+import { lazySingleton } from '../../../shared/lazy-singleton';
 
 export interface GiftServiceInitOptions {
   apiUrl: string;
@@ -20,7 +21,8 @@ export interface GiftServiceInitOptions {
 // can't assign to them — stub the module load instead (see
 // test/unit/server/web/gift-preview/controller.test.js).
 export let controller: GiftController | undefined;
-export let service: GiftService | undefined;
+let instance: GiftService | undefined;
+export const service = lazySingleton<GiftService>('GiftService', () => instance);
 
 export let deliveryService: GiftDeliveryService | undefined;
 
@@ -29,7 +31,7 @@ export let deliveryService: GiftDeliveryService | undefined;
 let rescheduleDeliveriesOnBoot = true;
 
 export function init(options: GiftServiceInitOptions): void {
-  if (service) {
+  if (instance) {
     return;
   }
 
@@ -136,7 +138,7 @@ export function init(options: GiftServiceInitOptions): void {
     settingsCache,
   });
 
-  service = giftService;
+  instance = giftService;
   deliveryService = giftDeliveryService;
   rescheduleDeliveriesOnBoot = Boolean(options.schedulerAdapter.rescheduleOnBoot);
   controller = new GiftController({ service: giftService });
