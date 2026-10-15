@@ -73,6 +73,15 @@ that needed them, not before.
   `files`, `scripts/prune.mts`, the eslint globs, the vitest unit include, the
   strict-mode test loader and the dependency resolver's emitted-JS scan all had
   `core/` hard-coded. Each gained `domains/`.
+- **Domains have a stable name.** `ghost/package.json` declares
+  `"imports": { "#domains/*": ... }`, so consumers write
+  `require('#domains/payments/api')` instead of a relative path that breaks
+  when `core/` is flattened. Node resolves it natively (the `source` condition
+  picks the `.ts` under `pnpm dev`, the default picks emitted `.js` in
+  production); `tsconfig.json` mirrors it in `paths` because TypeScript's
+  node10 resolution ignores `imports`; tsx applies the same `paths` under
+  vitest. Node requires the `#` prefix, so `@domains/...` is not available
+  without a package per domain.
 - **Left central on purpose**: the `donation_payment_events` table in
   `schema.js`, the `DonationPaymentEvent` Bookshelf model. No routes to lift.
 - **Gap**: CODEOWNERS entry pending the Berlin team handle.

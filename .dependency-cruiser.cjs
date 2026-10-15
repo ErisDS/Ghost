@@ -415,6 +415,7 @@ module.exports = {
     // Resolve public package exports to authored workspace source when available.
     enhancedResolveOptions: {
       exportsFields: ['exports'],
+      importsFields: ['imports'],
       conditionNames: ['source', 'import', 'require', 'node', 'default'],
     },
     reporterOptions: {

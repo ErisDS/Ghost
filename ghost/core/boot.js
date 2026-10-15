@@ -374,7 +374,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const slackNotifications = require('./server/services/slack-notifications');
   const mediaInliner = require('./server/services/media-inliner');
   const contentImport = require('./server/services/content-import');
-  const payments = require('../domains/payments/domain').default;
+  const payments = require('#domains/payments/domain').default;
   const giftService = require('./server/services/gifts');
   const machinePaymentsService = require('./server/services/machine-payments');
   const recommendationsService = require('./server/services/recommendations');
@@ -543,7 +543,7 @@ async function initBackgroundServices({ config }) {
   // subscriptions and recurring jobs start here. Guarded for the same reason as
   // the gift recovery above.
   try {
-    const payments = require('../domains/payments/domain').default;
+    const payments = require('#domains/payments/domain').default;
     await payments.boot();
   } catch (err) {
     const logging = require('@tryghost/logging');

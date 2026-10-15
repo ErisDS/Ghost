@@ -39,6 +39,12 @@
     "nodemon.json",
     "tsconfig.json"
   ],
+  "imports": {
+    "#domains/*": {
+      "source": "./domains/*.ts",
+      "default": "./domains/*.js"
+    }
+  },
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
