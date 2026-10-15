@@ -11,7 +11,7 @@ const {
 } = require('../../utils/e2e-framework');
 const {
   StartGiftDeliveryFlushEvent,
-} = require('../../../core/server/services/gifts/events/start-gift-delivery-flush-event');
+} = require('../../../domains/payments/gifts/events/start-gift-delivery-flush-event');
 
 const { anyContentVersion, anyEtag, anyErrorId } = matchers;
 const { cacheInvalidateHeaderNotSet } = assertions;

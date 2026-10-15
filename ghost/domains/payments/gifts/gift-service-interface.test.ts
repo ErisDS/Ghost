@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import sinon from 'sinon';
-import { GiftService } from '../../../../../core/server/services/gifts/gift-service';
-import { buildGift } from './utils';
+import { GiftService } from './gift-service';
+import { buildGift } from './test-utils';
 
 function hasInvalidDeliveryContext(error: unknown): boolean {
   const context =

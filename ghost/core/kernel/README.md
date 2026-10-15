@@ -103,19 +103,30 @@ describes how to catalogue extras while their eventual ownership is established.
 ## Modules
 
 [`defineModule(definition)`](module.ts) wraps a unit of application code that
-boot composes: a domain, the site renderer, the HTTP boundary. It mirrors the
-two phases of a Laravel service provider:
+boot composes: a domain, the site renderer, the HTTP boundary. Two phases,
+drawn where Ghost's boot already draws them:
 
-- `register()` constructs the module's instances from injected dependencies.
-  It must not rely on another module having booted.
-- `boot()` subscribes to events, schedules jobs and starts background work.
-  Every module has registered by the time any module boots.
+- `register(context)` constructs and binds: instances from injected
+  dependencies, event listeners, anything that must be in place before the
+  first request or the first job. It runs in boot's services phase and must not
+  rely on another module having booted.
+- `boot(context)` starts activity: recurring jobs, recovery of interrupted work,
+  timers. It runs in boot's background phase, which boot skips under test, so a
+  module's behaviour must not depend on it having run.
 - `shutdown()` is optional and releases what `boot()` started.
+
+The context is whatever boot owns and the module cannot construct for itself
+(the jobs service, the scheduling adapter, the server). Each phase has its own
+context type because boot's phases have different state in scope.
 
 The helper gives each phase the guarantees `defineService` gives `init()`:
 one attempt shared by concurrent callers, a retry after failure, and an error
 when `boot()` is called before `register()` has completed. It does not order
 modules; boot owns the order, as it owns the order of service `init()` calls.
+
+Known gap: the jobs service clears its handlers on every in-process boot while
+`register()` runs once per process, so job handlers are still bound centrally.
+A per-boot binding hook is the next kernel addition this needs.
 
 A domain's `domain.ts` default-exports one `Module`. See
 [`ghost/domains/README.md`](../../domains/README.md).

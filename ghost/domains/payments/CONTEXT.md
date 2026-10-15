@@ -13,8 +13,14 @@ payment event, optionally linked to a member, with the attribution captured at
 checkout. Staff are notified after the record is saved.
 _Avoid_: tip, one-time subscription
 
+**Gift**:
+A prepaid subscription bought for someone else, delivered by email on a
+chosen date, redeemed with a token, and reminded about before it lapses.
+See `gifts/CONTEXT.md` for the full language of that capability.
+_Avoid_: gift link (that is members' shareable access to one post)
+
 ## Status
 
-Only donations has moved here so far. Stripe, gifts, offers, checkout config
-and machine payments still live under `core/server/services/` and will join
-this domain one root at a time.
+Donations and gifts have moved here. Stripe, offers, checkout config and
+machine payments still live under `core/server/services/` and will join this
+domain one root at a time.

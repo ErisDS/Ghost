@@ -36,6 +36,27 @@ const domainImplementation = {
 const domainLegacyAllowlist = {
   payments: [
     '^ghost/core/server/models/index\\.js$', // Bookshelf model registry, frozen; the domain takes single models from it.
+    // Future domains, reached as legacy roots until they exist. Each entry
+    // becomes an api.ts import when its domain is created.
+    '^ghost/core/server/services/(members|tiers|staff|stripe|settings-helpers|i18n)(/index\\.(js|ts))?$',
+    '^ghost/core/server/services/email-address/email-address-parser\\.(js|ts)$',
+    '^ghost/core/server/services/email-analytics/jobs(/index\\.(js|ts))?$',
+    // Shared libraries and singletons awaiting a kernel or domain home.
+    '^ghost/core/server/lib/(mail|image)(/index\\.(js|ts))?$',
+    '^ghost/core/server/lib/mailgun/mailgun-client\\.(js|ts)$',
+    '^ghost/core/shared/(config|settings-cache|url-utils|events)(/index\\.(js|ts))?$',
+    '(^|/)node_modules/@tryghost/(logging|domain-events)/|^@tryghost/(logging|domain-events)$',
+  ],
+};
+// Implementation debt a domain carries into the move: application instances its
+// files still import directly instead of taking as dependencies. Per domain,
+// named individually, and only ever removed. A domain with an empty list is
+// clean; a root cannot be marked migrated in the services inventory while its
+// future domain still lists it here.
+const domainImplementationDebt = {
+  payments: [
+    '(^|/)node_modules/@tryghost/logging/|^@tryghost/logging$', // gifts: gift-service, gift-delivery-service, gift-checkout-adapter, jobs/index
+    '(^|/)node_modules/@tryghost/domain-events/|^@tryghost/domain-events$', // gifts: gift-delivery-service dispatches directly
   ],
 };
 
@@ -55,6 +76,16 @@ const serviceDependencyAllowlist = [
   '^ghost/core/server/lib/db-types/json\\.ts$', // Database JSON codec.
   '^ghost/core/server/lib/public-jwk\\.ts$', // Key conversion and thumbprints; includes memoization.
   '^ghost/core/server/services/jobs-service/job\\.ts$', // Job base class, not the running service.
+  // Added with the gifts move. Pure libraries and helpers; kernel-tier candidates.
+  '(^|/)node_modules/luxon/|^luxon$', // Date arithmetic.
+  '(^|/)node_modules/handlebars/|^handlebars$', // Template compilation for the domain's own templates.
+  '(^|/)node_modules/@tryghost/mongo-utils/|^@tryghost/mongo-utils$', // Filter transformers.
+  '(^|/)node_modules/@tryghost/color-utils/|^@tryghost/color-utils$', // Colour parsing for email rendering.
+  '^(node:)?fs$', // Template files shipped with the domain.
+  '^(node:)?path$',
+  '^ghost/core/server/lib/case-keys\\.ts$', // Key case codecs.
+  '^ghost/core/server/lib/mailgun/mailgun-message-id\\.ts$', // Message-id helper, no client.
+  '^ghost/core/server/adapters/scheduling/signed-flush-scheduler\\.ts$', // Scheduler helper class, not an adapter instance.
 ];
 
 /*
@@ -83,12 +114,34 @@ module.exports = {
     // ============================================================
     // ghost/domains — implementation imports: same domain, kernel, allowlist
     // ============================================================
+    ...Object.entries(domainImplementationDebt).map(([domain, debt]) => ({
+      name: `domain-dependencies-${domain}`,
+      comment: `${domain} implementation may import only its own domain, the kernel, type-only imports, the library allowlist and its listed debt. Application dependencies are wired in domain.ts and injected.`,
+      severity: 'error',
+      from: {
+        path: `^${domainsRoot}/${domain}/`,
+        pathNot: domainImplementation.pathNot,
+      },
+      to: {
+        pathNot: [
+          ...serviceDependencyAllowlist,
+          ...debt,
+          '^ghost/core/kernel/',
+          `^${domainsRoot}/${domain}/`,
+          `^${domainsRoot}/[^/]+/api\\.ts$`,
+        ],
+        dependencyTypesNot: ['type-only', 'type-import'],
+      },
+    })),
     {
       name: 'domain-dependencies',
       comment:
         'Domain implementation may import only its own domain, the kernel, type-only imports and the explicit library allowlist. Application dependencies are wired in domain.ts and injected.',
       severity: 'error',
-      from: domainImplementation,
+      from: {
+        path: `^${domainsRoot}/(?!(?:${Object.keys(domainImplementationDebt).join('|')})/)([^/]+)/`,
+        pathNot: domainImplementation.pathNot,
+      },
       to: {
         pathNot: [
           ...serviceDependencyAllowlist,

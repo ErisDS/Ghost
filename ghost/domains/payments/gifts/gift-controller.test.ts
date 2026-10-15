@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import errors from '@tryghost/errors';
 import sinon from 'sinon';
-import { GiftController } from '../../../../../core/server/services/gifts/gift-controller';
+import { GiftController } from './gift-controller';
 
 describe('GiftController', function () {
   afterEach(function () {

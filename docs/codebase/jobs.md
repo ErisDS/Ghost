@@ -20,7 +20,7 @@ are part of this API.
 
 Current examples include:
 
-- [Gift reminders](../../ghost/core/server/services/gifts/jobs/send-gift-reminders-job.ts),
+- [Gift reminders](../../ghost/domains/payments/gifts/jobs/send-gift-reminders-job.ts),
   dispatched on a recurring schedule.
 - [Site content imports](../../ghost/core/server/data/importer/jobs/content-import-job.ts),
   dispatched once in the shared default lane with the key of the stored upload

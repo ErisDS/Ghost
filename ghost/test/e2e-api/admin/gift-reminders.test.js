@@ -8,7 +8,7 @@ const {
   matchers,
   assertions,
 } = require('../../utils/e2e-framework');
-const StartGiftReminderFlushEvent = require('../../../core/server/services/gifts/events/start-gift-reminder-flush-event');
+const StartGiftReminderFlushEvent = require('../../../domains/payments/gifts/events/start-gift-reminder-flush-event');
 
 const { anyContentVersion, anyEtag, anyErrorId } = matchers;
 const { cacheInvalidateHeaderNotSet } = assertions;

@@ -3,7 +3,7 @@ import ObjectID from 'bson-objectid';
 import {
   decodeGiftDeliveryRow,
   encodeGiftDelivery,
-} from '../../../../../core/server/services/gifts/gift-delivery-codec';
+} from './gift-delivery-codec';
 
 describe('Gift delivery codec', function () {
   it('round-trips the persisted delivery row through the codec', function () {

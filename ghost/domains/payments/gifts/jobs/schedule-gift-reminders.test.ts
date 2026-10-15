@@ -4,11 +4,11 @@ import { describe, it, beforeEach, afterEach } from 'vitest';
 import logging from '@tryghost/logging';
 
 // require, not import: these must resolve to the same CommonJS module instances
-// that core/server/services/gifts/jobs/index.js loads, so the scheduled job is
+// that domains/payments/gifts/jobs/index.js loads, so the scheduled job is
 // instanceof the class below.
-const giftJobs = require('../../../../../../core/server/services/gifts/jobs');
+const giftJobs = require('./index');
 const SendGiftRemindersJob =
-  require('../../../../../../core/server/services/gifts/jobs/send-gift-reminders-job').default;
+  require('./send-gift-reminders-job').default;
 
 describe('gift jobs: reminder scheduling', function () {
   let jobsService: { scheduleRecurring: sinon.SinonStub };

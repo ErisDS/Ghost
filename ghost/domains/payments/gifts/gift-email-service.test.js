@@ -2,7 +2,7 @@ const assert = require('node:assert/strict');
 const sinon = require('sinon');
 const {
   GiftEmailService,
-} = require('../../../../../core/server/services/gifts/gift-email-service');
+} = require('./gift-email-service');
 
 describe('GiftEmailService', function () {
   let transactionalMailer;

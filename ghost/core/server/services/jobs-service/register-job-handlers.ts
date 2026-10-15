@@ -4,11 +4,9 @@ import EmailAnalyticsFetchLatestJob from '../email-analytics/jobs/email-analytic
 import type { EmailAnalyticsServiceWrapper } from '../email-analytics/email-analytics-service-wrapper';
 import { JobsService } from './jobs-service';
 import type { JobHandlingOptions } from './jobs-service';
-import type { GiftService } from '../gifts/gift-service';
 import CleanTokensJob from '../members/jobs/clean-tokens-job';
 import CleanExpiredCompedJob from '../members/jobs/clean-expired-comped-job';
-import CleanGiftsJob from '../gifts/jobs/clean-gifts-job';
-import SendGiftRemindersJob from '../gifts/jobs/send-gift-reminders-job';
+import { CleanGiftsJob, SendGiftRemindersJob, type GiftService } from '#domains/payments/api';
 import ExternalMediaInliner from '../media-inliner/external-media-inliner';
 import ExternalMediaInlinerJob from '../media-inliner/external-media-inliner-job';
 import ContentCSVImportJob from '../content-import/jobs/content-csv-import-job';
@@ -50,7 +48,7 @@ interface RegisterJobHandlersDependencies {
     cleanTokens(): Promise<number>;
     cleanExpiredComped(): Promise<unknown>;
   };
-  giftService: GiftService;
+  giftService: Pick<GiftService, 'cleanup' | 'processReminders'>;
   mediaInliner: ExternalMediaInliner;
   mentionsController: MentionController;
   mentionsSendingService: MentionSendingService;

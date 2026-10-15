@@ -2,9 +2,9 @@ import assert from 'node:assert/strict';
 import logging from '@tryghost/logging';
 import sinon from 'sinon';
 import type { Knex } from 'knex';
-import { GiftDeliveryService } from '../../../../../core/server/services/gifts/gift-delivery-service';
-import type { GiftDeliveryRepository } from '../../../../../core/server/services/gifts/gift-delivery-bookshelf-repository';
-import { buildGift, buildGiftDelivery } from './utils';
+import { GiftDeliveryService } from './gift-delivery-service';
+import type { GiftDeliveryRepository } from './gift-delivery-bookshelf-repository';
+import { buildGift, buildGiftDelivery } from './test-utils';
 
 const DomainEvents = require('@tryghost/domain-events');
 const transacting = 'trx' as unknown as Knex.Transaction;

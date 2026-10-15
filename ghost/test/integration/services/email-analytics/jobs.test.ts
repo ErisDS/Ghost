@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import ObjectId from 'bson-objectid';
-import { GIFT_DELIVERY_EMAIL_TAG } from '../../../../core/server/services/gifts/constants';
+import { GIFT_DELIVERY_EMAIL_TAG } from '../../../../domains/payments/gifts/constants';
 import { AUTOMATION_EMAIL_TAG } from '../../../../core/server/services/member-welcome-emails/constants';
 import sinon from 'sinon';
 import { vi } from 'vitest';

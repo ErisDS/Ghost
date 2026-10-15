@@ -3,7 +3,7 @@ const { BadRequestError } = require('@tryghost/errors');
 const {
   resolveGiftDuration,
   validateGiftCheckoutOffer,
-} = require('../../../../../core/server/services/gifts/gift-checkout-offer');
+} = require('./gift-checkout-offer');
 
 describe('gift checkout offer', function () {
   const tier = {

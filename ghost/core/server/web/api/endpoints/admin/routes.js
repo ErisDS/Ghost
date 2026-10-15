@@ -8,6 +8,7 @@ const mw = require('./middleware');
 const labs = require('../../../../../shared/labs');
 const limits = require('../../../../services/limits');
 const appInstallations = require('../../../../services/app-installations').default;
+const payments = require('#domains/payments/api');
 
 const shared = require('../../../shared');
 
@@ -96,9 +97,8 @@ module.exports = function apiRoutes() {
   // ## Schedules
   router.put('/schedules/:resource/:id', mw.authAdminApiWithUrl, http(api.schedules.publish));
 
-  // ## Gifts
-  router.put('/gifts/flush_reminders', mw.authAdminApiWithUrl, http(api.gifts.flushReminders));
-  router.put('/gifts/flush_deliveries', mw.authAdminApiWithUrl, http(api.gifts.flushDeliveries));
+  // ## Gifts (declared by the payments domain)
+  shared.mountDomainRoutes(router, payments.http.gifts.adminRoutes, { api, http, middleware: mw });
 
   // ## Settings
   router.get('/settings/routes/yaml', mw.authAdminApi, http(api.settings.download));

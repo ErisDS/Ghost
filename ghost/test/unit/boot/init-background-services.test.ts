@@ -10,7 +10,7 @@ function createBackgroundHarness(environment = 'production') {
     scheduleRecurringGiftDeliveriesJob: sinon.stub().resolves(),
   };
   const recovery = sinon.stub().resolves();
-  const giftRecovery = sinon.stub().resolves();
+  const paymentsBoot = sinon.stub().resolves();
   const activity = sinon.stub().resolves();
   const themes = { loadInactiveThemes: sinon.stub() };
   const logging = { error: sinon.stub() };
@@ -26,11 +26,7 @@ function createBackgroundHarness(environment = 'production') {
       './server/services/email-analytics/jobs': emailAnalyticsJobs,
       './server/services/themes': themes,
       './server/services/email-service': { service: { resumeInterruptedSends: recovery } },
-      './server/services/gifts': { recoverPendingDeliveries: giftRecovery },
-      './server/services/gifts/jobs': {
-        scheduleGiftCleanupJob: async () => {},
-        scheduleGiftReminderJob: async () => {},
-      },
+      '#domains/payments/domain': { default: { boot: paymentsBoot } },
       './server/services/members/jobs': {
         scheduleTokenCleanupJob: async () => {},
         scheduleExpiredCompCleanupJob: async () => {},
@@ -49,7 +45,7 @@ function createBackgroundHarness(environment = 'production') {
     init: (): Promise<void> => initBackgroundServices({ config: { get: () => true } }),
     themes,
     recovery,
-    giftRecovery,
+    paymentsBoot,
     activity,
     emailAnalyticsJobs,
     logging,
@@ -68,7 +64,7 @@ for (const environment of ['test', 'testing', 'testing-mysql']) {
 
     sinon.assert.calledOnce(boot.themes.loadInactiveThemes);
     sinon.assert.notCalled(boot.recovery);
-    sinon.assert.notCalled(boot.giftRecovery);
+    sinon.assert.notCalled(boot.paymentsBoot);
     sinon.assert.notCalled(boot.activity);
     sinon.assert.notCalled(boot.milestones.initAndRun);
   });
@@ -84,7 +80,7 @@ for (const environment of ['development', 'production']) {
     try {
       await setImmediate();
       sinon.assert.calledOnce(boot.recovery);
-      sinon.assert.notCalled(boot.giftRecovery);
+      sinon.assert.notCalled(boot.paymentsBoot);
       sinon.assert.notCalled(boot.activity);
       sinon.assert.notCalled(boot.milestones.initAndRun);
     } finally {
@@ -92,12 +88,15 @@ for (const environment of ['development', 'production']) {
       await startup;
     }
 
-    sinon.assert.calledOnce(boot.giftRecovery);
+    sinon.assert.calledOnceWithExactly(
+      boot.paymentsBoot,
+      sinon.match({ jobsService: sinon.match.same(boot.jobsInstance) }),
+    );
     sinon.assert.calledOnce(boot.activity);
     sinon.assert.calledOnce(boot.milestones.initAndRun);
     sinon.assert.callOrder(
       boot.recovery,
-      boot.giftRecovery,
+      boot.paymentsBoot,
       boot.activity,
       boot.milestones.initAndRun,
     );

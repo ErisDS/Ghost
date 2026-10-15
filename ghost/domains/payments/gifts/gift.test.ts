@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { Gift, type GiftFromPurchaseData } from '../../../../../core/server/services/gifts/gift';
-import { buildGift } from './utils';
+import { Gift, type GiftFromPurchaseData } from './gift';
+import { buildGift } from './test-utils';
 
 describe('Gift', function () {
   const purchaseData: GiftFromPurchaseData = {

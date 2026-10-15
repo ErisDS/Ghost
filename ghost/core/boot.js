@@ -375,7 +375,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const mediaInliner = require('./server/services/media-inliner');
   const contentImport = require('./server/services/content-import');
   const payments = require('#domains/payments/domain').default;
-  const giftService = require('./server/services/gifts');
+  const paymentsApi = require('#domains/payments/api');
   const machinePaymentsService = require('./server/services/machine-payments');
   const recommendationsService = require('./server/services/recommendations');
   const emailAddressService = require('./server/services/email-address');
@@ -401,13 +401,8 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const schedulerAdapter = withErrorCapture(adapterManager.getAdapter('scheduling'));
   schedulerAdapter.run();
   await stripe.init();
-  giftService.init({
-    apiUrl,
-    schedulerAdapter,
-    internalKeys,
-  });
-  const giftDeliveryService = giftService.deliveryService;
-  assert(giftDeliveryService, 'Gift delivery service should be initialized');
+  await payments.register({ apiUrl, schedulerAdapter, internalKeys });
+  const giftDeliveryService = paymentsApi.giftDeliveryService.service;
   if (ghostServer) {
     ghostServer.registerCleanupTask(async () => {
       await stripe.shutdown();
@@ -449,7 +444,6 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
     slackNotifications.init(),
     mediaInliner.init(),
     contentImport.init(),
-    payments.register(),
     recommendationsService.init(),
     statsService.init(),
     explorePingService.init(),
@@ -464,7 +458,6 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const tinybirdSync = require('./server/services/tinybird-sync');
   memberJobs.init();
   const siteImporter = require('./server/data/importer').init({ jobsService });
-  assert(giftService.service, 'Gift service should be initialized');
   assert(mentionsService.controller, 'Mentions controller should be initialized');
   assert(mentionsService.sendingService, 'Mentions sending service should be initialized');
   assert(membersService.handleImportJob, 'Members service should be initialized');
@@ -475,7 +468,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
     newsletters: emailAnalytics.getNewsletters(),
     jobsService,
     memberJobs,
-    giftService: giftService.service,
+    giftService: paymentsApi.giftService.service,
     mediaInliner: mediaInliner.getInstance(),
     mentionsController: mentionsService.controller,
     mentionsSendingService: mentionsService.sendingService,
@@ -534,41 +527,14 @@ async function initBackgroundServices({ config }) {
     logging.error(err);
   }
 
-  // Retry gift deliveries interrupted by a prior shutdown. Not awaited: recovery
-  // sends sequentially and must not hold up the remaining background services.
-  const giftService = require('./server/services/gifts');
-  giftService.recoverPendingDeliveries();
-
-  // Domains boot after every service and domain has registered: event
-  // subscriptions and recurring jobs start here. Guarded for the same reason as
-  // the gift recovery above.
-  try {
-    const payments = require('#domains/payments/domain').default;
-    await payments.boot();
-  } catch (err) {
-    const logging = require('@tryghost/logging');
-    logging.error(err);
-  }
-
   const jobsService = require('./server/services/jobs-service').getInstance();
 
-  // Runs before activitypub.init for the same reason as the send recovery
-  // above: gifts would otherwise go uncleaned for the life of the process
-  // if an unrelated background service fails.
+  // Domains start their background activity here: gift delivery recovery and
+  // the recurring gift jobs. Runs before activitypub.init for the same reason as
+  // the send recovery above. The domain guards each step itself.
   try {
-    const giftJobs = require('./server/services/gifts/jobs');
-    await giftJobs.scheduleGiftCleanupJob(jobsService);
-  } catch (err) {
-    const logging = require('@tryghost/logging');
-    logging.error(err);
-  }
-
-  // Runs before activitypub.init for the same reason as the gift cleanup
-  // above: reminders would otherwise go unsent for the life of the process
-  // if an unrelated background service fails.
-  try {
-    const giftJobs = require('./server/services/gifts/jobs');
-    await giftJobs.scheduleGiftReminderJob(jobsService);
+    const payments = require('#domains/payments/domain').default;
+    await payments.boot({ jobsService });
   } catch (err) {
     const logging = require('@tryghost/logging');
     logging.error(err);

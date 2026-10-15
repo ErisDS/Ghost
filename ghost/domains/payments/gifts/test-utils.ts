@@ -1,5 +1,5 @@
-import { Gift } from '../../../../../core/server/services/gifts/gift';
-import type { GiftDeliveryData } from '../../../../../core/server/services/gifts/gift-delivery-schema';
+import { Gift } from './gift';
+import type { GiftDeliveryData } from './gift-delivery-schema';
 
 export function buildGift(overrides: Partial<ConstructorParameters<typeof Gift>[0]> = {}) {
   return new Gift({

@@ -6,12 +6,11 @@ import { loadBootFunction } from './harness';
 function createServicesHarness({ rescheduleOnBoot = true } = {}) {
   const stripe = sinon.stub().resolves();
   // These initializers are synchronous in production.
-  const gifts = sinon.stub();
+  const payments = sinon.stub().resolves();
   const analytics = sinon.stub();
   const mentions = sinon.stub().resolves();
   const media = sinon.stub().resolves();
   const email = sinon.stub().resolves();
-  const donations = sinon.stub().resolves();
   const register = sinon.stub();
   const start = sinon.stub().resolves();
   // Production init returns before its first poll. Poll behavior belongs to
@@ -38,10 +37,10 @@ function createServicesHarness({ rescheduleOnBoot = true } = {}) {
       './shared/url-utils': { default: { urlFor: () => 'https://example.com/ghost/api/admin' } },
       './shared/settings-cache': { get: () => 'site-id' },
       './server/services/stripe': { init: stripe },
-      './server/services/gifts': {
-        init: gifts,
-        deliveryService: {},
-        service: {},
+      '#domains/payments/domain': { default: { register: payments } },
+      '#domains/payments/api': {
+        giftService: { service: {} },
+        giftDeliveryService: { service: {} },
       },
       './server/services/mentions': {
         init: mentions,
@@ -55,7 +54,6 @@ function createServicesHarness({ rescheduleOnBoot = true } = {}) {
         init: analytics,
       },
       './server/services/email-service': { init: email, service: {} },
-      './server/services/donations': { default: { init: donations } },
       './server/services/media-inliner': {
         init: media,
         getInstance: () => ({}),
@@ -70,12 +68,11 @@ function createServicesHarness({ rescheduleOnBoot = true } = {}) {
     initServices: (): Promise<void> =>
       initServices({ config: {}, prometheusClient: null, jobsService }),
     stripe,
-    gifts,
+    payments,
     mentions,
     analytics,
     media,
     email,
-    donations,
     register,
     start,
     automations,
@@ -87,7 +84,7 @@ it('initializes dependencies and starts jobs before calling automations init', a
   const boot = createServicesHarness();
   await boot.initServices();
 
-  for (const dependency of [boot.gifts, boot.mentions, boot.analytics, boot.media, boot.email]) {
+  for (const dependency of [boot.payments, boot.mentions, boot.analytics, boot.media, boot.email]) {
     sinon.assert.callOrder(dependency, boot.register);
   }
   sinon.assert.callOrder(boot.register, boot.start, boot.automations, boot.reschedule);
@@ -103,7 +100,7 @@ it('does not reschedule posts when the scheduling adapter opts out', async funct
   sinon.assert.notCalled(boot.reschedule);
 });
 
-it('waits for Stripe initialization before initializing gifts and the other services', async function () {
+it('waits for Stripe initialization before registering payments and the other services', async function () {
   const boot = createServicesHarness();
   const ready = Promise.withResolvers<void>();
   boot.stripe.returns(ready.promise);
@@ -113,7 +110,7 @@ it('waits for Stripe initialization before initializing gifts and the other serv
     // Drain runnable promise continuations while the dependency stays unresolved.
     await setImmediate();
     sinon.assert.calledOnce(boot.stripe);
-    sinon.assert.notCalled(boot.gifts);
+    sinon.assert.notCalled(boot.payments);
     sinon.assert.notCalled(boot.mentions);
     sinon.assert.notCalled(boot.analytics);
     sinon.assert.notCalled(boot.media);
@@ -124,12 +121,12 @@ it('waits for Stripe initialization before initializing gifts and the other serv
     await startup;
   }
 
-  sinon.assert.calledOnce(boot.gifts);
+  sinon.assert.calledOnce(boot.payments);
   sinon.assert.calledOnce(boot.register);
   sinon.assert.calledOnce(boot.start);
 });
 
-for (const dependency of ['mentions', 'media', 'email', 'donations'] as const) {
+for (const dependency of ['mentions', 'media', 'email', 'payments'] as const) {
   it(`waits for ${dependency} initialization to finish before registering or starting jobs`, async function () {
     const boot = createServicesHarness();
     const ready = Promise.withResolvers<void>();

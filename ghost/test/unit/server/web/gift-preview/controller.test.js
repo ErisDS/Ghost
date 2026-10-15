@@ -12,11 +12,11 @@ require('../../../../../core/server/services/i18n').init();
 
 const controller = require('../../../../../core/server/web/gift-preview/controller');
 
-// The gifts module's exports are getter-only under tsx, so the service can't be
+// The payments api exposes the gift service through a getter, so it can't be
 // stubbed by assignment. Intercept the controller's lazy require of the module
 // instead, matching on the resolved file path so renames or moved requires can't
 // silently defeat the stub.
-const giftsModulePath = require.resolve('../../../../../core/server/services/gifts');
+const giftsModulePath = require.resolve('../../../../../domains/payments/api');
 
 describe('Gift Preview Controller', function () {
   let giftService;
@@ -31,7 +31,7 @@ describe('Gift Preview Controller', function () {
     originalModuleLoad = Module._load;
     Module._load = function (request, parent, isMain) {
       if (parent && Module._resolveFilename(request, parent, isMain) === giftsModulePath) {
-        return { service: giftService };
+        return { giftService: { service: giftService } };
       }
 
       return originalModuleLoad.call(this, request, parent, isMain);

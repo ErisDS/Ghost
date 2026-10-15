@@ -1,6 +1,6 @@
 const assert = require('node:assert/strict');
 const sinon = require('sinon');
-const GiftCheckoutAdapter = require('../../../../../core/server/services/gifts/gift-checkout-adapter');
+const GiftCheckoutAdapter = require('./gift-checkout-adapter');
 
 describe('GiftCheckoutAdapter', function () {
   afterEach(function () {

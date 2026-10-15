@@ -2,24 +2,32 @@ import { IncorrectUsageError } from '@tryghost/errors';
 
 /**
  * A unit of application code that boot composes: a domain, the site renderer,
- * the HTTP boundary. Mirrors the two phases of a Laravel service provider.
+ * the HTTP boundary. Two phases, in the spirit of a Laravel service provider
+ * but drawn where Ghost's boot already draws them:
  *
- * - register(): construct the module's instances from injected dependencies.
- *   Nothing here may rely on another module having booted.
- * - boot(): subscribe to events, schedule jobs, start background work. Every
- *   module has been registered by the time any module boots.
+ * - register(context): construct and bind. Build the module's instances from
+ *   injected dependencies, subscribe event listeners, register job handlers.
+ *   Nothing here starts activity, and nothing may rely on another module having
+ *   booted. Runs in boot's services phase, before the jobs service starts.
+ * - boot(context): start activity. Schedule recurring jobs, resume interrupted
+ *   work, start timers. Runs in boot's background phase, which boot skips
+ *   under test, so the module's behaviour must not depend on it having run.
+ *
+ * The context is whatever boot owns and the module cannot construct for
+ * itself: the jobs service, the scheduling adapter, the server. Each phase
+ * gets its own context type because boot's phases have different state.
  */
-export interface ModuleDefinition {
+export interface ModuleDefinition<RegisterContext = void, BootContext = void> {
   readonly name: string;
-  register(): void | Promise<void>;
-  boot(): void | Promise<void>;
+  register(context: RegisterContext): void | Promise<void>;
+  boot(context: BootContext): void | Promise<void>;
   shutdown?(): void | Promise<void>;
 }
 
-export interface Module {
+export interface Module<RegisterContext = void, BootContext = void> {
   readonly name: string;
-  readonly register: () => Promise<void>;
-  readonly boot: () => Promise<void>;
+  readonly register: (context: RegisterContext) => Promise<void>;
+  readonly boot: (context: BootContext) => Promise<void>;
   readonly shutdown: () => Promise<void>;
 }
 
@@ -31,7 +39,9 @@ export interface Module {
  * It does not order modules. Boot owns the order it calls register() and
  * boot() in, exactly as it owns the order of service init() calls today.
  */
-export function defineModule(definition: ModuleDefinition): Module {
+export function defineModule<RegisterContext = void, BootContext = void>(
+  definition: ModuleDefinition<RegisterContext, BootContext>,
+): Module<RegisterContext, BootContext> {
   if (!/^[a-z][a-z0-9-]*$/.test(definition.name)) {
     throw new IncorrectUsageError({
       message: `Module name "${definition.name}" must be lower-case and hyphenated.`,
@@ -44,9 +54,9 @@ export function defineModule(definition: ModuleDefinition): Module {
 
   return {
     name: definition.name,
-    register(): Promise<void> {
+    register(context: RegisterContext): Promise<void> {
       registration ??= Promise.resolve()
-        .then(() => definition.register())
+        .then(() => definition.register(context))
         .then(() => {
           registered = true;
         })
@@ -56,14 +66,14 @@ export function defineModule(definition: ModuleDefinition): Module {
         });
       return registration;
     },
-    async boot(): Promise<void> {
+    async boot(context: BootContext): Promise<void> {
       if (!registered) {
         throw new IncorrectUsageError({
           message: `Module "${definition.name}" booted before register() completed.`,
         });
       }
       booting ??= Promise.resolve()
-        .then(() => definition.boot())
+        .then(() => definition.boot(context))
         .catch((error) => {
           booting = undefined;
           throw error;

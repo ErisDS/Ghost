@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict';
 import sinon from 'sinon';
 import type { Knex } from 'knex';
-import { GiftBookshelfRepository } from '../../../../../core/server/services/gifts/gift-bookshelf-repository';
-import { Gift } from '../../../../../core/server/services/gifts/gift';
+import { GiftBookshelfRepository } from './gift-bookshelf-repository';
+import { Gift } from './gift';
 
 type GiftBookshelfModel = ConstructorParameters<typeof GiftBookshelfRepository>[0]['GiftModel'];
 type TestGiftBookshelfModel = Omit<GiftBookshelfModel, 'findPage'> &

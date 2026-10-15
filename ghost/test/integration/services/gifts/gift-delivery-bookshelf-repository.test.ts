@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
-import { GiftBookshelfRepository } from '../../../../core/server/services/gifts/gift-bookshelf-repository';
-import { GiftDeliveryBookshelfRepository } from '../../../../core/server/services/gifts/gift-delivery-bookshelf-repository';
+import { GiftBookshelfRepository } from '../../../../domains/payments/gifts/gift-bookshelf-repository';
+import { GiftDeliveryBookshelfRepository } from '../../../../domains/payments/gifts/gift-delivery-bookshelf-repository';
 
 const { agentProvider, fixtureManager } = require('../../../utils/e2e-framework');
 const models = require('../../../../core/server/models');

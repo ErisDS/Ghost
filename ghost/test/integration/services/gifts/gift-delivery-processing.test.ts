@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import sinon from 'sinon';
-import { SendGiftDeliveryEvent } from '../../../../core/server/services/gifts/events/send-gift-delivery-event';
+import { SendGiftDeliveryEvent } from '../../../../domains/payments/gifts/events/send-gift-delivery-event';
 
 const DomainEvents = require('@tryghost/domain-events');
 const MailgunClient = require('../../../../core/server/lib/mailgun/mailgun-client');

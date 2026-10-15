@@ -341,7 +341,11 @@ module.exports = {
   },
 
   get giftsMembers() {
-    return apiFramework.pipeline(require('./gifts-members'), localUtils, 'members');
+    return apiFramework.pipeline(
+      require('#domains/payments/api').http.gifts.members,
+      localUtils,
+      'members',
+    );
   },
 
   get appInstallations() {
@@ -361,7 +365,7 @@ module.exports = {
   },
 
   get gifts() {
-    return apiFramework.pipeline(require('./gifts'), localUtils);
+    return apiFramework.pipeline(require('#domains/payments/api').http.gifts.admin, localUtils);
   },
 
   get recommendationsPublic() {

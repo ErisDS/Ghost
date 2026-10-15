@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import sinon from 'sinon';
-import CleanGiftsJob from '../../../../core/server/services/gifts/jobs/clean-gifts-job';
+import CleanGiftsJob from '../../../../domains/payments/gifts/jobs/clean-gifts-job';
 
 const logging = require('@tryghost/logging');
 const models = require('../../../../core/server/models');
@@ -94,17 +94,17 @@ describe('Job: Clean gifts', function () {
   // run, and the counts of the phases that did not run come back null rather
   // than zero, so a wedged phase is visible instead of looking like an idle one.
   it('logs every failing phase and still finishes, reporting their counts as null', async function () {
-    const gifts = require('../../../../core/server/services/gifts');
+    const { giftService, giftDeliveryService } = require('../../../../domains/payments/api');
     const failures = {
       processAbandonedCheckouts: new Error('abandoned checkouts phase is broken'),
       processConsumed: new Error('consumed phase is broken'),
       processExpired: new Error('expired phase is broken'),
     };
     for (const [method, err] of Object.entries(failures)) {
-      sinon.stub(gifts.service, method).rejects(err);
+      sinon.stub(giftService.service, method).rejects(err);
     }
     const recoverFailure = new Error('delivery recovery is broken');
-    sinon.stub(gifts.deliveryService, 'recoverPending').rejects(recoverFailure);
+    sinon.stub(giftDeliveryService.service, 'recoverPending').rejects(recoverFailure);
 
     const loggingInfoSpy = sinon.spy(logging, 'info');
     const loggingErrorSpy = sinon.spy(logging, 'error');
@@ -141,9 +141,9 @@ describe('Job: Clean gifts', function () {
   });
 
   it('summarises pending gift deliveries when the recovery had something to do', async function () {
-    const gifts = require('../../../../core/server/services/gifts');
+    const { giftService, giftDeliveryService } = require('../../../../domains/payments/api');
     sinon
-      .stub(gifts.deliveryService, 'recoverPending')
+      .stub(giftDeliveryService.service, 'recoverPending')
       .resolves({ sentCount: 2, skippedCount: 1, failedCount: 0 });
 
     const loggingInfoSpy = sinon.spy(logging, 'info');

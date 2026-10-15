@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'vitest';
-import { Job } from '../../../../../../core/server/services/jobs-service/job';
-import CleanGiftsJob from '../../../../../../core/server/services/gifts/jobs/clean-gifts-job';
+import { Job } from '../../../../core/server/services/jobs-service/job';
+import CleanGiftsJob from './clean-gifts-job';
 
 describe('CleanGiftsJob', function () {
   it('has a stable type', function () {

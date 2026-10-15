@@ -38,7 +38,7 @@ function escapeHtml(str) {
 }
 
 async function giftPreview(req, res) {
-  const giftService = require('../../services/gifts').service;
+  const giftService = require('#domains/payments/api').giftService.service;
   const urlUtils = require('../../../shared/url-utils').default;
   const settingsCache = require('../../../shared/settings-cache');
 
@@ -112,7 +112,7 @@ async function giftPreview(req, res) {
 }
 
 async function giftPreviewImage(req, res) {
-  const giftService = require('../../services/gifts').service;
+  const giftService = require('#domains/payments/api').giftService.service;
   const settingsCache = require('../../../shared/settings-cache');
 
   const accentColor = settingsCache.get('accent_color') || '#15171A';

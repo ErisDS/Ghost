@@ -45,7 +45,7 @@ export function checkDomains(dir = domainsRoot) {
     const wiring = path.join(domain, 'domain.ts');
     if (existsSync(wiring)) {
       const source = readFileSync(wiring, 'utf8');
-      const match = source.match(/export default defineModule\(\{\s*name:\s*'([^']+)'/);
+      const match = source.match(/export default defineModule(?:<[^>]*>)?\(\{\s*name:\s*'([^']+)'/);
       if (!match) {
         problems.push(`${name}: domain.ts must default-export defineModule({ name: '${name}', ... })`);
       } else if (match[1] !== name) {

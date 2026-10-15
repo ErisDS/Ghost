@@ -10,6 +10,7 @@ const shared = require('../shared');
 const errorHandler = require('@tryghost/mw-error-handler');
 const { http } = require('@tryghost/api-framework');
 const api = require('../../api').endpoints;
+const payments = require('#domains/payments/api');
 
 const accountRoutes = require('./account');
 const commentRouter = require('../comments');
@@ -151,18 +152,15 @@ module.exports = function setupMembersApp() {
     audienceFeedbackService.controller.redirectToPost(req, res, next),
   );
 
-  // Gifts
-  membersApp.get(
-    '/api/gifts/:token/redeem',
-    middleware.loadMemberSession,
-    http(api.giftsMembers.getRedeemable),
-  );
-  membersApp.post(
-    '/api/gifts/:token/redeem',
-    bodyParser.json({ limit: '50mb' }),
-    middleware.loadMemberSession,
-    http(api.giftsMembers.redeem),
-  );
+  // Gifts (declared by the payments domain)
+  shared.mountDomainRoutes(membersApp, payments.http.gifts.membersRoutes, {
+    api,
+    http,
+    middleware: {
+      json: bodyParser.json({ limit: '50mb' }),
+      loadMemberSession: middleware.loadMemberSession,
+    },
+  });
 
   // Announcement
   membersApp.use('/api/announcement', middleware.loadMemberSession, announcementRouter());

@@ -6,13 +6,13 @@ import type { Knex } from 'knex';
 import {
   GiftService,
   type GiftPurchaseData,
-} from '../../../../../core/server/services/gifts/gift-service';
-import { Gift } from '../../../../../core/server/services/gifts/gift';
+} from './gift-service';
+import { Gift } from './gift';
 import type {
   FindPendingReminderOptions,
   GiftRepository,
-} from '../../../../../core/server/services/gifts/gift-bookshelf-repository';
-import { buildGift } from './utils';
+} from './gift-bookshelf-repository';
+import { buildGift } from './test-utils';
 
 const transacting = 'trx' as unknown as Knex.Transaction;
 const outerTransacting = 'outer_trx' as unknown as Knex.Transaction;

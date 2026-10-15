@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import sinon from 'sinon';
-import SendGiftRemindersJob from '../../../../core/server/services/gifts/jobs/send-gift-reminders-job';
+import SendGiftRemindersJob from '../../../../domains/payments/gifts/jobs/send-gift-reminders-job';
 
 const logging = require('@tryghost/logging');
 const models = require('../../../../core/server/models');
@@ -172,8 +172,8 @@ describe('Job: Send gift reminders', function () {
   });
 
   it('reports a failed reminder poll as a failed job rather than a completion', async function () {
-    const gifts = require('../../../../core/server/services/gifts');
-    sinon.stub(gifts.service, 'processReminders').rejects(new Error('reminder poll is broken'));
+    const { giftService } = require('../../../../domains/payments/api');
+    sinon.stub(giftService.service, 'processReminders').rejects(new Error('reminder poll is broken'));
     const loggingErrorSpy = sinon.spy(logging, 'error');
 
     await getJobsService().dispatch(new SendGiftRemindersJob());

@@ -7,7 +7,7 @@ type Analytics = typeof import('../../../../../core/server/services/email-analyt
 let analytics: Analytics;
 let init: Analytics['init'];
 
-import { GIFT_DELIVERY_EMAIL_TAG } from '../../../../../core/server/services/gifts/constants';
+import { GIFT_DELIVERY_EMAIL_TAG } from '../../../../../domains/payments/gifts/constants';
 import { AUTOMATION_EMAIL_TAG } from '../../../../../core/server/services/member-welcome-emails/constants';
 
 describe('email analytics service', function () {
