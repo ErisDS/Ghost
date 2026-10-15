@@ -1,6 +1,6 @@
 import { DonationPaymentEvent } from './donation-payment-event';
 
-type DonationRepository = {
+export type DonationRepository = {
   save(event: DonationPaymentEvent): Promise<void>;
 };
 
@@ -29,7 +29,7 @@ type DonationEventModelInstance = BookshelfModelInstance & {
   utm_term: string | null;
   utm_content: string | null;
 };
-type DonationPaymentEventBookshelfModel = BookshelfModel<DonationEventModelInstance>;
+export type DonationPaymentEventBookshelfModel = BookshelfModel<DonationEventModelInstance>;
 
 export class DonationBookshelfRepository implements DonationRepository {
   #Model: DonationPaymentEventBookshelfModel;

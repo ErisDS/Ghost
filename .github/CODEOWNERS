@@ -16,6 +16,10 @@
 # Kernel
 /ghost/core/kernel/ @ErisDS
 
+# Domains
+# TODO: replace with the Berlin team handle once confirmed.
+# /ghost/domains/payments/ @TryGhost/berlin
+
 # Inbox Links
 ghost/core/server/lib/get-inbox-links.ts @EvanHahn
 ghost/test/unit/server/lib/get-inbox-links.test.ts @EvanHahn

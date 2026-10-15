@@ -21,6 +21,7 @@
   },
   "files": [
     "core/",
+    "domains/",
     "!core/built/**/*.map",
     "!core/built/**/test-*",
     "!core/built/**/tests-*",
@@ -70,11 +71,12 @@
     "test:types": "tsc --noEmit && tsc --noEmit -p test/tsconfig.json",
     "lint:server": "eslint 'core/server/**/*.{js,ts}' 'core/*.{js,ts}' '*.{js,ts}' 'bin/**/*.{js,ts}' 'scripts/**/*.{js,ts}' 'types/**/*.ts' --cache",
     "lint:kernel": "eslint 'core/kernel/**/*.{js,ts}' --cache",
+    "lint:domains": "eslint 'domains/**/*.{js,ts}' --cache",
     "lint:shared": "eslint 'core/shared/**/*.{js,ts}' --cache",
     "lint:frontend": "eslint 'core/frontend/**/*.{js,ts}' --cache",
     "lint:test": "eslint 'test/**/*.{js,ts}' --cache",
-    "lint:code": "pnpm run '/^lint:(server|kernel|shared|frontend)$/'",
-    "lint": "pnpm run '/^lint:(server|kernel|shared|frontend|test)$/'"
+    "lint:code": "pnpm run '/^lint:(server|kernel|domains|shared|frontend)$/'",
+    "lint": "pnpm run '/^lint:(server|kernel|domains|shared|frontend|test)$/'"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "3.1079.0",

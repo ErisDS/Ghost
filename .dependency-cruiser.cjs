@@ -21,6 +21,24 @@ const serviceImplementations = {
   pathNot: `^${servicesRoot}/[^/]+/index\\.${auditServices ? '(?:js|ts)' : 'ts'}$`,
 };
 
+// Domains: one directory per bounded context under ghost/domains. domain.ts is
+// the wiring root (the only file that may reach into legacy application code),
+// api.ts the only surface other code may import. Everything else is
+// implementation and follows the same dependency rule as migrated services.
+const domainsRoot = 'ghost/domains';
+const domainImplementation = {
+  path: `^${domainsRoot}/([^/]+)/`,
+  pathNot: [`^${domainsRoot}/[^/]+/domain\\.ts$`, '\\.test\\.(js|ts)$'],
+};
+// Legacy application code each domain's domain.ts may still wire by hand.
+// Per domain, named individually, and expected to shrink per entry; it grows
+// only when a new root moves into the domain and each addition is reviewed.
+const domainLegacyAllowlist = {
+  payments: [
+    '^ghost/core/server/models/index\\.js$', // Bookshelf model registry, frozen; the domain takes single models from it.
+  ],
+};
+
 // Explicit code-library and contract allowances, not application instances.
 // Keep each package or file named individually and explain additions here.
 const serviceDependencyAllowlist = [
@@ -62,6 +80,95 @@ const serviceDependencyAllowlist = [
  */
 module.exports = {
   forbidden: [
+    // ============================================================
+    // ghost/domains — implementation imports: same domain, kernel, allowlist
+    // ============================================================
+    {
+      name: 'domain-dependencies',
+      comment:
+        'Domain implementation may import only its own domain, the kernel, type-only imports and the explicit library allowlist. Application dependencies are wired in domain.ts and injected.',
+      severity: 'error',
+      from: domainImplementation,
+      to: {
+        pathNot: [
+          ...serviceDependencyAllowlist,
+          '^ghost/core/kernel/',
+          `^${domainsRoot}/$1/`,
+          // Another domain's public surface. Deep imports are caught by domains-cross-via-api-only.
+          `^${domainsRoot}/[^/]+/api\\.ts$`,
+        ],
+        dependencyTypesNot: ['type-only', 'type-import'],
+      },
+    },
+    {
+      name: 'domain-own-root',
+      comment: 'Domain implementation must not retrieve dependencies from its own wiring root.',
+      severity: 'error',
+      from: domainImplementation,
+      to: {
+        path: `^${domainsRoot}/$1/domain\\.ts$`,
+        dependencyTypesNot: ['type-only', 'type-import'],
+      },
+    },
+    {
+      name: 'domain-unresolved',
+      comment: 'Resolve this runtime import so the domain dependency rule can be checked.',
+      severity: 'error',
+      from: domainImplementation,
+      to: { couldNotResolve: true, dependencyTypesNot: ['type-only', 'type-import'] },
+    },
+    // ============================================================
+    // ghost/domains — domain.ts may wire legacy code only from its allowlist
+    // ============================================================
+    ...Object.entries(domainLegacyAllowlist).map(([domain, allowed]) => ({
+      name: `domain-wiring-${domain}`,
+      comment: `${domain}/domain.ts may import legacy application code only from its allowlist in .dependency-cruiser.cjs.`,
+      severity: 'error',
+      from: { path: `^${domainsRoot}/${domain}/domain\\.ts$` },
+      to: {
+        path: '^ghost/core/',
+        pathNot: ['^ghost/core/kernel/', ...allowed],
+        dependencyTypesNot: ['type-only', 'type-import'],
+      },
+    })),
+    {
+      name: 'domain-wiring-unlisted',
+      comment:
+        'A domain without an entry in domainLegacyAllowlist may not import legacy application code from domain.ts. Add the domain and its allowlist.',
+      severity: 'error',
+      from: {
+        path: `^${domainsRoot}/(?!(?:${Object.keys(domainLegacyAllowlist).join('|')})/)[^/]+/domain\\.ts$`,
+      },
+      to: {
+        path: '^ghost/core/',
+        pathNot: ['^ghost/core/kernel/'],
+        dependencyTypesNot: ['type-only', 'type-import'],
+      },
+    },
+    // ============================================================
+    // ghost/domains — the rest of the application sees api.ts and domain.ts only
+    // ============================================================
+    {
+      name: 'domains-public-surface-only',
+      comment:
+        'Code outside ghost/domains may import a domain only through its api.ts (consumers) or domain.ts (boot).',
+      severity: 'error',
+      from: { path: `^(?!${domainsRoot}/)` },
+      to: {
+        path: `^${domainsRoot}/[^/]+/`,
+        pathNot: [`^${domainsRoot}/[^/]+/(api|domain)\\.ts$`],
+      },
+    },
+    {
+      name: 'domains-cross-via-api-only',
+      comment: "A domain may import a different domain only through that domain's api.ts.",
+      severity: 'error',
+      from: { path: `^${domainsRoot}/([^/]+)/` },
+      to: {
+        path: `^${domainsRoot}/(?!$1/)[^/]+/`,
+        pathNot: [`^${domainsRoot}/[^/]+/api\\.ts$`],
+      },
+    },
     {
       name: 'service-dependencies',
       comment:

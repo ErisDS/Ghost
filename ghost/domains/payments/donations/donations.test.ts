@@ -1,15 +1,15 @@
 import assert from 'node:assert/strict';
 import { setImmediate } from 'node:timers/promises';
 import sinon from 'sinon';
-import type donationsRoot from '../../../../../core/server/services/donations';
-import type { DonationPaymentEvent } from '../../../../../core/server/services/donations/donation-payment-event';
+import type { donations as donationsRoot } from './index';
+import type { DonationPaymentEvent } from './donation-payment-event';
 
-// Keep the real CommonJS identities used by the factory and Stripe's composition.
-const models = require('../../../../../core/server/models');
-const StripeService = require('../../../../../core/server/services/stripe/stripe-service');
-const labs = require('../../../../../core/shared/labs');
-const settingsCache = require('../../../../../core/shared/settings-cache');
-const ROOT_PATH = require.resolve('../../../../../core/server/services/donations');
+// Keep the real CommonJS identities used by the domain's wiring and Stripe's composition.
+const models = require('../../../core/server/models');
+const StripeService = require('../../../core/server/services/stripe/stripe-service');
+const labs = require('../../../core/shared/labs');
+const settingsCache = require('../../../core/shared/settings-cache');
+const ROOT_PATH = require.resolve('./index');
 const { IncorrectUsageError } = require('@tryghost/errors');
 
 type DonationsRoot = typeof donationsRoot;
@@ -37,6 +37,10 @@ describe('donations root with its Stripe consumer', function () {
     Promise<void>
   >;
 
+  // What domain.ts passes in at register(). The test supplies it directly so the
+  // root can be exercised without the domain's wiring or the model registry.
+  const dependencies = () => ({ DonationPaymentEventModel: models.DonationPaymentEvent });
+
   beforeEach(function () {
     previousModule = require.cache[ROOT_PATH];
     delete require.cache[ROOT_PATH];
@@ -44,10 +48,10 @@ describe('donations root with its Stripe consumer', function () {
     notifyDonationReceived = sandbox
       .stub<[{ donationPaymentEvent: DonationPaymentEvent }], Promise<void>>()
       .resolves();
-    root = require(ROOT_PATH).default;
+    root = require(ROOT_PATH).donations;
 
-    // Boot constructs Stripe before initializing donations. The consumer must
-    // look up the repository later, when the checkout webhook arrives.
+    // Boot constructs Stripe before the payments domain registers. The consumer
+    // must look up the repository later, when the checkout webhook arrives.
     stripe = new StripeService({
       labs,
       settingsCache,
@@ -70,17 +74,17 @@ describe('donations root with its Stripe consumer', function () {
     }
   });
 
-  it('constructs one ready repository during boot without writing or notifying staff', async function () {
-    assert.equal(require(ROOT_PATH).default, root);
+  it('constructs one ready repository at register() without writing or notifying staff', async function () {
+    assert.equal(require(ROOT_PATH).donations, root);
     assert.throws(() => root.service, IncorrectUsageError);
     sinon.assert.notCalled(add);
     sinon.assert.notCalled(notifyDonationReceived);
 
-    const initialization = root.init();
-    assert.equal(root.init(), initialization);
+    const initialization = root.init(dependencies());
+    assert.equal(root.init(dependencies()), initialization);
     await initialization;
     const repository = root.service;
-    await root.init();
+    await root.init(dependencies());
 
     assert.equal(root.service, repository);
     sinon.assert.notCalled(add);
@@ -88,7 +92,7 @@ describe('donations root with its Stripe consumer', function () {
   });
 
   it('lets the earlier Stripe consumer save and notify through the initialized repository', async function () {
-    await root.init();
+    await root.init(dependencies());
     const save = sandbox.spy(root.service, 'save');
 
     const result =
@@ -128,7 +132,7 @@ describe('donations root with its Stripe consumer', function () {
       releaseWrite = resolve;
     });
     add.returns(write);
-    await root.init();
+    await root.init(dependencies());
 
     let completed = false;
     const handling: Promise<void> = stripe.webhookController.checkoutSessionEventService
@@ -158,7 +162,7 @@ describe('donations root with its Stripe consumer', function () {
   it('propagates the model write failure unchanged without notifying staff', async function () {
     const failure = new Error('The donation could not be saved');
     add.rejects(failure);
-    await root.init();
+    await root.init(dependencies());
 
     await assert.rejects(
       stripe.webhookController.checkoutSessionEventService.handleEvent(donationSession()),

@@ -26,6 +26,7 @@ import path from 'node:path';
 
 const CORE_ROOT = path.resolve(__dirname, '../..');
 const SOURCE_DIR = path.join(CORE_ROOT, 'core') + path.sep;
+const DOMAINS_DIR = path.join(CORE_ROOT, 'domains') + path.sep;
 // Browser bundles that ship to the client; never required by the server.
 const EXCLUDED_DIRS = [
   path.join(SOURCE_DIR, 'frontend', 'public') + path.sep,
@@ -41,6 +42,10 @@ function isGhostSource(filename: string): boolean {
 
   if (filename.startsWith(SOURCE_DIR)) {
     return !EXCLUDED_DIRS.some((dir) => filename.startsWith(dir));
+  }
+
+  if (filename.startsWith(DOMAINS_DIR)) {
+    return true;
   }
 
   return path.dirname(filename) === CORE_ROOT;

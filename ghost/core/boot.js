@@ -374,7 +374,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const slackNotifications = require('./server/services/slack-notifications');
   const mediaInliner = require('./server/services/media-inliner');
   const contentImport = require('./server/services/content-import');
-  const donationService = require('./server/services/donations').default;
+  const payments = require('../domains/payments/domain').default;
   const giftService = require('./server/services/gifts');
   const machinePaymentsService = require('./server/services/machine-payments');
   const recommendationsService = require('./server/services/recommendations');
@@ -449,7 +449,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
     slackNotifications.init(),
     mediaInliner.init(),
     contentImport.init(),
-    donationService.init(),
+    payments.register(),
     recommendationsService.init(),
     statsService.init(),
     explorePingService.init(),
@@ -538,6 +538,17 @@ async function initBackgroundServices({ config }) {
   // sends sequentially and must not hold up the remaining background services.
   const giftService = require('./server/services/gifts');
   giftService.recoverPendingDeliveries();
+
+  // Domains boot after every service and domain has registered: event
+  // subscriptions and recurring jobs start here. Guarded for the same reason as
+  // the gift recovery above.
+  try {
+    const payments = require('../domains/payments/domain').default;
+    await payments.boot();
+  } catch (err) {
+    const logging = require('@tryghost/logging');
+    logging.error(err);
+  }
 
   const jobsService = require('./server/services/jobs-service').getInstance();
 

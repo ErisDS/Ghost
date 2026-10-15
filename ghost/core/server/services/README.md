@@ -233,10 +233,10 @@ without treating its legacy placement or lifecycle shortcuts as requirements.
 New standalone service logic should be TypeScript unless it must extend an
 existing JavaScript module.
 
-Donations uses a TypeScript default export for its service initializer, while
-its implementation keeps named exports. Existing CommonJS callers read
-`require('./donations').default`; a CommonJS wrapper is not needed merely
-because boot still uses `require()`.
+Donations has moved out of this directory into the payments domain
+(`ghost/domains/payments/`), the first root to do so. Its `defineService` root
+is now wired by the domain's `domain.ts` and exposed through `api.ts`; see
+[`ghost/domains/README.md`](../../../domains/README.md).
 
 ## Migrated root contract
 

@@ -62,6 +62,27 @@ for IndexNow's partial-subscription cleanup and its test. This failure handling
 is separate from normal shutdown. Shutdown and background job registration
 remain with their existing owners; `defineService` does not provide those hooks.
 
+### Injected dependencies
+
+`init()` forwards its argument to `create`. A root that declares what it needs
+can be initialised by a wiring root (a domain's `domain.ts`) that supplies it,
+and constructed in a test with a fake, without the root importing application
+code itself:
+
+```ts
+export const donations = defineService(
+  'Donations',
+  ({ DonationPaymentEventModel }: DonationsDependencies) =>
+    new DonationBookshelfRepository({ DonationPaymentEventModel }),
+);
+// domain.ts
+await donations.init({ DonationPaymentEventModel: models.DonationPaymentEvent });
+```
+
+Roots that take no argument are unchanged: `init()` with no dependencies still
+type-checks and behaves as before. A retry after failure passes whatever the
+retrying caller supplies.
+
 ### Transitional extras
 
 An optional third argument preserves helpers that still accompany a service root:
@@ -78,3 +99,23 @@ resource ownership; each caller must respect the extra's documented timing.
 
 This is a temporary migration interface. The [services guide](../server/services/README.md)
 describes how to catalogue extras while their eventual ownership is established.
+
+## Modules
+
+[`defineModule(definition)`](module.ts) wraps a unit of application code that
+boot composes: a domain, the site renderer, the HTTP boundary. It mirrors the
+two phases of a Laravel service provider:
+
+- `register()` constructs the module's instances from injected dependencies.
+  It must not rely on another module having booted.
+- `boot()` subscribes to events, schedules jobs and starts background work.
+  Every module has registered by the time any module boots.
+- `shutdown()` is optional and releases what `boot()` started.
+
+The helper gives each phase the guarantees `defineService` gives `init()`:
+one attempt shared by concurrent callers, a retry after failure, and an error
+when `boot()` is called before `register()` has completed. It does not order
+modules; boot owns the order, as it owns the order of service `init()` calls.
+
+A domain's `domain.ts` default-exports one `Module`. See
+[`ghost/domains/README.md`](../../domains/README.md).

@@ -34,8 +34,12 @@ const escape = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 export function sourceExclusions(root) {
   const exclusions = ['\\.d\\.[cm]?ts$'];
-  const core = path.join(root, 'ghost/core');
-  for (const entry of readdirSync(core, { recursive: true, withFileTypes: true })) {
+  const sources = ['ghost/core', 'ghost/domains']
+    .map((dir) => path.join(root, dir))
+    .filter((dir) => existsSync(dir));
+  for (const entry of sources.flatMap((dir) =>
+    readdirSync(dir, { recursive: true, withFileTypes: true }),
+  )) {
     if (
       !entry.isFile() ||
       !/\.(?:[cm]?ts|tsx)$/.test(entry.name) ||
