@@ -94,7 +94,7 @@ describe('Job: Clean gifts', function () {
   // run, and the counts of the phases that did not run come back null rather
   // than zero, so a wedged phase is visible instead of looking like an idle one.
   it('logs every failing phase and still finishes, reporting their counts as null', async function () {
-    const { giftService, giftDeliveryService } = require('../../../../domains/payments/api');
+    const { giftService, giftDeliveryService } = require('../../../../domains/payments');
     const failures = {
       processAbandonedCheckouts: new Error('abandoned checkouts phase is broken'),
       processConsumed: new Error('consumed phase is broken'),
@@ -141,7 +141,7 @@ describe('Job: Clean gifts', function () {
   });
 
   it('summarises pending gift deliveries when the recovery had something to do', async function () {
-    const { giftService, giftDeliveryService } = require('../../../../domains/payments/api');
+    const { giftService, giftDeliveryService } = require('../../../../domains/payments');
     sinon
       .stub(giftDeliveryService.service, 'recoverPending')
       .resolves({ sentCount: 2, skippedCount: 1, failedCount: 0 });

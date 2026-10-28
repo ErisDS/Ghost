@@ -19,7 +19,7 @@ export interface PaymentsBootContext {
 /**
  * Wiring root for the payments domain. This is the only file in the domain
  * allowed to import application code outside it (legacy registries, other
- * domains' api.ts). Everything it reaches for is passed into the domain's
+ * domains' index.ts). Everything it reaches for is passed into the domain's
  * services as a dependency, so the implementation stays importable in tests.
  */
 export default defineModule<PaymentsRegisterContext, PaymentsBootContext>({
@@ -28,7 +28,7 @@ export default defineModule<PaymentsRegisterContext, PaymentsBootContext>({
   async register({ apiUrl, schedulerAdapter, internalKeys }) {
     // Legacy registries and singletons. Each line here is an entry in this
     // domain's allowlist in .dependency-cruiser.cjs, and each is a candidate
-    // to become an api.ts import once its owner is a domain.
+    // to become an index.ts import once its owner is a domain.
     const models = require('../../core/server/models');
     const membersService = require('../../core/server/services/members');
     const tiersService = require('../../core/server/services/tiers');

@@ -23,7 +23,7 @@ const serviceImplementations = {
 
 // Domains: one directory per bounded context under ghost/domains. domain.ts is
 // the wiring root (the only file that may reach into legacy application code),
-// api.ts the only surface other code may import. Everything else is
+// index.ts the only surface other code may import. Everything else is
 // implementation and follows the same dependency rule as migrated services.
 const domainsRoot = 'ghost/domains';
 const domainImplementation = {
@@ -37,7 +37,7 @@ const domainLegacyAllowlist = {
   payments: [
     '^ghost/core/server/models/index\\.js$', // Bookshelf model registry, frozen; the domain takes single models from it.
     // Future domains, reached as legacy roots until they exist. Each entry
-    // becomes an api.ts import when its domain is created.
+    // becomes an index.ts import when its domain is created.
     '^ghost/core/server/services/(members|tiers|staff|stripe|settings-helpers|i18n)(/index\\.(js|ts))?$',
     '^ghost/core/server/services/email-address/email-address-parser\\.(js|ts)$',
     '^ghost/core/server/services/email-analytics/jobs(/index\\.(js|ts))?$',
@@ -128,7 +128,7 @@ module.exports = {
           ...debt,
           '^ghost/core/kernel/',
           `^${domainsRoot}/${domain}/`,
-          `^${domainsRoot}/[^/]+/api\\.ts$`,
+          `^${domainsRoot}/[^/]+/index\\.ts$`,
         ],
         dependencyTypesNot: ['type-only', 'type-import'],
       },
@@ -147,8 +147,8 @@ module.exports = {
           ...serviceDependencyAllowlist,
           '^ghost/core/kernel/',
           `^${domainsRoot}/$1/`,
-          // Another domain's public surface. Deep imports are caught by domains-cross-via-api-only.
-          `^${domainsRoot}/[^/]+/api\\.ts$`,
+          // Another domain's public surface. Deep imports are caught by domains-cross-via-surface-only.
+          `^${domainsRoot}/[^/]+/index\\.ts$`,
         ],
         dependencyTypesNot: ['type-only', 'type-import'],
       },
@@ -199,27 +199,27 @@ module.exports = {
       },
     },
     // ============================================================
-    // ghost/domains — the rest of the application sees api.ts and domain.ts only
+    // ghost/domains — the rest of the application sees index.ts, domain.ts and the fragments only
     // ============================================================
     {
       name: 'domains-public-surface-only',
       comment:
-        'Code outside ghost/domains may import a domain only through its api.ts (consumers) or domain.ts (boot).',
+        'Code outside ghost/domains may import a domain only through its index.ts (consumers), domain.ts (boot) or a fragment the central registries aggregate.',
       severity: 'error',
       from: { path: `^(?!${domainsRoot}/)` },
       to: {
         path: `^${domainsRoot}/[^/]+/`,
-        pathNot: [`^${domainsRoot}/[^/]+/(api|domain)\\.ts$`],
+        pathNot: [`^${domainsRoot}/[^/]+/(index|domain|schema|permissions|settings)\\.ts$`],
       },
     },
     {
-      name: 'domains-cross-via-api-only',
-      comment: "A domain may import a different domain only through that domain's api.ts.",
+      name: 'domains-cross-via-surface-only',
+      comment: "A domain may import a different domain only through that domain's index.ts.",
       severity: 'error',
       from: { path: `^${domainsRoot}/([^/]+)/` },
       to: {
         path: `^${domainsRoot}/(?!$1/)[^/]+/`,
-        pathNot: [`^${domainsRoot}/[^/]+/api\\.ts$`],
+        pathNot: [`^${domainsRoot}/[^/]+/index\\.ts$`],
       },
     },
     {

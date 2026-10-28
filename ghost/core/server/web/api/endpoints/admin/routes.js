@@ -8,7 +8,7 @@ const mw = require('./middleware');
 const labs = require('../../../../../shared/labs');
 const limits = require('../../../../services/limits');
 const appInstallations = require('../../../../services/app-installations').default;
-const payments = require('#domains/payments/api');
+const payments = require('#domains/payments');
 
 const shared = require('../../../shared');
 

@@ -172,7 +172,7 @@ describe('Job: Send gift reminders', function () {
   });
 
   it('reports a failed reminder poll as a failed job rather than a completion', async function () {
-    const { giftService } = require('../../../../domains/payments/api');
+    const { giftService } = require('../../../../domains/payments');
     sinon.stub(giftService.service, 'processReminders').rejects(new Error('reminder poll is broken'));
     const loggingErrorSpy = sinon.spy(logging, 'error');
 

@@ -1,7 +1,8 @@
 /**
- * Public surface of the payments domain. Other domains, boot and the HTTP
- * boundary import from here and nowhere else inside the domain
- * (dependency-cruiser: domains-public-surface-only).
+ * Public surface of the payments domain, imported as `#domains/payments`.
+ * Other domains, boot and the HTTP boundary import from here and nowhere else
+ * inside the domain: the package.json `imports` entries resolve nothing deeper,
+ * and dependency-cruiser (domains-public-surface-only) checks relative paths.
  *
  * Service handles expose `.service` only. Consumers constructed before this
  * domain registers (Stripe, the members API) hold the handle and read it at

@@ -25,7 +25,7 @@ import { AUTOMATION_EMAIL_TAG } from '../member-welcome-emails/constants';
 import type * as AutomationsApi from '../automations/automations-api';
 import { AutomationEmailAnalyticsBatchProcessor } from './automation-email-analytics-batch-processor';
 import { GiftEmailAnalyticsBatchProcessor } from './gift-email-analytics-batch-processor';
-import { GIFT_DELIVERY_EMAIL_TAG, type GiftDeliveryService } from '#domains/payments/api';
+import { GIFT_DELIVERY_EMAIL_TAG, type GiftDeliveryService } from '#domains/payments';
 import EmailAnalyticsFetchLatestJob from './jobs/email-analytics-fetch-latest-job';
 import EmailAnalyticsAutomationFetchLatestJob from './jobs/email-analytics-automation-fetch-latest-job';
 import EmailAnalyticsGiftFetchLatestJob from './jobs/email-analytics-gift-fetch-latest-job';

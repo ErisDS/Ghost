@@ -38,7 +38,7 @@ function createServicesHarness({ rescheduleOnBoot = true } = {}) {
       './shared/settings-cache': { get: () => 'site-id' },
       './server/services/stripe': { init: stripe },
       '#domains/payments/domain': { default: { register: payments } },
-      '#domains/payments/api': {
+      '#domains/payments': {
         giftService: { service: {} },
         giftDeliveryService: { service: {} },
       },

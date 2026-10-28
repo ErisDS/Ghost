@@ -40,9 +40,21 @@
     "tsconfig.json"
   ],
   "imports": {
-    "#domains/*": {
-      "source": "./domains/*.ts",
-      "default": "./domains/*.js"
+    "#domains/payments": {
+      "source": "./domains/payments/index.ts",
+      "default": "./domains/payments/index.js"
+    },
+    "#domains/payments/domain": {
+      "source": "./domains/payments/domain.ts",
+      "default": "./domains/payments/domain.js"
+    },
+    "#domains/payments/schema": {
+      "source": "./domains/payments/schema.ts",
+      "default": "./domains/payments/schema.js"
+    },
+    "#domains/payments/permissions": {
+      "source": "./domains/payments/permissions.ts",
+      "default": "./domains/payments/permissions.js"
     }
   },
   "publishConfig": {

@@ -6,7 +6,7 @@ import { JobsService } from './jobs-service';
 import type { JobHandlingOptions } from './jobs-service';
 import CleanTokensJob from '../members/jobs/clean-tokens-job';
 import CleanExpiredCompedJob from '../members/jobs/clean-expired-comped-job';
-import { CleanGiftsJob, SendGiftRemindersJob, type GiftService } from '#domains/payments/api';
+import { CleanGiftsJob, SendGiftRemindersJob, type GiftService } from '#domains/payments';
 import ExternalMediaInliner from '../media-inliner/external-media-inliner';
 import ExternalMediaInlinerJob from '../media-inliner/external-media-inliner-job';
 import ContentCSVImportJob from '../content-import/jobs/content-csv-import-job';

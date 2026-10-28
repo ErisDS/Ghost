@@ -15,7 +15,7 @@ const models = require('../../models');
 const { GhostMailer } = require('../../lib/mail');
 const jobsService = require('../jobs-service');
 const tiersService = require('../tiers');
-const { giftService } = require('#domains/payments/api');
+const { giftService } = require('#domains/payments');
 const VerificationTrigger = require('../verification-trigger');
 const { verificationWebhookService } = require('../verification/verification-webhook-service');
 const DatabaseInfo = require('@tryghost/database-info');
@@ -149,7 +149,7 @@ const initVerificationTrigger = () => {
 module.exports = {
   async init() {
     const stripeService = require('../stripe');
-    const createMembersApiInstance = require('./api');
+    const createMembersApiInstance = require('./index');
     const env = config.get('env');
 
     // @TODO Move to stripe service

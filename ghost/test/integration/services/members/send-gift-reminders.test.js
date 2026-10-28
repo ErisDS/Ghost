@@ -24,7 +24,7 @@ describe('Gift reminder processing', function () {
     await fixtureManager.init('newsletters', 'members:newsletters');
     await agent.loginAsOwner();
 
-    giftService = require('../../../../domains/payments/api').giftService;
+    giftService = require('../../../../domains/payments').giftService;
 
     paidTier = await models.Product.findOne({ type: 'paid' }, { require: true });
   });

@@ -16,7 +16,7 @@ const controller = require('../../../../../core/server/web/gift-preview/controll
 // stubbed by assignment. Intercept the controller's lazy require of the module
 // instead, matching on the resolved file path so renames or moved requires can't
 // silently defeat the stub.
-const giftsModulePath = require.resolve('../../../../../domains/payments/api');
+const giftsModulePath = require.resolve('../../../../../domains/payments');
 
 describe('Gift Preview Controller', function () {
   let giftService;

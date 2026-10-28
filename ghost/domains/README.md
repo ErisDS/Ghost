@@ -12,7 +12,7 @@ any number of capability folders:
 | File         | Role                                                                                                                                                                             |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `domain.ts`  | Wiring root. Default-exports a `Module` from the kernel. `register()` constructs the domain's services from injected dependencies; `boot()` subscribes events and schedules jobs. |
-| `api.ts`     | Public surface. The only file other domains, boot and the HTTP boundary may import.                                                                                              |
+| `index.ts`   | Public surface. The only file other domains, boot and the HTTP boundary may import, as `#domains/<name>`.                                                                        |
 | `CONTEXT.md` | The bounded context and its language, as the gifts and email services carry today.                                                                                               |
 
 Capability folders (`donations/`, later `gifts/`, `stripe/`) hold the
@@ -29,15 +29,15 @@ Enforced by dependency-cruiser (`.dependency-cruiser.cjs`, rules prefixed
 `domain-` and `domains-`):
 
 - **Implementation** files import only their own domain, `core/kernel`,
-  type-only imports, another domain's `api.ts`, and the explicit library
+  type-only imports, another domain's `index.ts`, and the explicit library
   allowlist shared with migrated services. Application dependencies (models,
   settings, config, other services) are wired in `domain.ts` and injected.
 - **`domain.ts`** may import legacy application code only from its named
   allowlist in `domainLegacyAllowlist`. The list is per domain, reviewed on
   every addition, and only shrinks per entry.
-- **Everything outside `ghost/domains`** imports a domain only via `api.ts`
+- **Everything outside `ghost/domains`** imports a domain only via `index.ts`
   (consumers) or `domain.ts` (boot).
-- **Domains cross** into each other only via `api.ts`.
+- **Domains cross** into each other only via `index.ts`.
 
 ## What we learned
 
@@ -51,10 +51,10 @@ that needed them, not before.
   root that imports no application code. Before, the root's `index.ts` was the
   wiring and required `models` itself.
 - **The service root lives in the capability folder, not in `domain.ts`.**
-  `domain.ts` must call `init()` and `api.ts` must expose `.service`; neither may
+  `domain.ts` must call `init()` and `index.ts` must expose `.service`; neither may
   import the other, so the root object has to sit in a third file both can
   reach. `donations/index.ts` is that file.
-- **`api.ts` narrows the type, not the object.** It exposes the root as
+- **`index.ts` narrows the type, not the object.** It exposes the root as
   `{ readonly service }` so `init()` is not on the public type. At runtime it is
   the same object. Good enough for now; a real split would need the kernel to
   separate the handle boot initialises from the accessor consumers hold.
@@ -64,7 +64,7 @@ that needed them, not before.
   roots groups by capability first and by layer inside each capability.
 - **One deep import became a public one.** The Stripe checkout webhook imported
   `donations/donation-payment-event` directly; it now imports the class from
-  `api.ts`. Finding that is what `domains-public-surface-only` is for.
+  `index.ts`. Finding that is what `domains-public-surface-only` is for.
 - **Boot got a second phase call.** `payments.register()` replaces
   `donationService.init()` in the services phase; `payments.boot()` was added
   to the background phase so the domain owns its subscriptions and jobs once it
@@ -75,13 +75,18 @@ that needed them, not before.
   `core/` hard-coded. Each gained `domains/`.
 - **Domains have a stable name.** `ghost/package.json` declares
   `"imports": { "#domains/*": ... }`, so consumers write
-  `require('#domains/payments/api')` instead of a relative path that breaks
+  `require('#domains/payments')` instead of a relative path that breaks
   when `core/` is flattened. Node resolves it natively (the `source` condition
   picks the `.ts` under `pnpm dev`, the default picks emitted `.js` in
   production); `tsconfig.json` mirrors it in `paths` because TypeScript's
   node10 resolution ignores `imports`; tsx applies the same `paths` under
   vitest. Node requires the `#` prefix, so `@domains/...` is not available
-  without a package per domain.
+  without a package per domain. The entries are explicit, one per file
+  (`#domains/payments`, `#domains/payments/domain`, `#domains/payments/schema`),
+  not a wildcard: a deep import such as `#domains/payments/gifts/gift-service`
+  then fails to resolve at all, so the resolver enforces the surface before
+  dependency-cruiser does. `lint:domains` keeps the entries in step with the
+  files.
 - **Left central on purpose**: the `donation_payment_events` table in
   `schema.js`, the `DonationPaymentEvent` Bookshelf model. No routes to lift.
 - **Gap**: CODEOWNERS entry pending the Berlin team handle.
@@ -110,12 +115,12 @@ that needed them, not before.
   in-process boot and `register()` runs once per process, so a handler bound in
   `register()` would be lost on the test harness's second boot. The central
   `register-job-handlers.ts` keeps the two gift handlers, importing the job
-  classes and the service handle from `api.ts`. A per-boot binding hook is the
+  classes and the service handle from `index.ts`. A per-boot binding hook is the
   missing kernel piece; until it exists the job registry is the one registry a
   domain still writes into from outside.
-- **Controllers are built in `api.ts`, lazily.** Express apps are assembled
+- **Controllers are built in `index.ts`, lazily.** Express apps are assembled
   before services register, and the API registry's lazy getters are read at
-  mount time. So `api.ts` constructs the api-framework controllers at load with
+  mount time. So `index.ts` constructs the api-framework controllers at load with
   thunks into the registered runtime, and the runtime exposes `dispatchEvent`
   instead of the event bus. The admin controller test now builds the controller
   with a stub dispatcher and no longer stubs the shared bus.
@@ -141,7 +146,7 @@ that needed them, not before.
   scheduler class) joined the shared allowlist as kernel-tier candidates.
 - **`domain.ts` legacy allowlist grew from one entry to ten.** Six are future
   domains (members, tiers, staff, stripe, settings helpers, i18n), the rest are
-  `lib/` and `shared/` singletons. Each becomes an `api.ts` import or an
+  `lib/` and `shared/` singletons. Each becomes an `index.ts` import or an
   injected kernel instance as its owner appears.
 - **Schema fragment works; the integrity hash is unchanged by construction.**
   `schema.ts` exports the three tables and `schema.js` spreads them at the exact
@@ -156,7 +161,16 @@ that needed them, not before.
   beside `donations/`. The domain root holds only the contract files and the
   fragments.
 - **Tests that reached into the root changed shape.** Integration tests that
-  read `gifts.service` and `gifts.deliveryService` now read the `api.ts`
+  read `gifts.service` and `gifts.deliveryService` now read the `index.ts`
   handles; one that called `init()` with no options to "ensure booted" simply
   dropped the call. The boot unit tests stub `#domains/payments/domain` and
-  `#domains/payments/api` instead of five service paths.
+  `#domains/payments` instead of five service paths.
+
+### Naming the surface `index.ts`
+
+The first two moves called the public surface `api.ts`, copied from React
+Admin. On the server that collides with what "API" means in Ghost (the HTTP
+Admin and Content APIs), "interface" is a language keyword and "public" is
+too broad. `index.ts` is Node's own convention for a folder's entry point,
+reads as `#domains/payments`, and nothing else in a domain competes for the
+name since the wiring root is `domain.ts`. Admin keeps `api.ts` for now.

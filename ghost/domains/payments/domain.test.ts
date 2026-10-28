@@ -36,9 +36,9 @@ describe('payments domain wiring', function () {
     }
   });
 
-  it('registers both capabilities and exposes them through api.ts', async function () {
+  it('registers both capabilities and exposes them through index.ts', async function () {
     const payments = require(DOMAIN_PATH).default;
-    const { donations } = require('./api');
+    const { donations } = require('./index');
     const add = sandbox.stub(models.DonationPaymentEvent, 'add').resolves({});
 
     assert.equal(payments.name, 'payments');
@@ -46,7 +46,7 @@ describe('payments domain wiring', function () {
 
     await payments.register(context());
 
-    const { DonationPaymentEvent } = require('./api');
+    const { DonationPaymentEvent } = require('./index');
     await donations.service.save(
       DonationPaymentEvent.create({
         name: null,
@@ -70,7 +70,7 @@ describe('payments domain wiring', function () {
     );
     sinon.assert.calledOnce(add);
 
-    const { giftService, giftDeliveryService } = require('./api');
+    const { giftService, giftDeliveryService } = require('./index');
     assert.equal(typeof giftService.service.startCheckout, 'function');
     assert.equal(typeof giftDeliveryService.service.recoverPending, 'function');
   });

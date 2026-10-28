@@ -66,7 +66,7 @@ export interface GiftsRuntime {
   readonly giftService: GiftService;
   readonly giftDeliveryService: GiftDeliveryService;
   readonly controller: GiftController;
-  /** Dispatch on the injected event bus; lets api.ts build controllers before register(). */
+  /** Dispatch on the injected event bus; lets the domain surface build controllers before register(). */
   dispatchEvent(event: unknown): void;
   /** Bind the domain-event listeners. Called once, at register(). */
   subscribeEvents(): void;

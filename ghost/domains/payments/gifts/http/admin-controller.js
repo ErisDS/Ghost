@@ -4,7 +4,7 @@ const { StartGiftDeliveryFlushEvent } = require('../events/start-gift-delivery-f
 /**
  * Admin API controller for gifts, in api-framework's controller shape. The
  * dispatcher is injected so the controller can be built without the shared
- * event bus; api.ts builds it with a thunk into the registered runtime.
+ * event bus; the domain's index.ts builds it with a thunk into the registered runtime.
  *
  * @param {object} deps
  * @param {(event: unknown) => void} deps.dispatch

@@ -375,7 +375,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const mediaInliner = require('./server/services/media-inliner');
   const contentImport = require('./server/services/content-import');
   const payments = require('#domains/payments/domain').default;
-  const paymentsApi = require('#domains/payments/api');
+  const paymentsApi = require('#domains/payments');
   const machinePaymentsService = require('./server/services/machine-payments');
   const recommendationsService = require('./server/services/recommendations');
   const emailAddressService = require('./server/services/email-address');

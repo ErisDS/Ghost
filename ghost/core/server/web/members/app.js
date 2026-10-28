@@ -10,7 +10,7 @@ const shared = require('../shared');
 const errorHandler = require('@tryghost/mw-error-handler');
 const { http } = require('@tryghost/api-framework');
 const api = require('../../api').endpoints;
-const payments = require('#domains/payments/api');
+const payments = require('#domains/payments');
 
 const accountRoutes = require('./account');
 const commentRouter = require('../comments');

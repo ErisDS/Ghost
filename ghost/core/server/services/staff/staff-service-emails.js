@@ -315,7 +315,7 @@ class StaffServiceEmails {
   /**
    *
    * @param {object} eventData
-   * @param {import('#domains/payments/api').DonationPaymentEvent} eventData.donationPaymentEvent
+   * @param {import('#domains/payments').DonationPaymentEvent} eventData.donationPaymentEvent
    *
    * @returns {Promise<void>}
    */
