@@ -37,7 +37,7 @@ describe('donations root with its Stripe consumer', function () {
     Promise<void>
   >;
 
-  // What domain.ts passes in at register(). The test supplies it directly so the
+  // What module.ts passes in at register(). The test supplies it directly so the
   // root can be exercised without the domain's wiring or the model registry.
   const dependencies = () => ({ DonationPaymentEventModel: models.DonationPaymentEvent });
 

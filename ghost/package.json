@@ -44,9 +44,9 @@
       "source": "./domains/payments/index.ts",
       "default": "./domains/payments/index.js"
     },
-    "#domains/payments/domain": {
-      "source": "./domains/payments/domain.ts",
-      "default": "./domains/payments/domain.js"
+    "#domains/payments/module": {
+      "source": "./domains/payments/module.ts",
+      "default": "./domains/payments/module.js"
     },
     "#domains/payments/schema": {
       "source": "./domains/payments/schema.ts",

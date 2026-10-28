@@ -6,7 +6,6 @@ import { JobsService } from './jobs-service';
 import type { JobHandlingOptions } from './jobs-service';
 import CleanTokensJob from '../members/jobs/clean-tokens-job';
 import CleanExpiredCompedJob from '../members/jobs/clean-expired-comped-job';
-import { CleanGiftsJob, SendGiftRemindersJob, type GiftService } from '#domains/payments';
 import ExternalMediaInliner from '../media-inliner/external-media-inliner';
 import ExternalMediaInlinerJob from '../media-inliner/external-media-inliner-job';
 import ContentCSVImportJob from '../content-import/jobs/content-csv-import-job';
@@ -48,7 +47,6 @@ interface RegisterJobHandlersDependencies {
     cleanTokens(): Promise<number>;
     cleanExpiredComped(): Promise<unknown>;
   };
-  giftService: Pick<GiftService, 'cleanup' | 'processReminders'>;
   mediaInliner: ExternalMediaInliner;
   mentionsController: MentionController;
   mentionsSendingService: MentionSendingService;
@@ -70,7 +68,6 @@ export default function registerJobHandlers({
   automations,
   newsletters,
   memberJobs,
-  giftService,
   mediaInliner,
   mentionsController,
   mentionsSendingService,
@@ -100,14 +97,6 @@ export default function registerJobHandlers({
 
   jobsService.handle(CleanExpiredCompedJob, async () => {
     await memberJobs.cleanExpiredComped();
-  });
-
-  jobsService.handle(CleanGiftsJob, async () => {
-    await giftService.cleanup();
-  });
-
-  jobsService.handle(SendGiftRemindersJob, async () => {
-    await giftService.processReminders();
   });
 
   jobsService.handle(ExternalMediaInlinerJob, async (job) => {

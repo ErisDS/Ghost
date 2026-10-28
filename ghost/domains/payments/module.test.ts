@@ -3,7 +3,7 @@ import sinon from 'sinon';
 
 const { IncorrectUsageError } = require('@tryghost/errors');
 const models = require('../../core/server/models');
-const DOMAIN_PATH = require.resolve('./domain');
+const MODULE_PATH = require.resolve('./module');
 const DONATIONS_PATH = require.resolve('./donations');
 const GIFTS_PATH = require.resolve('./gifts');
 
@@ -20,7 +20,7 @@ describe('payments domain wiring', function () {
   const previous: Record<string, NodeJS.Module | undefined> = {};
 
   beforeEach(function () {
-    for (const key of [DOMAIN_PATH, DONATIONS_PATH, GIFTS_PATH]) {
+    for (const key of [MODULE_PATH, DONATIONS_PATH, GIFTS_PATH]) {
       previous[key] = require.cache[key];
       delete require.cache[key];
     }
@@ -28,7 +28,7 @@ describe('payments domain wiring', function () {
 
   afterEach(function () {
     sandbox.restore();
-    for (const key of [DOMAIN_PATH, DONATIONS_PATH, GIFTS_PATH]) {
+    for (const key of [MODULE_PATH, DONATIONS_PATH, GIFTS_PATH]) {
       delete require.cache[key];
       if (previous[key]) {
         require.cache[key] = previous[key];
@@ -37,7 +37,7 @@ describe('payments domain wiring', function () {
   });
 
   it('registers both capabilities and exposes them through index.ts', async function () {
-    const payments = require(DOMAIN_PATH).default;
+    const payments = require(MODULE_PATH).default;
     const { donations } = require('./index');
     const add = sandbox.stub(models.DonationPaymentEvent, 'add').resolves({});
 
@@ -76,7 +76,7 @@ describe('payments domain wiring', function () {
   });
 
   it('refuses to boot before register() has completed', async function () {
-    const payments = require(DOMAIN_PATH).default;
+    const payments = require(MODULE_PATH).default;
     await assert.rejects(payments.boot({ jobsService: {} }), IncorrectUsageError);
   });
 });

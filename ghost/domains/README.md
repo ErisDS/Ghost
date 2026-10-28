@@ -11,7 +11,7 @@ any number of capability folders:
 
 | File         | Role                                                                                                                                                                             |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `domain.ts`  | Wiring root. Default-exports a `Module` from the kernel. `register()` constructs the domain's services from injected dependencies; `boot()` subscribes events and schedules jobs. |
+| `module.ts`  | The domain's kernel `Module`. `register()` constructs the domain's services from injected dependencies and binds listeners; `jobs()` declares job handlers; `boot()` starts background activity. |
 | `index.ts`   | Public surface. The only file other domains, boot and the HTTP boundary may import, as `#domains/<name>`.                                                                        |
 | `CONTEXT.md` | The bounded context and its language, as the gifts and email services carry today.                                                                                               |
 
@@ -31,12 +31,12 @@ Enforced by dependency-cruiser (`.dependency-cruiser.cjs`, rules prefixed
 - **Implementation** files import only their own domain, `core/kernel`,
   type-only imports, another domain's `index.ts`, and the explicit library
   allowlist shared with migrated services. Application dependencies (models,
-  settings, config, other services) are wired in `domain.ts` and injected.
-- **`domain.ts`** may import legacy application code only from its named
+  settings, config, other services) are wired in `module.ts` and injected.
+- **`module.ts`** may import legacy application code only from its named
   allowlist in `domainLegacyAllowlist`. The list is per domain, reviewed on
   every addition, and only shrinks per entry.
 - **Everything outside `ghost/domains`** imports a domain only via `index.ts`
-  (consumers) or `domain.ts` (boot).
+  (consumers) or `module.ts` (boot).
 - **Domains cross** into each other only via `index.ts`.
 
 ## What we learned
@@ -47,11 +47,11 @@ that needed them, not before.
 ### Donations into payments (first move)
 
 - **`defineService` needed one change**: `init()` now forwards an argument to
-  the `create` callback, so a domain's `domain.ts` can supply dependencies to a
+  the `create` callback, so a domain's `module.ts` can supply dependencies to a
   root that imports no application code. Before, the root's `index.ts` was the
   wiring and required `models` itself.
-- **The service root lives in the capability folder, not in `domain.ts`.**
-  `domain.ts` must call `init()` and `index.ts` must expose `.service`; neither may
+- **The service root lives in the capability folder, not in `module.ts`.**
+  `module.ts` must call `init()` and `index.ts` must expose `.service`; neither may
   import the other, so the root object has to sit in a third file both can
   reach. `donations/index.ts` is that file.
 - **`index.ts` narrows the type, not the object.** It exposes the root as
@@ -82,7 +82,7 @@ that needed them, not before.
   node10 resolution ignores `imports`; tsx applies the same `paths` under
   vitest. Node requires the `#` prefix, so `@domains/...` is not available
   without a package per domain. The entries are explicit, one per file
-  (`#domains/payments`, `#domains/payments/domain`, `#domains/payments/schema`),
+  (`#domains/payments`, `#domains/payments/module`, `#domains/payments/schema`),
   not a wildcard: a deep import such as `#domains/payments/gifts/gift-service`
   then fails to resolve at all, so the resolver enforces the surface before
   dependency-cruiser does. `lint:domains` keeps the entries in step with the
@@ -111,13 +111,14 @@ that needed them, not before.
   boot skips the background phase under test and the admin flush endpoints
   dispatch those events in e2e tests. `boot()` starts activity only: delivery
   recovery and the two recurring jobs. The kernel doc now says so.
-- **Job handlers stayed central.** The jobs service clears its handlers on every
-  in-process boot and `register()` runs once per process, so a handler bound in
-  `register()` would be lost on the test harness's second boot. The central
-  `register-job-handlers.ts` keeps the two gift handlers, importing the job
-  classes and the service handle from `index.ts`. A per-boot binding hook is the
-  missing kernel piece; until it exists the job registry is the one registry a
-  domain still writes into from outside.
+- **Job handlers are declared, and boot binds them every boot.** The jobs
+  service clears its handlers on every in-process boot and `register()` runs
+  once per process, so a handler bound in `register()` would be lost on the
+  test harness's second boot. The first cut left the two gift handlers in the
+  central `register-job-handlers.ts`. The kernel `Module` now has `jobs()`,
+  a declaration boot reads on each boot and binds before the jobs service
+  starts, so the handlers live in `module.ts` and the central registry no
+  longer knows about gifts.
 - **Controllers are built in `index.ts`, lazily.** Express apps are assembled
   before services register, and the API registry's lazy getters are read at
   mount time. So `index.ts` constructs the api-framework controllers at load with
@@ -144,7 +145,7 @@ that needed them, not before.
   (`luxon`, `handlebars`, `node:fs`, `node:path`, mongo-utils, color-utils) and
   three Ghost helpers (`case-keys`, `mailgun-message-id`, the signed flush
   scheduler class) joined the shared allowlist as kernel-tier candidates.
-- **`domain.ts` legacy allowlist grew from one entry to ten.** Six are future
+- **`module.ts` legacy allowlist grew from one entry to ten.** Six are future
   domains (members, tiers, staff, stripe, settings helpers, i18n), the rest are
   `lib/` and `shared/` singletons. Each becomes an `index.ts` import or an
   injected kernel instance as its owner appears.
@@ -163,7 +164,7 @@ that needed them, not before.
 - **Tests that reached into the root changed shape.** Integration tests that
   read `gifts.service` and `gifts.deliveryService` now read the `index.ts`
   handles; one that called `init()` with no options to "ensure booted" simply
-  dropped the call. The boot unit tests stub `#domains/payments/domain` and
+  dropped the call. The boot unit tests stub `#domains/payments/module` and
   `#domains/payments` instead of five service paths.
 
 ### Naming the surface `index.ts`
@@ -173,4 +174,13 @@ Admin. On the server that collides with what "API" means in Ghost (the HTTP
 Admin and Content APIs), "interface" is a language keyword and "public" is
 too broad. `index.ts` is Node's own convention for a folder's entry point,
 reads as `#domains/payments`, and nothing else in a domain competes for the
-name since the wiring root is `domain.ts`. Admin keeps `api.ts` for now.
+name since the wiring root is `module.ts`. Admin keeps `api.ts` for now.
+
+### Naming the wiring root `module.ts`
+
+The Notion structure page added shared modules (`ghost/shared/<name>/`): Ghost-
+specific machinery used across domains, composed with the same kernel
+`Module`. Their wiring root cannot sensibly be called `domain.ts`, and the
+file's job is identical in both places, so it is `module.ts` everywhere. The
+checker, the boundary rules and the `#domains/<name>/module` specifier all
+moved with it.

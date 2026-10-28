@@ -1,9 +1,11 @@
 import type { SchedulerAdapter } from '@tryghost/adapter-base-scheduling';
 import type { JobsService } from '../../core/server/services/jobs-service/jobs-service';
 import type { InternalKeys } from '../../core/server/services/internal-keys';
-import { defineModule } from '../../core/kernel/module';
+import { declareJobHandler, defineModule } from '../../core/kernel/module';
 import { donations } from './donations';
 import { gifts } from './gifts';
+import CleanGiftsJob from './gifts/jobs/clean-gifts-job';
+import SendGiftRemindersJob from './gifts/jobs/send-gift-reminders-job';
 
 /** What boot owns and the domain cannot construct for itself. */
 export interface PaymentsRegisterContext {
@@ -17,7 +19,7 @@ export interface PaymentsBootContext {
 }
 
 /**
- * Wiring root for the payments domain. This is the only file in the domain
+ * Wiring root for the payments domain (its kernel Module). This is the only file in the domain
  * allowed to import application code outside it (legacy registries, other
  * domains' index.ts). Everything it reaches for is passed into the domain's
  * services as a dependency, so the implementation stays importable in tests.
@@ -87,6 +89,17 @@ export default defineModule<PaymentsRegisterContext, PaymentsBootContext>({
     // dispatch these events and must work in environments where boot() never
     // runs (tests skip the background phase).
     gifts.service.subscribeEvents();
+  },
+
+  jobs() {
+    return [
+      declareJobHandler(CleanGiftsJob, async () => {
+        await gifts.service.giftService.cleanup();
+      }),
+      declareJobHandler(SendGiftRemindersJob, async () => {
+        await gifts.service.giftService.processReminders();
+      }),
+    ];
   },
 
   async boot({ jobsService }) {

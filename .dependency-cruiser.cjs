@@ -21,16 +21,16 @@ const serviceImplementations = {
   pathNot: `^${servicesRoot}/[^/]+/index\\.${auditServices ? '(?:js|ts)' : 'ts'}$`,
 };
 
-// Domains: one directory per bounded context under ghost/domains. domain.ts is
+// Domains: one directory per bounded context under ghost/domains. module.ts is
 // the wiring root (the only file that may reach into legacy application code),
 // index.ts the only surface other code may import. Everything else is
 // implementation and follows the same dependency rule as migrated services.
 const domainsRoot = 'ghost/domains';
 const domainImplementation = {
   path: `^${domainsRoot}/([^/]+)/`,
-  pathNot: [`^${domainsRoot}/[^/]+/domain\\.ts$`, '\\.test\\.(js|ts)$'],
+  pathNot: [`^${domainsRoot}/[^/]+/module\\.ts$`, '\\.test\\.(js|ts)$'],
 };
-// Legacy application code each domain's domain.ts may still wire by hand.
+// Legacy application code each domain's module.ts may still wire by hand.
 // Per domain, named individually, and expected to shrink per entry; it grows
 // only when a new root moves into the domain and each addition is reviewed.
 const domainLegacyAllowlist = {
@@ -116,7 +116,7 @@ module.exports = {
     // ============================================================
     ...Object.entries(domainImplementationDebt).map(([domain, debt]) => ({
       name: `domain-dependencies-${domain}`,
-      comment: `${domain} implementation may import only its own domain, the kernel, type-only imports, the library allowlist and its listed debt. Application dependencies are wired in domain.ts and injected.`,
+      comment: `${domain} implementation may import only its own domain, the kernel, type-only imports, the library allowlist and its listed debt. Application dependencies are wired in module.ts and injected.`,
       severity: 'error',
       from: {
         path: `^${domainsRoot}/${domain}/`,
@@ -136,7 +136,7 @@ module.exports = {
     {
       name: 'domain-dependencies',
       comment:
-        'Domain implementation may import only its own domain, the kernel, type-only imports and the explicit library allowlist. Application dependencies are wired in domain.ts and injected.',
+        'Domain implementation may import only its own domain, the kernel, type-only imports and the explicit library allowlist. Application dependencies are wired in module.ts and injected.',
       severity: 'error',
       from: {
         path: `^${domainsRoot}/(?!(?:${Object.keys(domainImplementationDebt).join('|')})/)([^/]+)/`,
@@ -159,7 +159,7 @@ module.exports = {
       severity: 'error',
       from: domainImplementation,
       to: {
-        path: `^${domainsRoot}/$1/domain\\.ts$`,
+        path: `^${domainsRoot}/$1/module\\.ts$`,
         dependencyTypesNot: ['type-only', 'type-import'],
       },
     },
@@ -171,13 +171,13 @@ module.exports = {
       to: { couldNotResolve: true, dependencyTypesNot: ['type-only', 'type-import'] },
     },
     // ============================================================
-    // ghost/domains — domain.ts may wire legacy code only from its allowlist
+    // ghost/domains — module.ts may wire legacy code only from its allowlist
     // ============================================================
     ...Object.entries(domainLegacyAllowlist).map(([domain, allowed]) => ({
       name: `domain-wiring-${domain}`,
-      comment: `${domain}/domain.ts may import legacy application code only from its allowlist in .dependency-cruiser.cjs.`,
+      comment: `${domain}/module.ts may import legacy application code only from its allowlist in .dependency-cruiser.cjs.`,
       severity: 'error',
-      from: { path: `^${domainsRoot}/${domain}/domain\\.ts$` },
+      from: { path: `^${domainsRoot}/${domain}/module\\.ts$` },
       to: {
         path: '^ghost/core/',
         pathNot: ['^ghost/core/kernel/', ...allowed],
@@ -187,10 +187,10 @@ module.exports = {
     {
       name: 'domain-wiring-unlisted',
       comment:
-        'A domain without an entry in domainLegacyAllowlist may not import legacy application code from domain.ts. Add the domain and its allowlist.',
+        'A domain without an entry in domainLegacyAllowlist may not import legacy application code from module.ts. Add the domain and its allowlist.',
       severity: 'error',
       from: {
-        path: `^${domainsRoot}/(?!(?:${Object.keys(domainLegacyAllowlist).join('|')})/)[^/]+/domain\\.ts$`,
+        path: `^${domainsRoot}/(?!(?:${Object.keys(domainLegacyAllowlist).join('|')})/)[^/]+/module\\.ts$`,
       },
       to: {
         path: '^ghost/core/',
@@ -199,17 +199,17 @@ module.exports = {
       },
     },
     // ============================================================
-    // ghost/domains — the rest of the application sees index.ts, domain.ts and the fragments only
+    // ghost/domains — the rest of the application sees index.ts, module.ts and the fragments only
     // ============================================================
     {
       name: 'domains-public-surface-only',
       comment:
-        'Code outside ghost/domains may import a domain only through its index.ts (consumers), domain.ts (boot) or a fragment the central registries aggregate.',
+        'Code outside ghost/domains may import a domain only through its index.ts (consumers), module.ts (boot) or a fragment the central registries aggregate.',
       severity: 'error',
       from: { path: `^(?!${domainsRoot}/)` },
       to: {
         path: `^${domainsRoot}/[^/]+/`,
-        pathNot: [`^${domainsRoot}/[^/]+/(index|domain|schema|permissions|settings)\\.ts$`],
+        pathNot: [`^${domainsRoot}/[^/]+/(index|module|schema|permissions|settings)\\.ts$`],
       },
     },
     {

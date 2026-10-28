@@ -235,7 +235,7 @@ existing JavaScript module.
 
 Donations has moved out of this directory into the payments domain
 (`ghost/domains/payments/`), the first root to do so. Its `defineService` root
-is now wired by the domain's `domain.ts` and exposed through `index.ts`; see
+is now wired by the domain's `module.ts` and exposed through `index.ts`; see
 [`ghost/domains/README.md`](../../../domains/README.md).
 
 ## Migrated root contract

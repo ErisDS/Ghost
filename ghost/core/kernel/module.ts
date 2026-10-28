@@ -22,6 +22,13 @@ export interface ModuleDefinition<RegisterContext = void, BootContext = void> {
   register(context: RegisterContext): void | Promise<void>;
   boot(context: BootContext): void | Promise<void>;
   shutdown?(): void | Promise<void>;
+  /**
+   * Job handlers the module contributes. Boot binds them to the jobs service
+   * on every boot, after register(), so they survive the jobs service clearing
+   * its handlers on an in-process restart. Handlers reach the module's
+   * instances lazily; nothing here runs until a job is processed.
+   */
+  jobs?(): readonly JobHandlerDeclaration[];
 }
 
 export interface Module<RegisterContext = void, BootContext = void> {
@@ -29,6 +36,29 @@ export interface Module<RegisterContext = void, BootContext = void> {
   readonly register: (context: RegisterContext) => Promise<void>;
   readonly boot: (context: BootContext) => Promise<void>;
   readonly shutdown: () => Promise<void>;
+  readonly jobs: () => readonly JobHandlerDeclaration[];
+}
+
+/** A job class with the static type name the jobs service keys handlers by. */
+export interface JobClass<Job = unknown> {
+  readonly type: string;
+  new (...args: never[]): Job;
+}
+
+export interface JobHandlerDeclaration {
+  readonly job: JobClass;
+  // Contravariant parameter: any handler for a specific job is assignable.
+  readonly handle: (job: never) => void | Promise<void>;
+  readonly options?: Readonly<Record<string, unknown>>;
+}
+
+/** Builds one typed job handler declaration for a module's jobs() list. */
+export function declareJobHandler<Job>(
+  job: JobClass<Job>,
+  handle: (job: Job) => void | Promise<void>,
+  options?: Readonly<Record<string, unknown>>,
+): JobHandlerDeclaration {
+  return options === undefined ? { job, handle } : { job, handle, options };
 }
 
 /**
@@ -82,6 +112,9 @@ export function defineModule<RegisterContext = void, BootContext = void>(
     },
     async shutdown(): Promise<void> {
       await definition.shutdown?.();
+    },
+    jobs(): readonly JobHandlerDeclaration[] {
+      return definition.jobs?.() ?? [];
     },
   };
 }

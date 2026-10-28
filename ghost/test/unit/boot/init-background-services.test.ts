@@ -26,7 +26,7 @@ function createBackgroundHarness(environment = 'production') {
       './server/services/email-analytics/jobs': emailAnalyticsJobs,
       './server/services/themes': themes,
       './server/services/email-service': { service: { resumeInterruptedSends: recovery } },
-      '#domains/payments/domain': { default: { boot: paymentsBoot } },
+      '#domains/payments/module': { default: { boot: paymentsBoot } },
       './server/services/members/jobs': {
         scheduleTokenCleanupJob: async () => {},
         scheduleExpiredCompCleanupJob: async () => {},

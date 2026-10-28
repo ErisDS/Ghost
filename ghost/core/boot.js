@@ -374,7 +374,7 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
   const slackNotifications = require('./server/services/slack-notifications');
   const mediaInliner = require('./server/services/media-inliner');
   const contentImport = require('./server/services/content-import');
-  const payments = require('#domains/payments/domain').default;
+  const payments = require('#domains/payments/module').default;
   const paymentsApi = require('#domains/payments');
   const machinePaymentsService = require('./server/services/machine-payments');
   const recommendationsService = require('./server/services/recommendations');
@@ -468,7 +468,6 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
     newsletters: emailAnalytics.getNewsletters(),
     jobsService,
     memberJobs,
-    giftService: paymentsApi.giftService.service,
     mediaInliner: mediaInliner.getInstance(),
     mentionsController: mentionsService.controller,
     mentionsSendingService: mentionsService.sendingService,
@@ -477,6 +476,13 @@ async function initServices({ ghostServer, config, prometheusClient, jobsService
     siteImporter,
     tinybirdSync,
   });
+  // Modules declare their handlers; boot binds them on every boot so they
+  // survive the jobs service clearing handlers on an in-process restart.
+  for (const module of [payments]) {
+    for (const { job, handle, options } of module.jobs()) {
+      jobsService.handle(job, handle, options);
+    }
+  }
   await jobsService.start();
   debug('End: Register job handlers');
 
@@ -533,7 +539,7 @@ async function initBackgroundServices({ config }) {
   // the recurring gift jobs. Runs before activitypub.init for the same reason as
   // the send recovery above. The domain guards each step itself.
   try {
-    const payments = require('#domains/payments/domain').default;
+    const payments = require('#domains/payments/module').default;
     await payments.boot({ jobsService });
   } catch (err) {
     const logging = require('@tryghost/logging');

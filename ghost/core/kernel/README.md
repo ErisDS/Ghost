@@ -124,9 +124,12 @@ one attempt shared by concurrent callers, a retry after failure, and an error
 when `boot()` is called before `register()` has completed. It does not order
 modules; boot owns the order, as it owns the order of service `init()` calls.
 
-Known gap: the jobs service clears its handlers on every in-process boot while
-`register()` runs once per process, so job handlers are still bound centrally.
-A per-boot binding hook is the next kernel addition this needs.
+Job handlers are a declaration, not a phase: `jobs()` returns the module's
+`JobHandlerDeclaration`s (built with `declareJobHandler(JobClass, handle,
+options?)`) and boot binds them to the jobs service on every boot, after
+`register()`. That is what lets handlers live with their module while the jobs
+service clears its registry on an in-process restart. Handlers reach the
+module's instances lazily, so declaring one runs nothing.
 
-A domain's `domain.ts` default-exports one `Module`. See
+A domain's `module.ts` default-exports one `Module`. See
 [`ghost/domains/README.md`](../../domains/README.md).

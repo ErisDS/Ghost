@@ -38,10 +38,6 @@ export { GIFT_DELIVERY_EMAIL_TAG } from './gifts/constants';
 export { StartGiftDeliveryFlushEvent } from './gifts/events/start-gift-delivery-flush-event';
 export { SendGiftDeliveryEvent } from './gifts/events/send-gift-delivery-event';
 export const StartGiftReminderFlushEvent = require('./gifts/events/start-gift-reminder-flush-event');
-// Job classes stay registered centrally for now: the jobs service clears its
-// handlers on every in-process boot, and register() runs once per process.
-export { default as CleanGiftsJob } from './gifts/jobs/clean-gifts-job';
-export { default as SendGiftRemindersJob } from './gifts/jobs/send-gift-reminders-job';
 
 /**
  * HTTP contributions. Controllers are built here, not at register(), so the

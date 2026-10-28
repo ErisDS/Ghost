@@ -10,7 +10,7 @@ export interface DonationsDependencies {
 }
 
 /**
- * One ready donation repository per process. The domain's wiring root calls
+ * One ready donation repository per process. The domain's module.ts calls
  * init() with the Bookshelf model; nothing in this folder imports application
  * code, so the implementation can be constructed in a test with a fake model.
  */

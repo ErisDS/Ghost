@@ -41,7 +41,7 @@
     "resolveJsonModule": true /* Enable importing .json files. */,
     "paths": {
       "#domains/payments": ["./domains/payments/index.ts"],
-      "#domains/payments/domain": ["./domains/payments/domain.ts"],
+      "#domains/payments/module": ["./domains/payments/module.ts"],
       "#domains/payments/schema": ["./domains/payments/schema.ts"],
       "#domains/payments/permissions": ["./domains/payments/permissions.ts"]
     } /* Mirrors the package.json "imports" field entry for entry; node10 resolution does not read it. */,

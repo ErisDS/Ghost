@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 // Shape check for ghost/domains. Version zero: every domain has index.ts,
-// domain.ts and CONTEXT.md, domain.ts default-exports a defineModule call whose
+// module.ts and CONTEXT.md, module.ts default-exports a defineModule call whose
 // name matches the directory, nothing unexpected sits at the domain root, and
 // ghost/package.json "imports" plus tsconfig "paths" list exactly the domain's
-// importable files (index, domain, fragments) so a deep import fails to resolve.
+// importable files (index, module, fragments) so a deep import fails to resolve.
 // Dependency rules live in .dependency-cruiser.cjs, not here.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const domainsRoot = path.join(root, 'ghost/domains');
-const REQUIRED = ['index.ts', 'domain.ts', 'CONTEXT.md'];
+const REQUIRED = ['index.ts', 'module.ts', 'CONTEXT.md'];
 const FRAGMENTS = ['settings.ts', 'permissions.ts', 'schema.ts'];
 const OPTIONAL_FILES = ['README.md', ...FRAGMENTS];
 const TEST_FILE = /\.test\.(js|ts)$/;
@@ -22,7 +22,7 @@ function readJson(file) {
 
 // The names a domain may be imported by, and the file each resolves to.
 function expectedSpecifiers(name, domain) {
-  const entries = { [`#domains/${name}`]: 'index.ts', [`#domains/${name}/domain`]: 'domain.ts' };
+  const entries = { [`#domains/${name}`]: 'index.ts', [`#domains/${name}/module`]: 'module.ts' };
   for (const fragment of FRAGMENTS) {
     if (existsSync(path.join(domain, fragment))) {
       entries[`#domains/${name}/${fragment.replace(/\.ts$/, '')}`] = fragment;
@@ -78,20 +78,20 @@ export function checkDomains(dir = domainsRoot) {
         problems.push(`${name}: tsconfig.json "paths" must map ${specifier} to ${relative}`);
       }
     }
-    const wiring = path.join(domain, 'domain.ts');
+    const wiring = path.join(domain, 'module.ts');
     if (existsSync(wiring)) {
       const source = readFileSync(wiring, 'utf8');
       const match = source.match(/export default defineModule(?:<[^>]*>)?\(\{\s*name:\s*'([^']+)'/);
       if (!match) {
-        problems.push(`${name}: domain.ts must default-export defineModule({ name: '${name}', ... })`);
+        problems.push(`${name}: module.ts must default-export defineModule({ name: '${name}', ... })`);
       } else if (match[1] !== name) {
-        problems.push(`${name}: domain.ts declares module name '${match[1]}'`);
+        problems.push(`${name}: module.ts declares module name '${match[1]}'`);
       }
     }
   }
   for (const specifier of [...Object.keys(imports), ...Object.keys(paths)]) {
     if (specifier.startsWith('#domains/') && !seen.has(specifier)) {
-      problems.push(`${specifier}: not a domain surface, wiring root or fragment; remove it from package.json imports / tsconfig paths`);
+      problems.push(`${specifier}: not a domain surface, module file or fragment; remove it from package.json imports / tsconfig paths`);
     }
   }
   return problems;

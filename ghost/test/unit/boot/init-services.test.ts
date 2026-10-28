@@ -37,11 +37,8 @@ function createServicesHarness({ rescheduleOnBoot = true } = {}) {
       './shared/url-utils': { default: { urlFor: () => 'https://example.com/ghost/api/admin' } },
       './shared/settings-cache': { get: () => 'site-id' },
       './server/services/stripe': { init: stripe },
-      '#domains/payments/domain': { default: { register: payments } },
-      '#domains/payments': {
-        giftService: { service: {} },
-        giftDeliveryService: { service: {} },
-      },
+      '#domains/payments/module': { default: { register: payments, jobs: () => [] } },
+      '#domains/payments': { giftDeliveryService: { service: {} } },
       './server/services/mentions': {
         init: mentions,
         controller: {},
